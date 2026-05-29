@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConEd Steam Operations — Attrition Intelligence Platform</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #020617; color: #e2e8f0; min-height: 100vh; }
+
+  /* NAV */
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: #0f172a; border-bottom: 1px solid #1e293b; }
+  .brand-tag { font-size: 10px; font-weight: 800; color: #f97316; letter-spacing: 3px; }
+  .brand-title { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+  .nav-divider { width: 1px; height: 32px; background: #334155; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; }
+  .nav-tab.active { background: #334155; color: #f1f5f9; }
+  .nav-tab.inactive { color: #475569; background: none; cursor: default; }
+  .phase-badge { margin-left: auto; font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; color: #64748b; }
+  .customer-count { font-size: 11px; color: #475569; margin-left: 8px; }
+
+  /* LAYOUT */
+  .body-wrap { display: flex; height: calc(100vh - 53px); }
+  .table-pane { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .detail-pane { width: 380px; flex-shrink: 0; border-left: 1px solid #1e293b; background: #0f172a; overflow-y: auto; }
+
+  /* STATS BAR */
+  .stats-bar { display: flex; align-items: center; gap: 24px; padding: 12px 16px; border-bottom: 1px solid #1e293b; background: #0f172a; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; }
+  .stat-label { font-size: 10px; color: #64748b; margin-top: 1px; }
+  .export-btn { margin-left: auto; padding: 6px 12px; font-size: 11px; border-radius: 6px; border: 1px solid #334155; color: #94a3b8; background: none; cursor: pointer; }
+  .export-btn:hover { background: #1e293b; }
+
+  /* FILTERS */
+  .filters { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #1e293b; background: rgba(15,23,42,0.5); flex-wrap: wrap; align-items: center; }
+  .filters input, .filters select { padding: 6px 10px; font-size: 12px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; outline: none; }
+  .filters input::placeholder { color: #475569; }
+  .filter-count { margin-left: auto; font-size: 11px; color: #475569; }
+
+  /* TABLE */
+  .table-scroll { overflow: auto; flex: 1; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead { position: sticky; top: 0; background: #0f172a; z-index: 5; }
+  th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #1e293b; white-space: nowrap; cursor: pointer; user-select: none; }
+  th:hover { color: #94a3b8; }
+  td { padding: 8px 14px; border-bottom: 1px solid rgba(30,41,59,0.6); }
+  tr { cursor: pointer; transition: background 0.1s; }
+  tr:hover { background: rgba(30,41,59,0.5); }
+  tr.selected { background: rgba(51,65,85,0.5); }
+  tr:nth-child(even) { background: rgba(15,23,42,0.3); }
+  tr.selected:nth-child(even) { background: rgba(51,65,85,0.5); }
+
+  .risk-cell { display: flex; align-items: center; gap: 6px; }
+  .risk-bar { width: 4px; height: 18px; border-radius: 2px; }
+  .risk-pct { font-weight: 700; font-size: 13px; }
+  .tier-chip { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .sig-label { font-size: 11px; font-weight: 600; }
+  .addr-cell { font-weight: 500; color: #f1f5f9; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .type-cell { color: #94a3b8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .num-cell { color: #cbd5e1; }
+  .dob-chip { background: #1e293b; padding: 2px 7px; border-radius: 4px; font-size: 11px; }
+
+  /* DETAIL PANEL */
+  .panel-header { position: sticky; top: 0; background: #0f172a; border-bottom: 1px solid #1e293b; padding: 18px 20px 14px; z-index: 5; }
+  .panel-address { font-size: 14px; font-weight: 700; color: #f1f5f9; line-height: 1.3; }
+  .panel-sub { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+  .panel-close { float: right; background: none; border: none; color: #475569; font-size: 20px; cursor: pointer; margin-left: 8px; line-height: 1; }
+  .panel-close:hover { color: #94a3b8; }
+  .action-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-top: 10px; }
+  .panel-body { padding: 0 20px 32px; }
+  .section-title { font-size: 10px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 1.5px; margin: 20px 0 4px; }
+  .big-score { font-size: 48px; font-weight: 900; line-height: 1; }
+  .score-tier { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+  .score-row { display: flex; align-items: flex-end; gap: 12px; padding: 10px 0; }
+  .signal-box { background: #1e293b; border-radius: 8px; padding: 10px 12px; margin-top: 4px; }
+  .signal-box-label { font-size: 10px; color: #475569; margin-bottom: 6px; letter-spacing: 1px; }
+  .signal-box-row { display: flex; justify-content: space-between; align-items: center; }
+  .peer-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; }
+  .data-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(30,41,59,0.6); }
+  .data-row:last-child { border-bottom: none; }
+  .data-label { font-size: 12px; color: #64748b; flex-shrink: 0; }
+  .data-val { font-size: 12px; font-weight: 600; text-align: right; }
+  .disclaimer { font-size: 10px; color: #334155; margin-top: 10px; line-height: 1.5; }
+
+  /* FORECAST SECTION */
+  .forecast-section { border-top: 1px solid #1e293b; padding: 20px; }
+  .forecast-title { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 12px; }
+  .forecast-bands { position: relative; height: 90px; }
+  .band { position: absolute; border-radius: 4px; opacity: 0.15; }
+  .band-line { position: absolute; height: 2px; border-radius: 2px; }
+  .band-label { font-size: 10px; position: absolute; right: 0; }
+  .forecast-axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: #334155; }
+
+  /* EMPTY STATE */
+  .empty-state { display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; gap: 8px; }
+  .empty-icon { font-size: 32px; opacity: 0.2; }
+  .empty-text { font-size: 13px; color: #334155; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand-tag">CONED</div>
+    <div class="brand-title">Steam Operations — Attrition Intelligence</div>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active">Attrition Rankings</button>
+    <button class="nav-tab inactive">Load Forecast</button>
+    <button class="nav-tab inactive">Watch List</button>
+    <button class="nav-tab inactive">AI Agent</button>
+  </div>
+  <span class="phase-badge">Phase 1 · Decision-Support Ranking</span>
+  <span class="customer-count" id="customer-count">— active steam customers</span>
+</header>
+
+<div class="body-wrap">
+  <div class="table-pane">
+
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num" style="color:#ef4444" id="s-high">—</div><div class="stat-label">High Attrition</div></div>
+      <div class="stat"><div class="stat-num" style="color:#f97316" id="s-med">—</div><div class="stat-label">Med Attrition</div></div>
+      <div class="stat"><div class="stat-num" style="color:#22c55e" id="s-low">—</div><div class="stat-label">Low Attrition</div></div>
+      <div class="stat"><div class="stat-num" style="color:#94a3b8" id="s-total">—</div><div class="stat-label">Total</div></div>
+      <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <div class="filters">
+      <input type="text" id="search" placeholder="Search address…" oninput="renderTable()" style="width:180px" />
+      <select id="tier-filter" onchange="renderTable()">
+        <option>All</option><option>High</option><option>Medium</option><option>Low</option>
+      </select>
+      <select id="type-filter" onchange="renderTable()">
+        <option>All</option>
+        <option>Office</option><option>Multifamily Housing</option><option>Hotel</option>
+        <option>K-12 School</option><option>College/University</option><option>Hospital</option><option>Retail Store</option>
+      </select>
+      <span class="filter-count" id="filter-count"></span>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sort('address')">Address <span id="sort-address"></span></th>
+            <th onclick="sort('use')">Type <span id="sort-use"></span></th>
+            <th onclick="sort('risk')">Attrition Score <span id="sort-risk">↓</span></th>
+            <th onclick="sort('steam')">Steam (M kBtu) <span id="sort-steam"></span></th>
+            <th>Top Signal</th>
+            <th onclick="sort('dob_jobs')">DOB Jobs <span id="sort-dob_jobs"></span></th>
+            <th onclick="sort('deed_date')">Last Sale <span id="sort-deed_date"></span></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div id="empty-msg" style="display:none" class="empty-state">
+        <div class="empty-icon">🏢</div>
+        <div class="empty-text">No buildings match current filters</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-pane" id="detail-pane">
+    <div class="empty-state" style="height:100%">
+      <div class="empty-icon">←</div>
+      <div class="empty-text">Select a building to view details</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Real data from buildingEnrichment + buildings ──────────────────────────
+// Embedded top 50 at risk + sample across tiers for demo purposes
+// Full dataset loads from /buildings.json + /buildingEnrichment.json in production
+
+let buildings = [];
+let sortKey = 'risk';
+let sortDir = 'desc';
+let selectedAddr = null;
+
+async function init() {
+  try {
+    const [bRes, eRes] = await Promise.all([
+      fetch('/buildings.json'),
+      fetch('/buildingEnrichment.json')
+    ]);
+    const bldgs = await bRes.json();
+    const enrich = eRes.ok ? await eRes.json() : {};
+    buildings = bldgs.map(b => ({ ...b, ...(enrich[b.address] ?? {}) }));
+  } catch {
+    // fallback: demo data
+    buildings = DEMO_DATA;
+  }
+  updateStats();
+  renderTable();
+  document.getElementById('customer-count').textContent =
+    buildings.length.toLocaleString() + ' active steam customers';
+}
+
+function riskColor(r) {
+  if (r > 0.7) return '#ef4444';
+  if (r > 0.4) return '#f97316';
+  return '#22c55e';
+}
+function riskTier(r) {
+  if (!isFinite(r)) return { label:'Unknown', color:'#64748b', bg:'#1e293b' };
+  if (r > 0.7) return { label:'High',   color:'#ef4444', bg:'rgba(239,68,68,0.1)' };
+  if (r > 0.4) return { label:'Medium', color:'#f97316', bg:'rgba(249,115,22,0.1)' };
+  return              { label:'Low',    color:'#22c55e', bg:'rgba(34,197,94,0.1)' };
+}
+function signalMeta(s) {
+  if (s === 'big_drop') return { label:'⚠ Big Drop',  color:'#00d4dc' };
+  if (s === 'mod_drop') return { label:'↓ Mod Drop',  color:'#ffa500' };
+  return                       { label:'—',            color:'#475569' };
+}
+function action(risk, signal) {
+  if (!isFinite(risk)) return { label:'Insufficient Data', color:'#64748b', bg:'rgba(100,116,139,0.15)' };
+  if (risk > 0.7 || signal === 'big_drop') return { label:'Outreach Now', color:'#ef4444', bg:'rgba(239,68,68,0.15)' };
+  if (risk > 0.5 || signal === 'mod_drop') return { label:'Monitor',      color:'#f97316', bg:'rgba(249,115,22,0.15)' };
+  return { label:'Low Priority', color:'#64748b', bg:'rgba(100,116,139,0.15)' };
+}
+
+function updateStats() {
+  const high = buildings.filter(b => isFinite(b.risk) && b.risk > 0.7).length;
+  const med  = buildings.filter(b => isFinite(b.risk) && b.risk > 0.4 && b.risk <= 0.7).length;
+  const low  = buildings.filter(b => isFinite(b.risk) && b.risk <= 0.4).length;
+  document.getElementById('s-high').textContent  = high.toLocaleString();
+  document.getElementById('s-med').textContent   = med.toLocaleString();
+  document.getElementById('s-low').textContent   = low.toLocaleString();
+  document.getElementById('s-total').textContent = buildings.length.toLocaleString();
+}
+
+function filtered() {
+  const q    = document.getElementById('search').value.trim().toLowerCase();
+  const tier = document.getElementById('tier-filter').value;
+  const type = document.getElementById('type-filter').value;
+  let rows = buildings;
+  if (q)    rows = rows.filter(b => b.address?.toLowerCase().includes(q));
+  if (tier !== 'All') rows = rows.filter(b => riskTier(b.risk).label === tier);
+  if (type !== 'All') rows = rows.filter(b => b.use?.includes(type));
+  return [...rows].sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    const al = typeof av === 'string' ? av.toLowerCase() : av;
+    const bl = typeof bv === 'string' ? bv.toLowerCase() : bv;
+    if (al < bl) return sortDir === 'asc' ? -1 : 1;
+    if (al > bl) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function renderTable() {
+  const rows = filtered();
+  document.getElementById('filter-count').textContent = rows.length.toLocaleString() + ' buildings';
+  const tbody = document.getElementById('table-body');
+  if (!rows.length) {
+    tbody.innerHTML = '';
+    document.getElementById('empty-msg').style.display = 'flex';
+    return;
+  }
+  document.getElementById('empty-msg').style.display = 'none';
+  tbody.innerHTML = rows.map(b => {
+    const tier = riskTier(b.risk);
+    const sig  = signalMeta(b.signal);
+    const sel  = b.address === selectedAddr;
+    const riskPct = isFinite(b.risk) ? Math.round(b.risk * 100) + '%' : '—';
+    const steam = b.steam != null ? (b.steam / 1e6).toFixed(1) : '—';
+    return `<tr class="${sel ? 'selected' : ''}" onclick="selectBuilding('${esc(b.address)}')">
+      <td class="addr-cell">${esc(b.address)}</td>
+      <td class="type-cell">${esc(b.use ?? '—')}</td>
+      <td>
+        <div class="risk-cell">
+          <div class="risk-bar" style="background:${tier.color}"></div>
+          <span class="risk-pct" style="color:${tier.color}">${riskPct}</span>
+          <span class="tier-chip" style="color:${tier.color};background:${tier.bg}">${tier.label}</span>
+        </div>
+      </td>
+      <td class="num-cell">${steam}</td>
+      <td><span class="sig-label" style="color:${sig.color}">${sig.label}${b.hdd_pct != null ? `<span style="color:#64748b;font-weight:400"> ${b.hdd_pct > 0 ? '+' : ''}${b.hdd_pct}%</span>` : ''}</span></td>
+      <td>${b.dob_jobs ? `<span class="dob-chip" style="color:${b.dob_jobs >= 3 ? '#f87171' : '#fb923c'}">${b.dob_jobs}</span>` : '<span style="color:#334155">—</span>'}</td>
+      <td style="color:#94a3b8">${b.deed_date ? b.deed_date.slice(0, 10) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sort(key) {
+  ['address','use','risk','steam','dob_jobs','deed_date'].forEach(k => {
+    document.getElementById('sort-' + k).textContent = '';
+  });
+  if (sortKey === key) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey = key;
+    sortDir = key === 'risk' || key === 'steam' || key === 'dob_jobs' ? 'desc' : 'asc';
+  }
+  document.getElementById('sort-' + key).textContent = sortDir === 'asc' ? ' ↑' : ' ↓';
+  renderTable();
+}
+
+function selectBuilding(addr) {
+  selectedAddr = selectedAddr === addr ? null : addr;
+  renderTable();
+  const b = buildings.find(x => x.address === addr);
+  if (!selectedAddr || !b) {
+    document.getElementById('detail-pane').innerHTML = `
+      <div class="empty-state" style="height:100%">
+        <div class="empty-icon">←</div>
+        <div class="empty-text">Select a building to view details</div>
+      </div>`;
+    return;
+  }
+  renderPanel(b);
+}
+
+const EUI_MEDIANS = { Office:27.5, 'Multifamily Housing':46.4, Hotel:40.0, 'K-12 School':32.0, 'College/University':35.0, 'Hospital (General Medical & Surgical)':60.0 };
+
+function renderPanel(b) {
+  const tier  = riskTier(b.risk);
+  const sig   = signalMeta(b.signal);
+  const act   = action(b.risk, b.signal);
+  const riskPct = isFinite(b.risk) ? Math.round(b.risk * 100) + '%' : '—';
+  const euiMed  = EUI_MEDIANS[b.use] ?? 27.5;
+  const euiDelta = b.eui != null ? Math.round(((b.eui - euiMed) / euiMed) * 100) : null;
+
+  const dataRow = (label, value, color='#e2e8f0', note='') =>
+    value ? `<div class="data-row"><span class="data-label">${label}</span><span class="data-val" style="color:${color}">${value}${note ? `<span style="display:block;font-size:10px;font-weight:400;color:#64748b">${note}</span>` : ''}</span></div>` : '';
+
+  document.getElementById('detail-pane').innerHTML = `
+    <div class="panel-header">
+      <div>
+        <button class="panel-close" onclick="selectBuilding('${esc(b.address)}')">×</button>
+        <div class="panel-address">${esc(b.address)}</div>
+        <div class="panel-sub">${esc(b.use ?? 'Unknown type')} · Built ${b.yr ?? '—'}</div>
+      </div>
+      <div><span class="action-badge" style="color:${act.color};background:${act.bg};border:1px solid ${act.color}40">${act.label}</span></div>
+    </div>
+    <div class="panel-body">
+
+      <div class="section-title">Attrition Risk</div>
+      <div class="score-row">
+        <span class="big-score" style="color:${tier.color}">${riskPct}</span>
+        <div style="margin-bottom:6px">
+          <span class="score-tier" style="color:${tier.color};background:${tier.bg}">${tier.label} Risk</span>
+        </div>
+      </div>
+
+      ${b.signal ? `
+      <div class="signal-box">
+        <div class="signal-box-label">TOP SIGNAL</div>
+        <div class="signal-box-row">
+          <span style="font-size:13px;font-weight:700;color:${sig.color}">${sig.label}</span>
+          ${b.hdd_pct != null ? `<span style="font-size:12px;font-weight:600;color:#cbd5e1">${b.hdd_pct > 0 ? '+' : ''}${b.hdd_pct}% YoY (HDD-normalized)</span>` : ''}
+        </div>
+      </div>` : ''}
+
+      ${isFinite(b.peer_score) && b.peer_score > 0 ? `
+      <div class="peer-row">
+        <span style="color:#64748b">Peer Attrition Zone</span>
+        <span style="font-weight:600;color:${b.peer_score >= 0.6 ? '#f87171' : b.peer_score >= 0.3 ? '#fb923c' : '#94a3b8'}">${Math.round(b.peer_score * 100)}% cluster density</span>
+      </div>` : ''}
+
+      ${isFinite(b.portfolio_score) && b.portfolio_score > 0 ? `
+      <div class="peer-row">
+        <span style="color:#64748b">Owner Portfolio</span>
+        <span style="font-weight:600;color:${b.portfolio_score >= 0.75 ? '#f87171' : b.portfolio_score >= 0.4 ? '#fb923c' : '#facc15'}">${Math.round(b.portfolio_score * 100)}% already converted</span>
+      </div>` : ''}
+
+      <p class="disclaimer">Phase 1 decision-support ranking · Public signal model · Not a validated production classifier</p>
+
+      <div class="section-title">Energy & Demand</div>
+      ${dataRow('Steam Demand', b.steam != null ? `${(b.steam/1e6).toLocaleString(undefined,{maximumFractionDigits:1})} M kBtu` : null)}
+      ${dataRow('Steam EUI', b.eui != null ? `${b.eui} kBtu/ft²` : null,
+          euiDelta != null ? (euiDelta > 20 ? '#f97316' : euiDelta < -20 ? '#22c55e' : '#94a3b8') : '#e2e8f0',
+          euiDelta != null ? `${euiDelta > 0 ? '+' : ''}${euiDelta}% vs type median (${euiMed})` : '')}
+      ${dataRow('Energy Star', b.energy_star != null ? `${b.energy_star} / 100` : null,
+          b.energy_star != null ? (b.energy_star >= 75 ? '#22c55e' : b.energy_star >= 50 ? '#eab308' : '#ef4444') : '#e2e8f0')}
+      ${dataRow('LL33 Grade', b.ll33 || null,
+          b.ll33 === 'A' || b.ll33 === 'B' ? '#22c55e' : b.ll33 === 'C' ? '#eab308' : '#ef4444')}
+      ${dataRow('Boiler Fuel', b.boiler_fuel || null)}
+
+      <div class="section-title">DOB Activity</div>
+      ${b.dob_jobs ? dataRow('HVAC / Boiler Jobs', `${b.dob_jobs} filing${b.dob_jobs > 1 ? 's' : ''}`,
+          b.dob_jobs >= 3 ? '#f87171' : '#fb923c') :
+        '<p style="font-size:12px;color:#334155;padding:6px 0">No recent HVAC filings on record</p>'}
+
+      <div class="section-title">Ownership</div>
+      ${b.deed_date ? dataRow('Last Sale', b.deed_date.slice(0,10), '#a78bfa') :
+        '<p style="font-size:12px;color:#334155;padding:6px 0">No recent deed transfer on record</p>'}
+      ${dataRow('Sale Price', b.deed_amt != null ? `$${b.deed_amt}M` : null, '#a78bfa')}
+
+      <div class="section-title">Building Info</div>
+      ${dataRow('Use Type',      b.use || null)}
+      ${dataRow('Year Built',    b.yr  || null)}
+      ${dataRow('GHG Emissions', b.ghg != null ? `${b.ghg?.toLocaleString()} MT CO₂e` : null)}
+
+      <div class="section-title">Load Forecast Scenario</div>
+      <div style="font-size:10px;color:#475569;margin-bottom:8px">12-month projected load under 3 attrition scenarios</div>
+      ${renderMiniChart(b)}
+    </div>`;
+}
+
+function renderMiniChart(b) {
+  const base = b.steam ?? 5e6;
+  const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const seasonal = [1.4,1.3,1.1,0.8,0.5,0.3,0.2,0.2,0.4,0.7,1.1,1.3];
+  const risk = b.risk ?? 0.5;
+
+  const conserv = seasonal.map(s => base * s * (1 - risk * 0.3));
+  const baseS   = seasonal.map(s => base * s * (1 - risk * 0.6));
+  const accel   = seasonal.map(s => base * s * (1 - risk * 0.9));
+
+  const maxVal = Math.max(...conserv);
+  const W = 320, H = 80;
+
+  const toX = i => 20 + (i / 11) * (W - 40);
+  const toY = v => H - 10 - (v / maxVal) * (H - 20);
+
+  const path = pts => pts.map((v, i) => `${i === 0 ? 'M' : 'L'}${toX(i).toFixed(1)},${toY(v).toFixed(1)}`).join(' ');
+
+  const areaPath = (pts, color) => {
+    const p = path(pts);
+    const last = pts.length - 1;
+    return `<path d="${p} L${toX(last)},${H} L${toX(0)},${H} Z" fill="${color}" opacity="0.08"/>
+            <path d="${p}" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.7"/>`;
+  };
+
+  return `
+  <svg width="${W}" height="${H}" style="overflow:visible;display:block">
+    ${areaPath(conserv, '#22c55e')}
+    ${areaPath(baseS,   '#f97316')}
+    ${areaPath(accel,   '#ef4444')}
+    ${months.map((m,i) => `<text x="${toX(i)}" y="${H+12}" text-anchor="middle" fill="#334155" font-size="9">${m}</text>`).join('')}
+  </svg>
+  <div style="display:flex;gap:14px;margin-top:6px;font-size:10px">
+    <span style="color:#22c55e">— Conservative</span>
+    <span style="color:#f97316">— Base</span>
+    <span style="color:#ef4444">— Accelerated</span>
+  </div>`;
+}
+
+function exportCSV() {
+  const cell = v => { const s = String(v??'').replace(/"/g,'""'); return /^[=+\-@\t\r]/.test(s)?`"'${s}"`:`"${s}"`; };
+  const header = ['Address','Type','Attrition Score','Steam (M kBtu)','Signal','DOB HVAC Jobs','Last Sale'].join(',');
+  const rows = filtered().map(b => [
+    cell(b.address), cell(b.use),
+    isFinite(b.risk) ? (b.risk*100).toFixed(1)+'%' : '',
+    b.steam != null ? (b.steam/1e6).toFixed(1) : '',
+    cell(b.signal), b.dob_jobs ?? 0, cell(b.deed_date)
+  ].join(','));
+  const blob = new Blob([header+'\n'+rows.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'coned-attrition-risk.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Demo fallback data if fetch fails (standalone mode)
+const DEMO_DATA = [
+  {address:"53 West 53 St",use:"Multifamily Housing",yr:2019,risk:0.816,steam:31705858.5,energy_star:3,peer_score:0.348,signal:"big_drop",hdd_pct:-31,dob_jobs:0,ghg:3084},
+  {address:"432 Park Avenue",use:"Multifamily Housing",yr:2012,risk:0.807,steam:31539195.7,energy_star:2,peer_score:0.644,signal:"big_drop",hdd_pct:-28,dob_jobs:2,ghg:5138},
+  {address:"155 West 11th Street",use:"Multifamily Housing",yr:2016,risk:0.782,steam:41783535.0,energy_star:8,peer_score:0.21,signal:"big_drop",hdd_pct:-22,dob_jobs:1,ghg:4102},
+  {address:"15 Central Park West",use:"Multifamily Housing",yr:2008,risk:0.771,steam:35245523.2,energy_star:4,peer_score:0.15,signal:"mod_drop",hdd_pct:-14,dob_jobs:0,ghg:3890},
+  {address:"151 East 58th Street",use:"Office",yr:1972,risk:0.803,steam:28500370.4,eui:88,energy_star:12,peer_score:0.52,signal:"big_drop",hdd_pct:-34,dob_jobs:4,deed_date:"2022-03-15",deed_amt:285,ghg:3210},
+  {address:"43 West 64th St",use:"Multifamily Housing",yr:2003,risk:0.799,steam:5875292.7,eui:42.4,energy_star:2,peer_score:0.025,signal:"mod_drop",hdd_pct:-12,dob_jobs:10},
+  {address:"611 Fifth Avenue",use:"Retail Store",yr:1928,risk:0.796,steam:10430736.0,energy_star:18,peer_score:0.38,signal:"big_drop",hdd_pct:-29},
+  {address:"1 Central Park South",use:"Multifamily Housing",yr:1982,risk:0.776,steam:27144431.0,energy_star:6,peer_score:0.19,signal:"mod_drop",hdd_pct:-18},
+  {address:"30 Hudson Yards",use:"Office",yr:2019,risk:0.55,steam:18200000,eui:51,energy_star:72,peer_score:0.12,signal:"mod_drop",hdd_pct:-8,dob_jobs:1,ghg:1840},
+  {address:"One World Trade Center",use:"Office",yr:2014,risk:0.42,steam:45000000,eui:38,energy_star:84,peer_score:0.08,signal:null,ghg:3200},
+  {address:"350 Fifth Avenue",use:"Office",yr:1931,risk:0.61,steam:32000000,eui:67,energy_star:45,peer_score:0.31,signal:"mod_drop",hdd_pct:-11,dob_jobs:2,deed_date:"2021-06-01",deed_amt:195},
+  {address:"Rockefeller Center",use:"Office",yr:1933,risk:0.38,steam:65000000,eui:44,energy_star:78,peer_score:0.15,signal:null},
+  {address:"Metropolitan Museum of Art",use:"College/University",yr:1902,risk:0.18,steam:22000000,eui:55,energy_star:62,peer_score:0.05},
+  {address:"Bellevue Hospital Center",use:"Hospital (General Medical & Surgical)",yr:1908,risk:0.12,steam:85000000,eui:120,energy_star:68,peer_score:0.02},
+  {address:"Penn Station",use:"Office",yr:1910,risk:0.29,steam:48000000,eui:82,energy_star:51,peer_score:0.09,signal:"mod_drop",hdd_pct:-6},
+];
+
+init();
+</script>
+</body>
+</html>

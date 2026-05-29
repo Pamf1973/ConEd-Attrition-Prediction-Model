@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConEd Steam — Wireframe: Load Forecast + Watch List</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #020617; color: #e2e8f0; min-height: 100vh; }
+
+  /* WIREFRAME BADGE */
+  .wf-banner { background: #1e1000; border-bottom: 1px solid #92400e; padding: 6px 20px; display: flex; align-items: center; gap: 10px; }
+  .wf-label { font-size: 10px; font-weight: 800; letter-spacing: 2px; color: #f59e0b; text-transform: uppercase; }
+  .wf-desc { font-size: 11px; color: #78716c; }
+  .wf-screens { margin-left: auto; display: flex; gap: 6px; }
+  .wf-screen-btn { font-size: 10px; padding: 3px 10px; border-radius: 4px; border: 1px solid #92400e; background: none; color: #d97706; cursor: pointer; }
+  .wf-screen-btn.active { background: #92400e; color: #fef3c7; }
+
+  /* NAV */
+  header { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: #0f172a; border-bottom: 1px solid #1e293b; }
+  .brand-tag { font-size: 10px; font-weight: 800; color: #f97316; letter-spacing: 3px; }
+  .brand-title { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+  .nav-divider { width: 1px; height: 32px; background: #334155; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; }
+  .nav-tab.active { background: #334155; color: #f1f5f9; }
+  .nav-tab.inactive { color: #475569; background: none; }
+  .phase-badge { margin-left: auto; font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; color: #64748b; }
+
+  /* SCREENS */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── LOAD FORECAST SCREEN ── */
+  .forecast-wrap { display: flex; height: calc(100vh - 100px); }
+
+  /* Left controls */
+  .fc-sidebar { width: 220px; flex-shrink: 0; border-right: 1px solid #1e293b; background: #0f172a; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+  .ctrl-section { }
+  .ctrl-label { font-size: 10px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+  .ctrl-option { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; font-size: 12px; color: #94a3b8; cursor: pointer; margin-bottom: 2px; }
+  .ctrl-option.selected { background: #1e293b; color: #f1f5f9; }
+  .ctrl-radio { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #334155; flex-shrink: 0; }
+  .ctrl-radio.on { border-color: #f97316; background: #f97316; }
+  .ctrl-divider { border: none; border-top: 1px solid #1e293b; margin: 4px 0; }
+  .segment-chip { font-size: 10px; padding: 3px 8px; border-radius: 12px; border: 1px solid #334155; color: #64748b; cursor: pointer; display: inline-block; margin: 2px; }
+  .segment-chip.on { border-color: #f97316; color: #f97316; background: rgba(249,115,22,0.08); }
+  .apply-btn { width: 100%; padding: 8px; border-radius: 6px; background: #1e3a5f; border: 1px solid #1d4ed8; color: #93c5fd; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: auto; }
+
+  /* Main forecast area */
+  .fc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Summary KPIs */
+  .fc-kpis { display: flex; gap: 0; border-bottom: 1px solid #1e293b; }
+  .kpi { flex: 1; padding: 14px 20px; border-right: 1px solid #1e293b; }
+  .kpi:last-child { border-right: none; }
+  .kpi-label { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .kpi-val { font-size: 22px; font-weight: 800; line-height: 1; }
+  .kpi-sub { font-size: 11px; color: #475569; margin-top: 3px; }
+  .kpi-delta { font-size: 11px; font-weight: 600; margin-top: 3px; }
+
+  /* Chart area */
+  .fc-chart-wrap { flex: 1; padding: 20px 24px 8px; overflow: hidden; position: relative; }
+  .fc-chart-title { font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #64748b; }
+  .legend-dot { width: 24px; height: 3px; border-radius: 2px; }
+
+  /* Buildings-at-risk table */
+  .fc-table-wrap { border-top: 1px solid #1e293b; padding: 0; }
+  .fc-table-header { display: flex; align-items: center; gap: 8px; padding: 10px 24px; border-bottom: 1px solid #1e293b; }
+  .fc-table-title { font-size: 11px; font-weight: 600; color: #94a3b8; }
+  .fc-table-sub { font-size: 10px; color: #475569; }
+  .fc-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .fc-tbl th { padding: 8px 16px; text-align: left; font-size: 10px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 1px solid #1e293b; }
+  .fc-tbl td { padding: 7px 16px; border-bottom: 1px solid rgba(30,41,59,0.5); }
+  .fc-tbl tr:hover td { background: rgba(30,41,59,0.4); }
+  .load-bar-wrap { display: flex; align-items: center; gap: 6px; }
+  .load-bar-bg { flex: 1; height: 4px; background: #1e293b; border-radius: 2px; max-width: 80px; }
+  .load-bar-fill { height: 100%; border-radius: 2px; }
+
+  /* ── WATCH LIST SCREEN ── */
+  .wl-wrap { display: flex; height: calc(100vh - 100px); }
+
+  /* Alert sidebar stats */
+  .wl-sidebar { width: 220px; flex-shrink: 0; border-right: 1px solid #1e293b; background: #0f172a; padding: 16px; }
+  .alert-stat { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .alert-stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+  .alert-stat-label { font-size: 10px; color: #475569; margin-top: 3px; }
+  .alert-type-list { margin-top: 16px; }
+  .alert-type-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(30,41,59,0.5); font-size: 11px; }
+  .alert-type-row:last-child { border-bottom: none; }
+  .alert-type-name { color: #94a3b8; }
+  .alert-type-count { font-weight: 700; font-size: 12px; }
+
+  /* Main alert feed */
+  .wl-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .wl-filters { display: flex; gap: 8px; padding: 10px 16px; border-bottom: 1px solid #1e293b; background: rgba(15,23,42,0.5); flex-wrap: wrap; align-items: center; }
+  .wl-filters input, .wl-filters select { padding: 5px 10px; font-size: 11px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; outline: none; }
+  .wl-filters input::placeholder { color: #475569; }
+  .wl-count { margin-left: auto; font-size: 11px; color: #475569; }
+  .alert-feed { overflow-y: auto; flex: 1; }
+  .alert-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border-bottom: 1px solid #1e293b; cursor: pointer; transition: background 0.1s; }
+  .alert-card:hover { background: rgba(30,41,59,0.4); }
+  .alert-card.unread { border-left: 3px solid #f97316; }
+  .alert-card.read { border-left: 3px solid transparent; opacity: 0.65; }
+  .alert-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .alert-body { flex: 1; min-width: 0; }
+  .alert-address { font-size: 13px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .alert-type-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 3px 0; }
+  .alert-detail { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .alert-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+  .alert-date { font-size: 10px; color: #475569; }
+  .alert-assignee { font-size: 10px; padding: 1px 6px; border-radius: 10px; background: #1e293b; color: #64748b; }
+  .alert-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .risk-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .action-btn { font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 1px solid #334155; color: #94a3b8; background: none; cursor: pointer; white-space: nowrap; }
+  .action-btn:hover { background: #1e293b; }
+
+  /* Annotation boxes */
+  .annotation { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: #92400e; background: rgba(146,64,14,0.12); border: 1px dashed #92400e; border-radius: 4px; padding: 3px 8px; margin-left: 8px; }
+  .annotation::before { content: "✎"; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<!-- Wireframe banner -->
+<div class="wf-banner">
+  <span class="wf-label">Wireframe</span>
+  <span class="wf-desc">ConEd Steam Operations — Load Forecast + Watch List · Not connected to live data</span>
+  <div class="wf-screens">
+    <button class="wf-screen-btn active" onclick="showScreen('forecast', this)">Screen 1 — Load Forecast</button>
+    <button class="wf-screen-btn" onclick="showScreen('watchlist', this)">Screen 2 — Watch List</button>
+  </div>
+</div>
+
+<!-- Nav (same across both screens) -->
+<header>
+  <div>
+    <div class="brand-tag">CONED</div>
+    <div class="brand-title">Steam Operations — Attrition Intelligence</div>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-tabs" id="main-tabs">
+    <button class="nav-tab inactive" onclick="setTab(0)">Attrition Rankings</button>
+    <button class="nav-tab active" id="tab-forecast" onclick="setTab(1)">Load Forecast</button>
+    <button class="nav-tab inactive" id="tab-watchlist" onclick="setTab(2)">Watch List</button>
+    <button class="nav-tab inactive">AI Agent</button>
+  </div>
+  <span class="phase-badge">Phase 1 · Decision-Support Ranking</span>
+</header>
+
+<!-- ══════════════════ SCREEN 1 — LOAD FORECAST ══════════════════ -->
+<div class="screen active" id="screen-forecast">
+  <div class="forecast-wrap">
+
+    <!-- Controls sidebar -->
+    <div class="fc-sidebar">
+      <div class="ctrl-section">
+        <div class="ctrl-label">Forecast Horizon</div>
+        <div class="ctrl-option selected"><div class="ctrl-radio on"></div>12 months</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>24 months</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>36 months</div>
+      </div>
+      <hr class="ctrl-divider">
+      <div class="ctrl-section">
+        <div class="ctrl-label">Attrition Scenario</div>
+        <div class="ctrl-option selected"><div class="ctrl-radio on"></div>All three bands</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>Conservative only</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>Base only</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>Accelerated only</div>
+      </div>
+      <hr class="ctrl-divider">
+      <div class="ctrl-section">
+        <div class="ctrl-label">Customer Segment</div>
+        <span class="segment-chip on">All</span>
+        <span class="segment-chip">Office</span>
+        <span class="segment-chip">Multifamily</span>
+        <span class="segment-chip">Hotel</span>
+        <span class="segment-chip">Hospital</span>
+        <span class="segment-chip">Retail</span>
+      </div>
+      <hr class="ctrl-divider">
+      <div class="ctrl-section">
+        <div class="ctrl-label">Weather Assumption</div>
+        <div class="ctrl-option selected"><div class="ctrl-radio on"></div>30-yr HDD normal</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>Prior year actual</div>
+        <div class="ctrl-option"><div class="ctrl-radio"></div>NOAA seasonal outlook</div>
+      </div>
+      <button class="apply-btn">Apply</button>
+    </div>
+
+    <!-- Main area -->
+    <div class="fc-main">
+
+      <!-- KPI strip -->
+      <div class="fc-kpis">
+        <div class="kpi">
+          <div class="kpi-label">Current Baseline (Annual)</div>
+          <div class="kpi-val" style="color:#94a3b8">21.9 <span style="font-size:14px;font-weight:400">B kBtu</span></div>
+          <div class="kpi-sub">1,300 active customers · HDD-normalized</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Conservative Scenario Loss</div>
+          <div class="kpi-val" style="color:#22c55e">−1.1 <span style="font-size:14px;font-weight:400">B kBtu</span></div>
+          <div class="kpi-delta" style="color:#22c55e">−5% · ~18 buildings attrite</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Base Scenario Loss</div>
+          <div class="kpi-val" style="color:#f97316">−2.6 <span style="font-size:14px;font-weight:400">B kBtu</span></div>
+          <div class="kpi-delta" style="color:#f97316">−12% · ~38 buildings attrite</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Accelerated Scenario Loss</div>
+          <div class="kpi-val" style="color:#ef4444">−4.8 <span style="font-size:14px;font-weight:400">B kBtu</span></div>
+          <div class="kpi-delta" style="color:#ef4444">−22% · ~56 buildings attrite</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="fc-chart-wrap">
+        <div class="fc-chart-title">
+          Monthly Steam Load Forecast — All Customers (M kBtu)
+          <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;border-top:2px dashed #94a3b8;height:0"></div>Historical baseline</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Conservative</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Base</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Accelerated</div>
+          <span class="annotation">interactive zoom + hover tooltips</span>
+        </div>
+        <svg id="fc-svg" width="100%" height="220" viewBox="0 0 900 220" preserveAspectRatio="none" style="display:block"></svg>
+      </div>
+
+      <!-- Top-impact buildings table -->
+      <div class="fc-table-wrap">
+        <div class="fc-table-header">
+          <div>
+            <span class="fc-table-title">Buildings Driving Forecast Uncertainty</span>
+            <span style="color:#475569;font-size:10px;margin-left:8px">— high-risk accounts with the largest steam demand impact if they attrite</span>
+          </div>
+          <span class="annotation" style="margin-left:auto">sortable · click row → building detail</span>
+        </div>
+        <table class="fc-tbl">
+          <thead>
+            <tr>
+              <th>Address</th>
+              <th>Type</th>
+              <th>Attrition Score</th>
+              <th>Steam Demand</th>
+              <th>% of Total Load</th>
+              <th>Forecast Impact</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="fc-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════ SCREEN 2 — WATCH LIST ══════════════════ -->
+<div class="screen" id="screen-watchlist">
+  <div class="wl-wrap">
+
+    <!-- Stats sidebar -->
+    <div class="wl-sidebar">
+      <div class="ctrl-label" style="font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">Alert Summary</div>
+      <div class="alert-stat">
+        <div class="alert-stat-num" style="color:#ef4444">12</div>
+        <div class="alert-stat-label">New alerts (last 7 days)</div>
+      </div>
+      <div class="alert-stat">
+        <div class="alert-stat-num" style="color:#f97316">28</div>
+        <div class="alert-stat-label">Open · unreviewed</div>
+      </div>
+      <div class="alert-stat">
+        <div class="alert-stat-num" style="color:#64748b">47</div>
+        <div class="alert-stat-label">Total watched buildings</div>
+      </div>
+      <div class="alert-type-list">
+        <div class="ctrl-label" style="font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">By Trigger Type</div>
+        <div class="alert-type-row">
+          <span class="alert-type-name">DOB Permit Filed</span>
+          <span class="alert-type-count" style="color:#ef4444">9</span>
+        </div>
+        <div class="alert-type-row">
+          <span class="alert-type-name">Ownership Transfer</span>
+          <span class="alert-type-count" style="color:#f97316">7</span>
+        </div>
+        <div class="alert-type-row">
+          <span class="alert-type-name">LL84 Update</span>
+          <span class="alert-type-count" style="color:#facc15">6</span>
+        </div>
+        <div class="alert-type-row">
+          <span class="alert-type-name">LL97 Threshold</span>
+          <span class="alert-type-count" style="color:#a78bfa">4</span>
+        </div>
+        <div class="alert-type-row">
+          <span class="alert-type-name">Reviewed</span>
+          <span class="alert-type-count" style="color:#475569">19</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert feed -->
+    <div class="wl-main">
+      <div class="wl-filters">
+        <input type="text" placeholder="Search address or owner…" style="width:200px" />
+        <select>
+          <option>All trigger types</option>
+          <option>DOB Permit Filed</option>
+          <option>Ownership Transfer</option>
+          <option>LL84 Update</option>
+          <option>LL97 Threshold</option>
+        </select>
+        <select>
+          <option>All tiers</option>
+          <option>High</option>
+          <option>Medium</option>
+        </select>
+        <select>
+          <option>All assignees</option>
+          <option>Unassigned</option>
+          <option>Account Mgr A</option>
+          <option>Account Mgr B</option>
+        </select>
+        <select>
+          <option>Unreviewed first</option>
+          <option>Most recent</option>
+          <option>Highest risk</option>
+        </select>
+        <span class="wl-count">28 open alerts</span>
+        <span class="annotation">real-time via Socrata API webhooks</span>
+      </div>
+      <div class="alert-feed" id="alert-feed"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── Forecast chart ─────────────────────────────────────────────
+const W = 900, H = 220, PAD = { top: 10, right: 20, bottom: 32, left: 52 };
+const MONTHS = ['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+const HIST_IDX = 6; // first 6 months are historical
+
+// Seasonal shape: heating months high, summer low
+const seasonal = [0.62,0.37,0.21,0.17,0.19,0.38,0.65,0.78,0.90,0.90,0.73,0.58, 0.58,0.35,0.19,0.16,0.17,0.36,0.63,0.76,0.88,0.88,0.71,0.56];
+const TOTAL = 21900; // M kBtu/year ~ 1825/mo average
+const base_monthly = seasonal.map(s => TOTAL * s / seasonal.slice(0,12).reduce((a,b)=>a+b,0) * 12 / 12);
+
+// 3 attrition scenarios (loss accrues after month 6)
+const build = (loss_frac) => base_monthly.map((v, i) => {
+  if (i < HIST_IDX) return v;
+  const ramp = Math.min(1, (i - HIST_IDX) / 10); // ramp in loss over forecast window
+  return v * (1 - loss_frac * ramp);
+});
+
+const conserv = build(0.05);
+const base_s  = build(0.12);
+const accel   = build(0.22);
+const all     = [...conserv, ...base_s, ...accel, ...base_monthly];
+const maxV = Math.max(...all);
+const minV = 0;
+const N = MONTHS.length;
+
+const tx = i => PAD.left + (i / (N - 1)) * (W - PAD.left - PAD.right);
+const ty = v => PAD.top + (1 - (v - minV) / (maxV - minV)) * (H - PAD.top - PAD.bottom);
+
+const path = pts => pts.map((v, i) => `${i === 0 ? 'M' : 'L'}${tx(i).toFixed(1)},${ty(v).toFixed(1)}`).join(' ');
+const area = (pts, color) => {
+  const p = path(pts);
+  return `<path d="${p} L${tx(N-1)},${ty(0)} L${tx(0)},${ty(0)} Z" fill="${color}" opacity="0.07"/>
+          <path d="${p}" fill="none" stroke="${color}" stroke-width="2" opacity="0.8"/>`;
+};
+
+function buildChart() {
+  const svg = document.getElementById('fc-svg');
+  let html = '';
+
+  // Grid lines + Y labels
+  const yTicks = [0, 500, 1000, 1500, 2000, 2500];
+  yTicks.forEach(v => {
+    const y = ty(v).toFixed(1);
+    html += `<line x1="${PAD.left}" y1="${y}" x2="${W - PAD.right}" y2="${y}" stroke="#1e293b" stroke-width="1"/>`;
+    html += `<text x="${PAD.left - 6}" y="${parseFloat(y)+4}" text-anchor="end" fill="#334155" font-size="10">${v}</text>`;
+  });
+
+  // "Today" divider
+  const todayX = tx(HIST_IDX - 0.5).toFixed(1);
+  html += `<line x1="${todayX}" y1="${PAD.top}" x2="${todayX}" y2="${H - PAD.bottom}" stroke="#475569" stroke-width="1" stroke-dasharray="4 3"/>`;
+  html += `<text x="${parseFloat(todayX)+4}" y="${PAD.top + 12}" fill="#475569" font-size="10">Today</text>`;
+
+  // Historical baseline (dashed)
+  const histPts = base_monthly.slice(0, HIST_IDX + 1);
+  html += `<path d="${histPts.map((v,i) => `${i===0?'M':'L'}${tx(i).toFixed(1)},${ty(v).toFixed(1)}`).join(' ')}" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5 3"/>`;
+
+  // Scenario bands (only in forecast region)
+  const fIdx = Array.from({length: N - HIST_IDX}, (_, i) => i + HIST_IDX);
+  const slicePath = (arr) => arr.slice(HIST_IDX).map((v, i) => `${i===0?'M':'L'}${tx(i + HIST_IDX).toFixed(1)},${ty(v).toFixed(1)}`).join(' ');
+  const sliceArea = (arr, color) => {
+    const p = slicePath(arr);
+    const lastX = tx(N-1).toFixed(1), firstX = tx(HIST_IDX).toFixed(1);
+    return `<path d="${p} L${lastX},${ty(0)} L${firstX},${ty(0)} Z" fill="${color}" opacity="0.07"/>
+            <path d="${p}" fill="none" stroke="${color}" stroke-width="2" opacity="0.85"/>`;
+  };
+  html += sliceArea(conserv, '#22c55e');
+  html += sliceArea(base_s, '#f97316');
+  html += sliceArea(accel, '#ef4444');
+
+  // Connecting dot at today
+  const connectY = ty(base_monthly[HIST_IDX - 1]).toFixed(1);
+  html += `<circle cx="${tx(HIST_IDX - 1)}" cy="${connectY}" r="3" fill="#64748b"/>`;
+
+  // X axis labels (every other month)
+  MONTHS.forEach((m, i) => {
+    if (i % 2 === 0) {
+      html += `<text x="${tx(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#334155" font-size="10">${m}</text>`;
+    }
+  });
+
+  // "2025" / "2026" year labels
+  html += `<text x="${tx(0)}" y="${H - PAD.bottom + 22}" fill="#1e293b" font-size="10" font-weight="600">◀ 2025</text>`;
+  html += `<text x="${tx(12)}" y="${H - PAD.bottom + 22}" fill="#1e293b" font-size="10" font-weight="600">2026 ▶</text>`;
+
+  // Y axis label
+  html += `<text transform="rotate(-90)" x="${-(H/2)}" y="12" text-anchor="middle" fill="#334155" font-size="10">M kBtu / month</text>`;
+
+  svg.innerHTML = html;
+}
+
+// ── Forecast buildings table ───────────────────────────────────
+const FC_BUILDINGS = [
+  { addr:"31 W 34 St",            use:"Office",            risk:0.658, steam:982.4, pct:4.5, action:"Outreach Now" },
+  { addr:"Rockefeller Center",    use:"Office",            risk:0.470, steam:318.3, pct:1.5, action:"Monitor"      },
+  { addr:"252 First Ave",         use:"Hospital",          risk:0.392, steam:272.4, pct:1.2, action:"Monitor"      },
+  { addr:"53 West 53 St",         use:"Multifamily",       risk:0.816, steam:31.7,  pct:0.1, action:"Outreach Now" },
+  { addr:"432 Park Avenue",       use:"Multifamily",       risk:0.807, steam:31.5,  pct:0.1, action:"Outreach Now" },
+  { addr:"151 East 58th Street",  use:"Office",            risk:0.803, steam:28.5,  pct:0.1, action:"Outreach Now" },
+  { addr:"350 Fifth Avenue",      use:"Office",            risk:0.610, steam:32.0,  pct:0.1, action:"Monitor"      },
+];
+
+function riskColor(r) {
+  return r > 0.7 ? '#ef4444' : r > 0.4 ? '#f97316' : '#22c55e';
+}
+function actionColor(a) {
+  return a === 'Outreach Now' ? '#ef4444' : a === 'Monitor' ? '#f97316' : '#64748b';
+}
+function actionBg(a) {
+  return a === 'Outreach Now' ? 'rgba(239,68,68,0.12)' : a === 'Monitor' ? 'rgba(249,115,22,0.12)' : 'rgba(100,116,139,0.12)';
+}
+
+function buildFcTable() {
+  const tbody = document.getElementById('fc-tbody');
+  const maxSteam = Math.max(...FC_BUILDINGS.map(b => b.steam));
+  tbody.innerHTML = FC_BUILDINGS.map(b => `
+    <tr>
+      <td style="color:#f1f5f9;font-weight:500">${b.addr}</td>
+      <td style="color:#94a3b8">${b.use}</td>
+      <td>
+        <span style="font-weight:700;color:${riskColor(b.risk)}">${Math.round(b.risk*100)}%</span>
+        <span style="font-size:10px;padding:1px 5px;border-radius:3px;color:${riskColor(b.risk)};background:${riskColor(b.risk)}22;margin-left:5px">${b.risk>0.7?'High':b.risk>0.4?'Medium':'Low'}</span>
+      </td>
+      <td>
+        <div class="load-bar-wrap">
+          <span style="color:#cbd5e1;min-width:44px;font-size:11px">${b.steam.toLocaleString()} M</span>
+          <div class="load-bar-bg"><div class="load-bar-fill" style="width:${(b.steam/maxSteam*100).toFixed(0)}%;background:${riskColor(b.risk)}"></div></div>
+        </div>
+      </td>
+      <td style="color:#94a3b8">${b.pct}%</td>
+      <td style="color:${riskColor(b.risk)};font-weight:600;font-size:11px">
+        −${(b.steam * b.risk * 0.8).toFixed(0)} M kBtu
+        <span style="font-size:9px;font-weight:400;color:#475569;display:block">base scenario</span>
+      </td>
+      <td>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;color:${actionColor(b.action)};background:${actionBg(b.action)}">${b.action}</span>
+      </td>
+    </tr>`).join('');
+}
+
+// ── Alert feed ─────────────────────────────────────────────────
+const ALERTS = [
+  { addr:"53 West 53 St",          type:"DOB Permit Filed",       detail:"Alt-1 major renovation permit filed — mechanical systems scope",     date:"May 19, 2026",  assignee:"Unassigned",    tier:"High",   read:false, icon:"🔧", iconBg:"rgba(239,68,68,0.15)" },
+  { addr:"432 Park Avenue",        type:"Ownership Transfer",     detail:"ACRIS deed recorded — transferred to Vornado Realty Trust LLC",       date:"May 17, 2026",  assignee:"Acct Mgr A",    tier:"High",   read:false, icon:"🏛", iconBg:"rgba(249,115,22,0.15)" },
+  { addr:"151 East 58th Street",   type:"DOB Permit Filed",       detail:"Boiler replacement permit (NB) filed — high-efficiency gas system",   date:"May 16, 2026",  assignee:"Unassigned",    tier:"High",   read:false, icon:"🔧", iconBg:"rgba(239,68,68,0.15)" },
+  { addr:"611 Fifth Avenue",       type:"LL84 Update",            detail:"2024 benchmarking submitted — EUI down 31% YoY, steam EUI −28%",      date:"May 14, 2026",  assignee:"Acct Mgr B",    tier:"High",   read:false, icon:"📊", iconBg:"rgba(250,204,21,0.15)" },
+  { addr:"Rockefeller Center",     type:"LL97 Threshold",         detail:"2030 carbon cap projection: building will exceed by est. 340 tCO₂",   date:"May 13, 2026",  assignee:"Unassigned",    tier:"Medium", read:false, icon:"⚠",  iconBg:"rgba(167,139,250,0.15)" },
+  { addr:"30 Hudson Yards",        type:"Ownership Transfer",     detail:"ACRIS mortgage refinancing filed — $1.4B refi, Related Companies",    date:"May 11, 2026",  assignee:"Acct Mgr A",    tier:"Medium", read:false, icon:"🏛", iconBg:"rgba(249,115,22,0.15)" },
+  { addr:"43 West 64th St",        type:"DOB Permit Filed",       detail:"HVAC equipment permit — heat pump condensing units, rooftop",         date:"May 10, 2026",  assignee:"Unassigned",    tier:"High",   read:false, icon:"🔧", iconBg:"rgba(239,68,68,0.15)" },
+  { addr:"155 West 11th Street",   type:"LL84 Update",            detail:"2024 benchmarking submitted — 3rd consecutive year of steam decline",  date:"May 9, 2026",   assignee:"Acct Mgr B",    tier:"High",   read:false, icon:"📊", iconBg:"rgba(250,204,21,0.15)" },
+  { addr:"350 Fifth Avenue",       type:"LL97 Threshold",         detail:"2024 carbon cap: building at threshold — 12 tCO₂ projected overage",  date:"May 6, 2026",   assignee:"Acct Mgr A",    tier:"Medium", read:true,  icon:"⚠",  iconBg:"rgba(167,139,250,0.15)" },
+  { addr:"One World Trade Center", type:"LL84 Update",            detail:"2024 benchmarking submitted — stable usage, no attrition signal",     date:"May 4, 2026",   assignee:"Acct Mgr A",    tier:"Low",    read:true,  icon:"📊", iconBg:"rgba(250,204,21,0.15)" },
+];
+
+const tierColor = t => t === 'High' ? '#ef4444' : t === 'Medium' ? '#f97316' : '#22c55e';
+const tierBg    = t => t === 'High' ? 'rgba(239,68,68,0.1)' : t === 'Medium' ? 'rgba(249,115,22,0.1)' : 'rgba(34,197,94,0.1)';
+
+function buildAlertFeed() {
+  const feed = document.getElementById('alert-feed');
+  feed.innerHTML = ALERTS.map(a => `
+    <div class="alert-card ${a.read ? 'read' : 'unread'}">
+      <div class="alert-icon" style="background:${a.iconBg}">${a.icon}</div>
+      <div class="alert-body">
+        <div class="alert-address">${a.addr}</div>
+        <span class="alert-type-badge" style="color:${a.read?'#475569':tierColor(a.tier)};background:${a.read?'rgba(71,85,105,0.1)':tierBg(a.tier)}">${a.type}</span>
+        <div class="alert-detail">${a.detail}</div>
+        <div class="alert-meta">
+          <span class="alert-date">${a.date}</span>
+          <span class="alert-assignee">${a.assignee}</span>
+        </div>
+      </div>
+      <div class="alert-right">
+        <span class="risk-badge" style="color:${tierColor(a.tier)};background:${tierBg(a.tier)}">${a.tier}</span>
+        <button class="action-btn">${a.read ? 'Reopen' : 'Mark reviewed'}</button>
+        <button class="action-btn">Assign →</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── Screen / tab switching ─────────────────────────────────────
+function showScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.wf-screen-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'forecast') {
+    document.getElementById('tab-forecast').classList.add('active');
+    document.getElementById('tab-forecast').classList.remove('inactive');
+    document.getElementById('tab-watchlist').classList.remove('active');
+    document.getElementById('tab-watchlist').classList.add('inactive');
+  } else {
+    document.getElementById('tab-watchlist').classList.add('active');
+    document.getElementById('tab-watchlist').classList.remove('inactive');
+    document.getElementById('tab-forecast').classList.remove('active');
+    document.getElementById('tab-forecast').classList.add('inactive');
+  }
+}
+
+function setTab(i) {
+  if (i === 1) showScreen('forecast', document.querySelectorAll('.wf-screen-btn')[0]);
+  if (i === 2) showScreen('watchlist', document.querySelectorAll('.wf-screen-btn')[1]);
+}
+
+// Init
+buildChart();
+buildFcTable();
+buildAlertFeed();
+</script>
+</body>
+</html>
