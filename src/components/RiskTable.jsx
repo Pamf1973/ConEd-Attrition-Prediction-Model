@@ -2,13 +2,13 @@ import { useState, useMemo } from "react";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 const COLS = [
-  { key: "address",      label: "Address",        sortable: true  },
-  { key: "cluster_name", label: "Archetype",       sortable: true  },
-  { key: "risk",         label: "Attrition Score", sortable: true  },
-  { key: "steam",        label: "Steam (M kBtu)",  sortable: true  },
-  { key: "signal",       label: "Top Signal",      sortable: false },
-  { key: "dob_jobs",     label: "DOB HVAC Jobs",   sortable: true  },
-  { key: "deed_date",    label: "Last Sale",        sortable: true  },
+  { key: "address",           label: "Address",        sortable: true  },
+  { key: "cluster_name",      label: "Archetype",       sortable: true  },
+  { key: "risk",              label: "Attrition Score", sortable: true  },
+  { key: "ll97_penalty_2024", label: "LL97 Penalty",    sortable: true  },
+  { key: "steam",             label: "Steam (M kBtu)",  sortable: true  },
+  { key: "signal",            label: "Top Signal",      sortable: false },
+  { key: "dob_jobs",          label: "DOB HVAC Jobs",   sortable: true  },
 ];
 
 const USE_TYPES = [
@@ -79,13 +79,15 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
     // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
     const cell = v => {
       const s = String(v ?? "").replace(/"/g, '""');
-      return /^[=+\-@\t\r]/.test(s) ? `"'${s}"` : `"${s}"`;
+      return /^[\s]*[=+\-@\t\r\n]/.test(s) ? `"'${s}"` : `"${s}"`;
     };
-    const header = ["Address","Type","Attrition Score","Steam (M kBtu)","Signal","DOB HVAC Jobs","Last Sale"].join(",");
+    const header = ["Address","Type","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","Signal","DOB HVAC Jobs","Last Sale"].join(",");
     const rows = filtered.map(b => [
       cell(b.address),
       cell(b.use),
       Number.isFinite(b.risk) ? (b.risk * 100).toFixed(1) + "%" : "",
+      b.ll97_penalty_2024 ?? "",
+      b.ll97_penalty_2030 ?? "",
       b.steam != null ? (b.steam / 1e6).toFixed(1) : "",
       cell(b.signal),
       b.dob_jobs ?? 0,
@@ -248,6 +250,22 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                         {tier.label}
                       </span>
                     </div>
+                  </td>
+                  <td className="px-4 py-2.5 whitespace-nowrap">
+                    {b.ll97_penalty_2024 != null ? (
+                      b.ll97_penalty_2024 > 0 ? (
+                        <span className="text-xs font-semibold"
+                          style={{ color: b.ll97_penalty_2024 > 100_000 ? "#ef4444" : "#f97316" }}>
+                          ${b.ll97_penalty_2024 >= 1_000_000
+                            ? (b.ll97_penalty_2024 / 1_000_000).toFixed(1) + "M"
+                            : b.ll97_penalty_2024 >= 1_000
+                              ? Math.round(b.ll97_penalty_2024 / 1_000) + "k"
+                              : b.ll97_penalty_2024}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-green-600">✓</span>
+                      )
+                    ) : "—"}
                   </td>
                   <td className="px-4 py-2.5 text-slate-300">
                     {b.steam != null ? (b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—"}
