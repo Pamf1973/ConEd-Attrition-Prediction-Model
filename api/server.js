@@ -1,5 +1,19 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+
+// Load .env explicitly so it overrides any inherited shell env vars
+// (important when running inside Claude Code which sets ANTHROPIC_API_KEY)
+try {
+  const envPath = resolve(process.cwd(), ".env");
+  for (const line of readFileSync(envPath, "utf8").split("\n")) {
+    const [k, ...v] = line.split("=");
+    if (k?.trim() && !k.trim().startsWith("#")) {
+      process.env[k.trim()] = v.join("=").trim();
+    }
+  }
+} catch { /* no .env file — rely on actual env */ }
 
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;

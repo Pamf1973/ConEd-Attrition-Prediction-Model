@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node api/server.js\" \"vite\" --names api,vite --prefix-colors cyan,green",
-    "dev:api": "node api/server.js",
+    "dev": "concurrently \"node --env-file=.env --env-file-if-exists=.env.local api/server.js\" \"vite\" --names api,vite --prefix-colors cyan,green",
+    "dev:api": "node --env-file=.env api/server.js",
     "dev:ui": "vite",
     "build": "vite build",
     "build:all": "cd ../coned-3d-map && npm run build:all",
