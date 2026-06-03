@@ -4,13 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"node api/server.js\" \"vite\" --names api,vite --prefix-colors cyan,green",
+    "dev:api": "node api/server.js",
+    "dev:ui": "vite",
     "build": "vite build",
     "build:all": "cd ../coned-3d-map && npm run build:all",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^10.0.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

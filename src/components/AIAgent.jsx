@@ -2,8 +2,6 @@ import { useState, useRef } from "react";
 import { queryBuildings, applyFilterSpec } from "../lib/groqFilter";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
-const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-
 const EXAMPLES = [
   "High risk hotels with HVAC permits filed",
   "Office buildings over their LL97 limit with big steam drops",
@@ -23,18 +21,13 @@ export default function AIAgent({ buildings, onSelect, selectedAddress }) {
   async function handleSubmit(q) {
     const question = q ?? query;
     if (!question.trim()) return;
-    if (!API_KEY) {
-      setError("VITE_GROQ_API_KEY not set — add it to .env and restart the dev server.");
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setResults(null);
     setExplanation("");
 
     try {
-      const spec    = await queryBuildings(question, API_KEY);
+      const spec    = await queryBuildings(question);
       const matched = applyFilterSpec(buildings, spec);
       setResults(matched);
       setExplanation(spec.explanation ?? "");
