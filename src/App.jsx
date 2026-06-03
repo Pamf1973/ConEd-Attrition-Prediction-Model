@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useBuildings } from "./data/useBuildings";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
+import AIAgent from "./components/AIAgent";
 
 export default function App() {
   const { buildings, loading, error } = useBuildings();
-  const [selected, setSelected] = useState(null);
+  const [selected,    setSelected]    = useState(null);
+  const [activeTab,   setActiveTab]   = useState("rankings");
 
   function handleSelect(b) {
     setSelected(prev => prev?.address === b.address ? null : b);
@@ -49,17 +51,25 @@ export default function App() {
         </div>
         <div className="w-px h-8 bg-slate-700 mx-1" />
         <nav className="flex gap-1">
-          {["Attrition Rankings", "Load Forecast", "Watch List", "AI Agent"].map((tab, i) => (
+          {[
+            { id: "rankings", label: "Attrition Rankings", enabled: true  },
+            { id: "forecast", label: "Load Forecast",       enabled: false },
+            { id: "watchlist",label: "Watch List",          enabled: false },
+            { id: "agent",    label: "AI Agent",            enabled: true  },
+          ].map(tab => (
             <button
-              key={tab}
-              disabled={i > 0}
+              key={tab.id}
+              disabled={!tab.enabled}
+              onClick={() => tab.enabled && setActiveTab(tab.id)}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                i === 0
+                activeTab === tab.id
                   ? "bg-slate-700 text-slate-100"
-                  : "text-slate-600 cursor-not-allowed"
+                  : tab.enabled
+                    ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                    : "text-slate-600 cursor-not-allowed"
               }`}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </nav>
@@ -73,23 +83,46 @@ export default function App() {
         </div>
       </header>
 
-      {/* Body — table + detail panel */}
+      {/* Body */}
       <div className="flex flex-1 min-h-0">
-        <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
-          <RiskTable
-            buildings={buildings}
-            onSelect={handleSelect}
-            selectedAddress={selected?.address}
-          />
-        </div>
+        {activeTab === "rankings" && (
+          <>
+            <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
+              <RiskTable
+                buildings={buildings}
+                onSelect={handleSelect}
+                selectedAddress={selected?.address}
+              />
+            </div>
+            {selected && (
+              <div className="w-[380px] shrink-0 overflow-hidden">
+                <BuildingPanel
+                  building={selected}
+                  onClose={() => setSelected(null)}
+                />
+              </div>
+            )}
+          </>
+        )}
 
-        {selected && (
-          <div className="w-[380px] shrink-0 overflow-hidden">
-            <BuildingPanel
-              building={selected}
-              onClose={() => setSelected(null)}
-            />
-          </div>
+        {activeTab === "agent" && (
+          <>
+            <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
+              <AIAgent
+                buildings={buildings}
+                onSelect={handleSelect}
+                selectedAddress={selected?.address}
+              />
+            </div>
+            {selected && (
+              <div className="w-[380px] shrink-0 overflow-hidden">
+                <BuildingPanel
+                  building={selected}
+                  onClose={() => setSelected(null)}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
