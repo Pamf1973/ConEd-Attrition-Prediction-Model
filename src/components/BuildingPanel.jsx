@@ -42,6 +42,18 @@ export default function BuildingPanel({ building, onClose }) {
   const euiMedian = EUI_MEDIANS[b.use] ?? EUI_MEDIANS["Office"];
   const euiDelta  = b.eui != null ? Math.round(((b.eui - euiMedian) / euiMedian) * 100) : null;
 
+  const s2022 = Number.isFinite(b.steam_2022) ? b.steam_2022 : null;
+  const s2023 = Number.isFinite(b.steam_2023) ? b.steam_2023 : null;
+  const yoyPct = s2022 && s2023 ? Math.round(((s2023 - s2022) / s2022) * 100) : null;
+  const yoyColor = yoyPct == null ? "#94a3b8"
+                 : yoyPct <= -20 ? "#ef4444"
+                 : yoyPct <= -5  ? "#f97316"
+                 : yoyPct >=  5  ? "#22c55e"
+                 :                  "#94a3b8";
+  const maxSteam = s2022 && s2023 ? Math.max(s2022, s2023) : 0;
+  const bar2022Pct = maxSteam ? (s2022 / maxSteam) * 100 : 0;
+  const bar2023Pct = maxSteam ? (s2023 / maxSteam) * 100 : 0;
+
   return (
     <div className="flex flex-col h-full bg-slate-900 border-l border-slate-800 overflow-y-auto">
       {/* Header */}
@@ -140,6 +152,42 @@ export default function BuildingPanel({ building, onClose }) {
 
         {/* Energy & demand */}
         <Section title="Energy & Demand">
+          {s2022 && s2023 && (
+            <div className="rounded-lg p-3 mt-1 mb-2" style={{ background: "#1e293b" }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-slate-500">STEAM USAGE — YEAR OVER YEAR</span>
+                <span className="text-sm font-bold" style={{ color: yoyColor }}>
+                  {yoyPct > 0 ? "+" : ""}{yoyPct}%
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 w-10">2022</span>
+                  <div className="flex-1 h-3 bg-slate-800 rounded overflow-hidden">
+                    <div className="h-full rounded" style={{ width: `${bar2022Pct}%`, background: "#475569" }} />
+                  </div>
+                  <span className="text-xs text-slate-300 w-16 text-right">
+                    {(s2022 / 1e6).toFixed(1)}M
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500 w-10">2023</span>
+                  <div className="flex-1 h-3 bg-slate-800 rounded overflow-hidden">
+                    <div className="h-full rounded" style={{ width: `${bar2023Pct}%`, background: yoyColor }} />
+                  </div>
+                  <span className="text-xs text-slate-300 w-16 text-right">
+                    {(s2023 / 1e6).toFixed(1)}M
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-slate-600 mt-2">
+                {yoyPct <= -20 ? "Sharp drop — possible disconnect underway"
+                 : yoyPct <= -5 ? "Moderate decline in steam demand"
+                 : yoyPct >= 5  ? "Demand increasing"
+                 :                "Stable demand"}
+              </p>
+            </div>
+          )}
           <Row label="Steam Demand"  value={b.steam != null ? `${(b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 })} M kBtu` : null} />
           <Row
             label="Steam EUI"

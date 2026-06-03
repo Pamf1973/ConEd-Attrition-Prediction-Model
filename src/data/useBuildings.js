@@ -23,10 +23,21 @@ export function useBuildings() {
           console.warn("buildingEnrichment.json failed to load — continuing without enrichment");
         }
 
+        let yearly = {};
+        try {
+          const yearlyRes = await fetch("/yearly.json");
+          if (yearlyRes.ok) yearly = await yearlyRes.json();
+        } catch {
+          console.warn("yearly.json failed to load — continuing without yearly steam history");
+        }
+
         if (cancelled) return;
 
-        // Enrichment keys are uppercased by kmeans_model.py — normalize join key
-        const merged = bldgs.map(b => ({ ...b, ...(enrich[b.address?.toUpperCase()] ?? {}) }));
+        // Enrichment + yearly keys are uppercased — normalize join key
+        const merged = bldgs.map(b => {
+          const key = b.address?.toUpperCase();
+          return { ...b, ...(enrich[key] ?? {}), ...(yearly[key] ?? {}) };
+        });
         setBuildings(merged);
       } catch (err) {
         if (!cancelled) setError(err.message ?? "Failed to load building data");
