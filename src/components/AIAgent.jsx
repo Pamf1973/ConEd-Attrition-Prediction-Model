@@ -102,7 +102,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress }) {
         {loading && (
           <div className="flex items-center justify-center h-48 text-slate-500 text-sm gap-3">
             <div className="w-4 h-4 border-2 border-orange-500/40 border-t-orange-400 rounded-full animate-spin" />
-            Asking Llama 3.3…
+            Thinking…
           </div>
         )}
 
@@ -199,7 +199,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress }) {
           <div className="flex flex-col items-center justify-center h-full text-center px-8 pb-16">
             <div className="text-4xl mb-4 opacity-20">⚡</div>
             <p className="text-slate-400 text-sm mb-1">Ask anything about the steam portfolio</p>
-            <p className="text-slate-600 text-xs">Powered by Llama 3.3 70B via Groq</p>
+            <p className="text-slate-600 text-xs">Powered by Claude Haiku · backend proxy</p>
           </div>
         )}
       </div>

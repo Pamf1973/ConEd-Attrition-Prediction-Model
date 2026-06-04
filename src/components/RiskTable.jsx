@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { riskTier, signalMeta } from "../data/useBuildings";
+import { riskTier, signalMeta, isUncertain } from "../data/useBuildings";
 
 const COLS = [
   { key: "address",           label: "Address",        sortable: true  },
@@ -23,6 +23,8 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
   const [tierFilter,    setTierFilter]    = useState("All");
   const [typeFilter,    setTypeFilter]    = useState("All");
   const [clusterFilter, setClusterFilter] = useState("All");
+  const [signalFilter,  setSignalFilter]  = useState("All");
+  const [ll97Filter,    setLl97Filter]    = useState("All");
   const [demandMin,     setDemandMin]     = useState("");
   const [demandMax,     setDemandMax]     = useState("");
   const [search,        setSearch]        = useState("");
@@ -41,11 +43,15 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
 
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      rows = rows.filter(b => b.address.toLowerCase().includes(q));
+      rows = rows.filter(b => (b.address?.toLowerCase() ?? "").includes(q));
     }
 
     if (tierFilter !== "All") {
-      rows = rows.filter(b => riskTier(b.risk).label === tierFilter);
+      if (tierFilter === "Uncertain") {
+        rows = rows.filter(b => isUncertain(b));
+      } else {
+        rows = rows.filter(b => !isUncertain(b) && riskTier(b.risk).label === tierFilter);
+      }
     }
 
     if (typeFilter !== "All") {
@@ -54,6 +60,20 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
 
     if (clusterFilter !== "All") {
       rows = rows.filter(b => b.cluster_name === clusterFilter);
+    }
+
+    if (signalFilter === "Big Drop") {
+      rows = rows.filter(b => b.signal === "big_drop");
+    } else if (signalFilter === "Mod Drop") {
+      rows = rows.filter(b => b.signal === "mod_drop");
+    } else if (signalFilter === "No Signal") {
+      rows = rows.filter(b => !b.signal);
+    }
+
+    if (ll97Filter === "Over Cap") {
+      rows = rows.filter(b => b.ll97_penalty_2024 > 0);
+    } else if (ll97Filter === "Compliant") {
+      rows = rows.filter(b => b.ll97_penalty_2024 === 0);
     }
 
     const min = parseFloat(demandMin);
@@ -73,7 +93,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       if (av > bv) return sortDir === "asc" ?  1 : -1;
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, demandMin, demandMax, sortKey, sortDir]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, demandMin, demandMax, sortKey, sortDir]);
 
   function exportCSV() {
     // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
@@ -100,25 +120,48 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
     URL.revokeObjectURL(url);
   }
 
-  const high   = filtered.filter(b => b.risk > 0.7).length;
-  const medium = filtered.filter(b => b.risk > 0.4 && b.risk <= 0.7).length;
-  const low    = filtered.filter(b => Number.isFinite(b.risk) && b.risk <= 0.4).length;
+  const high         = filtered.filter(b => !isUncertain(b) && b.risk > 0.7).length;
+  const medium       = filtered.filter(b => !isUncertain(b) && b.risk > 0.4 && b.risk <= 0.7).length;
+  const low          = filtered.filter(b => !isUncertain(b) && Number.isFinite(b.risk) && b.risk <= 0.4).length;
+  const uncertain    = filtered.filter(b => isUncertain(b)).length;
+  const overCap      = filtered.filter(b => b.ll97_penalty_2024 > 0).length;
+  const totalPenalty = filtered.reduce((sum, b) => sum + (b.ll97_penalty_2024 || 0), 0);
 
   return (
     <div className="flex flex-col h-full">
       {/* Stats bar */}
-      <div className="flex gap-4 p-4 border-b border-slate-800">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 border-b border-slate-800 items-center">
         {[
-          { label: "High Attrition",   count: high,   color: "#ef4444" },
-          { label: "Med Attrition",   count: medium, color: "#f97316" },
-          { label: "Low Attrition",   count: low,    color: "#22c55e" },
-          { label: "Total",       count: buildings.length, color: "#94a3b8" },
+          { label: "High Attrition", count: high,             color: "#ef4444" },
+          { label: "Med Attrition",  count: medium,           color: "#f97316" },
+          { label: "Low Attrition",  count: low,              color: "#22c55e" },
+          { label: "Uncertain",      count: uncertain,        color: "#a78bfa" },
+          { label: "Total",          count: buildings.length, color: "#94a3b8" },
         ].map(s => (
           <div key={s.label} className="text-center">
             <div className="text-2xl font-bold" style={{ color: s.color }}>{s.count}</div>
             <div className="text-xs text-slate-500">{s.label}</div>
           </div>
         ))}
+
+        {/* LL97 divider */}
+        <div className="w-px h-8 bg-slate-700 mx-1 hidden sm:block" />
+
+        <div className="text-center">
+          <div className="text-2xl font-bold" style={{ color: overCap > 0 ? "#ef4444" : "#22c55e" }}>{overCap}</div>
+          <div className="text-xs text-slate-500">Over LL97 Cap</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold" style={{ color: totalPenalty > 5_000_000 ? "#ef4444" : totalPenalty > 0 ? "#f97316" : "#22c55e" }}>
+            {totalPenalty >= 1_000_000
+              ? `$${(totalPenalty / 1_000_000).toFixed(1)}M`
+              : totalPenalty > 0
+                ? `$${Math.round(totalPenalty / 1_000)}k`
+                : "$0"}
+          </div>
+          <div className="text-xs text-slate-500">Combined Fine</div>
+        </div>
+
         <div className="ml-auto flex items-center">
           <button
             onClick={exportCSV}
@@ -146,6 +189,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           <option>High</option>
           <option>Medium</option>
           <option>Low</option>
+          <option>Uncertain</option>
         </select>
         <select
           value={typeFilter}
@@ -166,6 +210,25 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           <option>Large Commercial — Capital Mobilized</option>
           <option>Mid-Century Residential — Quiet Attrition</option>
           <option>Small Commercial — Neighborhood Contagion</option>
+        </select>
+        <select
+          value={signalFilter}
+          onChange={e => setSignalFilter(e.target.value)}
+          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+        >
+          <option value="All">All Signals</option>
+          <option value="Big Drop">Big Drop (≥50%)</option>
+          <option value="Mod Drop">Mod Drop</option>
+          <option value="No Signal">No Signal</option>
+        </select>
+        <select
+          value={ll97Filter}
+          onChange={e => setLl97Filter(e.target.value)}
+          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+        >
+          <option value="All">All LL97</option>
+          <option value="Over Cap">Over Cap</option>
+          <option value="Compliant">Compliant</option>
         </select>
         <input
           value={demandMin}
@@ -212,7 +275,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
               const active = b.address === selectedAddress;
               return (
                 <tr
-                  key={b.address}
+                  key={b.address ?? i}
                   onClick={() => onSelect(b)}
                   className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
                     active
@@ -235,21 +298,27 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                     ) : <span className="text-slate-600">—</span>}
                   </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-1.5 h-5 rounded-sm"
-                        style={{ background: tier.color, opacity: 0.85 }}
-                      />
-                      <span className="font-bold" style={{ color: tier.color }}>
-                        {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
-                      </span>
-                      <span
-                        className="text-xs px-1.5 py-0.5 rounded"
-                        style={{ color: tier.color, background: tier.bg }}
-                      >
-                        {tier.label}
-                      </span>
-                    </div>
+                    {isUncertain(b) ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-5 rounded-sm" style={{ background: "#a78bfa", opacity: 0.85 }} />
+                        <span className="font-bold" style={{ color: "#a78bfa" }}>
+                          {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
+                        </span>
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: "#a78bfa", background: "#2e1065" }}>
+                          Uncertain
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-5 rounded-sm" style={{ background: tier.color, opacity: 0.85 }} />
+                        <span className="font-bold" style={{ color: tier.color }}>
+                          {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
+                        </span>
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: tier.color, background: tier.bg }}>
+                          {tier.label}
+                        </span>
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">
                     {b.ll97_penalty_2024 != null ? (
@@ -288,9 +357,6 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                     {b.dob_jobs ? (
                       <span className="px-2 py-0.5 rounded bg-slate-700 text-xs">{b.dob_jobs}</span>
                     ) : "—"}
-                  </td>
-                  <td className="px-4 py-2.5 text-slate-400 text-sm">
-                    {b.deed_date ? b.deed_date.slice(0, 10) : "—"}
                   </td>
                 </tr>
               );

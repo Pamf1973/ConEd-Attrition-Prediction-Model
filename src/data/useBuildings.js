@@ -25,8 +25,25 @@ export function useBuildings() {
 
         if (cancelled) return;
 
-        // Enrichment keys are uppercased by kmeans_model.py — normalize join key
-        const merged = bldgs.map(b => ({ ...b, ...(enrich[b.address?.toUpperCase()] ?? {}) }));
+        // yearly.json is optional — year-over-year steam trend (steam_2022/2023/2024)
+        let yearly = {};
+        try {
+          const yearlyRes = await fetch("/yearly.json");
+          if (yearlyRes.ok) yearly = await yearlyRes.json();
+        } catch {
+          console.warn("yearly.json failed to load");
+        }
+
+        // Enrichment keys are uppercased by ll97_model.py / kmeans_model.py
+        const merged = bldgs.map(b => {
+          const key = b.address?.toUpperCase();
+          const e = enrich[key] ?? {};
+          const y = yearly[key] ?? {};
+          const has_ml_risk = e.ml_risk != null;
+          const risk   = has_ml_risk ? e.ml_risk : b.risk;
+          const signal = e.signal || null;
+          return { ...b, ...e, ...y, risk, has_ml_risk, signal };
+        });
         setBuildings(merged);
       } catch (err) {
         if (!cancelled) setError(err.message ?? "Failed to load building data");
@@ -45,9 +62,10 @@ export function useBuildings() {
 // Derive risk tier label and color from risk score (0–1)
 export function riskTier(score) {
   if (!Number.isFinite(score)) return { label: "Unknown", color: "#64748b", bg: "#1e293b" };
-  if (score > 0.7) return { label: "High",   color: "#ef4444", bg: "#450a0a" };
-  if (score > 0.4) return { label: "Medium", color: "#f97316", bg: "#431407" };
-  return                  { label: "Low",    color: "#22c55e", bg: "#052e16" };
+  const s = Math.max(0, Math.min(1, score));
+  if (s > 0.7) return { label: "High",   color: "#ef4444", bg: "#450a0a" };
+  if (s > 0.4) return { label: "Medium", color: "#f97316", bg: "#431407" };
+  return               { label: "Low",   color: "#22c55e", bg: "#052e16" };
 }
 
 // Signal label + color from enrichment signal field
@@ -57,12 +75,17 @@ export function signalMeta(signal) {
   return                            { label: "—",          color: "#475569" };
 }
 
+// Building has no supervised ML score — only the legacy heuristic is available
+export function isUncertain(building) {
+  return building.has_ml_risk === false;
+}
+
 // Recommended action based on risk score + signal
 export function recommendedAction(score, signal) {
   if (!Number.isFinite(score)) return { label: "Insufficient Data", color: "#64748b", bg: "#1e293b" };
   if (score > 0.7 || signal === "big_drop")
     return { label: "Outreach Now", color: "#ef4444", bg: "#450a0a" };
-  if (score > 0.5 || signal === "mod_drop")
+  if (score > 0.4 || signal === "mod_drop")
     return { label: "Monitor",      color: "#f97316", bg: "#431407" };
   return   { label: "Low Priority", color: "#64748b", bg: "#1e293b" };
 }

@@ -67,7 +67,16 @@ Trained on **real observed behavior** — not synthetic labels:
 Run: `/opt/homebrew/bin/python3.13 ll97_model.py`
 
 ### The K-Shaped Distribution
-The model finds very little middle ground: **60 High risk / 9 Medium / 1,191 Low**. This reflects the real customer landscape — buildings either have converging signals (LL97 pressure + neighbors leaving + HVAC permits filed) and are heading out, or they have none of those and are staying. The retention strategy should focus on the 60 high-risk buildings.
+The model finds very little middle ground: **58 High risk / 7 Medium / 1,145 Low / 50 Uncertain**. This reflects the real customer landscape — buildings either have converging signals (LL97 pressure + neighbors leaving + HVAC permits filed) and are heading out, or they have none of those and are staying. The retention strategy should focus on the 58 high-risk buildings.
+
+The **Uncertain** tier (50 buildings, shown in purple) uses only the legacy heuristic score because those buildings were excluded from the ML training set (missing GHG, floor area, or year-built data). ConEd's own early-warning model uses a similar "Uncertain" category for customers where the regression model has low fit (R² too low to trust the normalized usage estimate).
+
+### Weather Normalization — Known Limitation
+
+ConEd's internal early-warning model performs **per-customer linear regression** to weather-normalize usage:
+`normalized = actual + (NHDD − AHDD) × β_HDD + (NCDD − ACDD) × β_CDD + billing_day_adj`
+
+This Phase 1 model uses a **city-wide annual HDD ratio** (2023: 1.227×, 2022: 1.031×) applied uniformly to all buildings. This means the 57 "big drop" training labels carry some weather contamination — a warm year (2023 had ~18% fewer heating degree days than average) inflates apparent demand drops. Phase 2 should implement per-building regression once ConEd billing data is available under the data sharing agreement.
 
 ---
 

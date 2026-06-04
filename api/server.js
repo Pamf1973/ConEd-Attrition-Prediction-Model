@@ -18,6 +18,7 @@ try {
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
 
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "16kb" }));
 
 // Rate limit: 30 queries / minute per IP
@@ -79,6 +80,7 @@ FILTER SPEC (return ONLY valid JSON, no explanation text, no markdown):
 async function callClaude(question) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
+    signal: AbortSignal.timeout(10_000),
     headers: {
       "content-type":      "application/json",
       "x-api-key":         ANTHROPIC_KEY,
@@ -91,7 +93,7 @@ async function callClaude(question) {
       messages:   [{ role: "user", content: question }],
     }),
   });
-  if (!res.ok) throw new Error(`Claude API ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Claude API ${res.status}`);
   const data = await res.json();
   return data.content?.[0]?.text ?? "";
 }
@@ -99,6 +101,7 @@ async function callClaude(question) {
 async function callGroq(question) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
+    signal: AbortSignal.timeout(10_000),
     headers: {
       "content-type":  "application/json",
       "Authorization": `Bearer ${GROQ_KEY}`,
@@ -113,7 +116,7 @@ async function callGroq(question) {
       ],
     }),
   });
-  if (!res.ok) throw new Error(`Groq API ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw new Error(`Groq API ${res.status}`);
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
 }

@@ -1,4 +1,53 @@
-import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
+import { riskTier, signalMeta, recommendedAction, isUncertain } from "../data/useBuildings";
+
+function SteamSparkline({ building }) {
+  const pts = [
+    { yr: "2022", v: building.steam_2022 },
+    { yr: "2023", v: building.steam_2023 },
+    { yr: "2024", v: building.steam_2024 },
+  ].filter(p => p.v != null);
+
+  if (pts.length < 2) return null;
+
+  const W = 144, H = 36, padX = 4, padY = 5;
+  const vals = pts.map(p => p.v);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals);
+  const rangeV = maxV - minV || 1;
+
+  const cx = i  => padX + (i / (pts.length - 1)) * (W - padX * 2);
+  const cy = v  => H - padY - ((v - minV) / rangeV) * (H - padY * 2);
+  const d  = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${cx(i).toFixed(1)} ${cy(p.v).toFixed(1)}`).join(" ");
+
+  const delta    = pts[pts.length - 1].v - pts[0].v;
+  const deltaPct = pts[0].v ? Math.round((delta / pts[0].v) * 100) : 0;
+  const lineColor = deltaPct <= -5 ? "#ef4444" : deltaPct >= 5 ? "#22c55e" : "#94a3b8";
+
+  return (
+    <div className="mt-2 rounded-lg p-3" style={{ background: "#1e293b" }}>
+      <div className="text-xs text-slate-500 mb-2">STEAM TREND (M kBtu)</div>
+      <div className="flex items-center gap-3">
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} overflow="visible">
+          <path d={d} fill="none" stroke={lineColor} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+          {pts.map((p, i) => (
+            <circle key={p.yr} cx={cx(i)} cy={cy(p.v)} r="2.5" fill={lineColor} />
+          ))}
+        </svg>
+        <span className="text-sm font-bold" style={{ color: lineColor }}>
+          {deltaPct > 0 ? "+" : ""}{deltaPct}%
+        </span>
+      </div>
+      <div className="flex justify-between mt-1.5" style={{ width: W }}>
+        {pts.map(p => (
+          <div key={p.yr} className="text-center">
+            <div className="text-xs text-slate-600">{p.yr}</div>
+            <div className="text-xs text-slate-500">{(p.v / 1e6).toFixed(1)}M</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const EUI_MEDIANS = {
   Office:                              27.5,
@@ -121,9 +170,15 @@ export default function BuildingPanel({ building, onClose }) {
             </div>
           )}
 
-          <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-            Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
-          </p>
+          {isUncertain(b) ? (
+            <div className="mt-3 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ background: "#1e1a2e", color: "#a78bfa", border: "1px solid #4c1d95" }}>
+              Uncertain — score uses legacy heuristic (building excluded from ML training due to missing features). ConEd classifies similar cases as "Uncertain" pending better data.
+            </div>
+          ) : (
+            <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+              Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
+            </p>
+          )}
         </Section>
 
         {/* Cluster archetype */}
@@ -138,9 +193,50 @@ export default function BuildingPanel({ building, onClose }) {
           </Section>
         )}
 
+        {/* LL97 Compliance */}
+        {(b.ll97_penalty_2024 != null || b.ll97_penalty_2030 != null) && (
+          <Section title="LL97 Carbon Compliance">
+            <div className="rounded-lg p-3 mt-1 space-y-2" style={{ background: "#1e293b" }}>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">2024–2029 Annual Penalty</span>
+                <span className="text-sm font-bold"
+                  style={{ color: b.ll97_penalty_2024 > 100_000 ? "#ef4444" : b.ll97_penalty_2024 > 0 ? "#f97316" : "#22c55e" }}>
+                  {b.ll97_penalty_2024 > 0
+                    ? `$${b.ll97_penalty_2024.toLocaleString()}`
+                    : "✓ Compliant"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">2030–2034 Annual Penalty</span>
+                <span className="text-sm font-bold"
+                  style={{ color: b.ll97_penalty_2030 > 100_000 ? "#ef4444" : b.ll97_penalty_2030 > 0 ? "#f97316" : "#22c55e" }}>
+                  {b.ll97_penalty_2030 > 0
+                    ? `$${b.ll97_penalty_2030.toLocaleString()}`
+                    : "✓ Compliant"}
+                </span>
+              </div>
+              {b.ll97_penalty_2024 > 0 && (
+                <p className="text-xs text-slate-600 pt-1">
+                  Based on {b.floor_sqft?.toLocaleString()} ft² · $268/MT CO₂e over limit · LL97 of 2019
+                </p>
+              )}
+            </div>
+            {b.ml_risk != null && (
+              <div className="flex justify-between items-center mt-2 text-sm">
+                <span className="text-slate-500">ML Attrition Score</span>
+                <span className="font-semibold"
+                  style={{ color: b.ml_risk > 0.7 ? "#ef4444" : b.ml_risk > 0.4 ? "#f97316" : "#94a3b8" }}>
+                  {Math.round(b.ml_risk * 100)}%
+                </span>
+              </div>
+            )}
+          </Section>
+        )}
+
         {/* Energy & demand */}
         <Section title="Energy & Demand">
           <Row label="Steam Demand"  value={b.steam != null ? `${(b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 })} M kBtu` : null} />
+          <SteamSparkline building={b} />
           <Row
             label="Steam EUI"
             value={b.eui != null ? `${b.eui} kBtu/ft²` : null}
