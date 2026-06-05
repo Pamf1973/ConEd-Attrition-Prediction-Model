@@ -70,10 +70,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       rows = rows.filter(b => !b.signal);
     }
 
-    if (ll97Filter === "Over Cap") {
-      rows = rows.filter(b => b.ll97_penalty_2024 > 0);
+    if (ll97Filter === "Over Limit") {
+      rows = rows.filter(b => b.ll97_over_2024 === 1);
     } else if (ll97Filter === "Compliant") {
-      rows = rows.filter(b => b.ll97_penalty_2024 === 0);
+      rows = rows.filter(b => b.ll97_over_2024 === 0);
     }
 
     const min = parseFloat(demandMin);
@@ -124,7 +124,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
   const medium       = filtered.filter(b => !isUncertain(b) && b.risk > 0.4 && b.risk <= 0.7).length;
   const low          = filtered.filter(b => !isUncertain(b) && Number.isFinite(b.risk) && b.risk <= 0.4).length;
   const uncertain    = filtered.filter(b => isUncertain(b)).length;
-  const overCap      = filtered.filter(b => b.ll97_penalty_2024 > 0).length;
+  const overCap      = filtered.filter(b => b.ll97_over_2024 === 1).length;
   const totalPenalty = filtered.reduce((sum, b) => sum + (b.ll97_penalty_2024 || 0), 0);
 
   return (
@@ -227,7 +227,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
         >
           <option value="All">All LL97</option>
-          <option value="Over Cap">Over Cap</option>
+          <option value="Over Limit">Over Limit</option>
           <option value="Compliant">Compliant</option>
         </select>
         <input
