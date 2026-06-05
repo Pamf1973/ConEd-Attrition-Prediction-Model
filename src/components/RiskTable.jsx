@@ -275,7 +275,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
               const active = b.address === selectedAddress;
               return (
                 <tr
-                  key={i}
+                  key={b.address}
                   onClick={() => onSelect(b)}
                   className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
                     active
