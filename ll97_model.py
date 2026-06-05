@@ -20,7 +20,8 @@ import csv, json, math, os, sys
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -88,9 +89,10 @@ FEATURES = [
     # steam_signal_ord excluded — it IS the label source
 ]
 
-# NYC ConEd district steam emission factor (EPA eGRID / NYC LL84 Technical Guidance)
-# 66.8 kg CO₂e per MMBtu = 6.68e-5 MT CO₂e per kBtu
-STEAM_EMISSION_FACTOR = 6.68e-5
+# NYC district steam emission factor per NYC DOB LL97 Technical Guidance (Chapter 103 Rules)
+# 0.00004493 MT CO₂e per kBtu — the LL97-specific coefficient used in NYC compliance calculations
+# Note: EPA eGRID cites ~6.68e-5 (higher); LL97 uses 4.493e-5 as the binding regulatory value
+STEAM_EMISSION_FACTOR = 4.493e-5
 
 
 # ── Loaders ───────────────────────────────────────────────────────────────────
@@ -251,18 +253,21 @@ def train(labeled_rows):
     X = np.array([[r[f] for f in FEATURES] for r, _ in labeled_rows])
     y = np.array([lbl for _, lbl in labeled_rows])
 
-    scaler = StandardScaler()
-    X_sc   = scaler.fit_transform(X)
-
     clf = GradientBoostingClassifier(
         n_estimators=300, learning_rate=0.05,
         max_depth=4, subsample=0.8,
         random_state=42,
     )
 
-    cv_scores = cross_val_score(clf, X_sc, y, cv=5, scoring="roc_auc")
-    print(f"5-fold CV AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
+    # Pipeline prevents scaler fit-leakage across CV folds
+    pipe = Pipeline([("scaler", StandardScaler()), ("clf", clf)])
+    skf  = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = cross_val_score(pipe, X, y, cv=skf, scoring="roc_auc")
+    print(f"5-fold stratified CV AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
 
+    # Fit final model on full training set
+    scaler = StandardScaler()
+    X_sc   = scaler.fit_transform(X)
     sample_w = _class_weights(y)
     clf.fit(X_sc, y, sample_weight=sample_w)
 
