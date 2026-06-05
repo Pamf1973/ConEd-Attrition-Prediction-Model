@@ -84,8 +84,13 @@ FEATURES = [
     "use_type_ord", "cluster_id",
     "ll97_penalty_2024_log", "ll97_penalty_2030_log",
     "ll97_over_2024",
+    "steam_ghg_share",
     # steam_signal_ord excluded — it IS the label source
 ]
+
+# NYC ConEd district steam emission factor (EPA eGRID / NYC LL84 Technical Guidance)
+# 66.8 kg CO₂e per MMBtu = 6.68e-5 MT CO₂e per kBtu
+STEAM_EMISSION_FACTOR = 6.68e-5
 
 
 # ── Loaders ───────────────────────────────────────────────────────────────────
@@ -176,6 +181,11 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
         sig_raw   = signals.get(addr, {}).get("signal", "none")
         sig_ord   = 2 if sig_raw == "big_drop" else 1 if sig_raw == "mod_drop" else 0
 
+        # Fraction of total GHG attributable to steam — addresses Edwin's causal gap:
+        # LL97 pressure only points at steam if steam IS the dominant emissions source.
+        steam_ghg = steam * STEAM_EMISSION_FACTOR  # MT CO₂e from steam
+        steam_ghg_share = min(steam_ghg / ghg, 1.0) if ghg > 0 else 0.0
+
         rows.append({
             "address":              addr,
             "log_steam":            math.log(steam),
@@ -189,6 +199,7 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
             "ll97_penalty_2024_log": math.log1p(ll97["ll97_penalty_2024"]),
             "ll97_penalty_2030_log": math.log1p(ll97["ll97_penalty_2030"]),
             "ll97_over_2024":       float(ll97["ll97_over_2024"]),
+            "steam_ghg_share":      steam_ghg_share,
             "steam_signal_ord":     float(sig_ord),
             # raw outputs for enrichment write
             "ll97_penalty_2024":    ll97["ll97_penalty_2024"],
@@ -286,6 +297,7 @@ def update_enrichment(enrichment, rows, probs):
         enrichment[addr]["ll97_cap_2024"]     = row["ll97_cap_2024"]
         enrichment[addr]["ll97_cap_2030"]     = row["ll97_cap_2030"]
         enrichment[addr]["floor_sqft"]        = int(row["floor_sqft"])
+        enrichment[addr]["steam_ghg_share"]   = round(row["steam_ghg_share"], 3)
         enrichment[addr]["ml_risk"]           = round(float(prob), 4)
 
 
