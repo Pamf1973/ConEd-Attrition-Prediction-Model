@@ -42,6 +42,11 @@ const PORT = process.env.API_PORT ?? 3001;
 
 app.set("trust proxy", 1);
 app.use(express.json({ limit: "16kb" }));
+app.use((err, req, res, next) => {
+  if (err.status === 413 || err.type === "entity.too.large")
+    return res.status(413).json({ error: "Request too large — max 16kb" });
+  next(err);
+});
 
 // Rate limit: 30 queries / minute per IP
 const limiter = rateLimit({
