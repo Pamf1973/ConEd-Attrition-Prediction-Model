@@ -1,6 +1,6 @@
 import { riskTier, signalMeta, recommendedAction, isUncertain } from "../data/useBuildings";
 
-function SteamSparkline({ building }) {
+function SteamTrend({ building }) {
   const pts = [
     { yr: "2022", v: building.steam_2022 },
     { yr: "2023", v: building.steam_2023 },
@@ -9,42 +9,45 @@ function SteamSparkline({ building }) {
 
   if (pts.length < 2) return null;
 
-  const W = 144, H = 36, padX = 4, padY = 5;
-  const vals = pts.map(p => p.v);
-  const minV = Math.min(...vals);
-  const maxV = Math.max(...vals);
-  const rangeV = maxV - minV || 1;
+  const first = pts[0].v;
+  const last  = pts[pts.length - 1].v;
+  const pct   = first ? Math.round(((last - first) / first) * 100) : 0;
+  const color = pct <= -20 ? "#ef4444" : pct <= -5 ? "#f97316" : pct >= 5 ? "#22c55e" : "#94a3b8";
+  const maxV  = Math.max(...pts.map(p => p.v));
 
-  const cx = i  => padX + (i / (pts.length - 1)) * (W - padX * 2);
-  const cy = v  => H - padY - ((v - minV) / rangeV) * (H - padY * 2);
-  const d  = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${cx(i).toFixed(1)} ${cy(p.v).toFixed(1)}`).join(" ");
-
-  const delta    = pts[pts.length - 1].v - pts[0].v;
-  const deltaPct = pts[0].v ? Math.round((delta / pts[0].v) * 100) : 0;
-  const lineColor = deltaPct <= -5 ? "#ef4444" : deltaPct >= 5 ? "#22c55e" : "#94a3b8";
+  const label = pct <= -20 ? "Sharp drop — possible disconnect underway"
+              : pct <= -5  ? "Moderate decline in steam demand"
+              : pct >= 5   ? "Demand increasing"
+              :               "Stable demand";
 
   return (
-    <div className="mt-2 rounded-lg p-3" style={{ background: "#1e293b" }}>
-      <div className="text-xs text-slate-500 mb-2">STEAM TREND (M kBtu)</div>
-      <div className="flex items-center gap-3">
-        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} overflow="visible">
-          <path d={d} fill="none" stroke={lineColor} strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-          {pts.map((p, i) => (
-            <circle key={p.yr} cx={cx(i)} cy={cy(p.v)} r="2.5" fill={lineColor} />
-          ))}
-        </svg>
-        <span className="text-sm font-bold" style={{ color: lineColor }}>
-          {deltaPct > 0 ? "+" : ""}{deltaPct}%
+    <div className="rounded-lg p-3 mt-1 mb-2" style={{ background: "#1e293b" }}>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-slate-500">STEAM USAGE — YEAR OVER YEAR</span>
+        <span className="text-sm font-bold" style={{ color }}>
+          {pct > 0 ? "+" : ""}{pct}%
         </span>
       </div>
-      <div className="flex justify-between mt-1.5" style={{ width: W }}>
+      <div className="space-y-1.5">
         {pts.map(p => (
-          <div key={p.yr} className="text-center">
-            <div className="text-xs text-slate-600">{p.yr}</div>
-            <div className="text-xs text-slate-500">{(p.v / 1e6).toFixed(1)}M</div>
+          <div key={p.yr} className="flex items-center gap-2">
+            <span className="text-xs text-slate-500 w-10">{p.yr}</span>
+            <div className="flex-1 h-3 bg-slate-800 rounded overflow-hidden">
+              <div
+                className="h-full rounded"
+                style={{
+                  width: `${maxV ? (p.v / maxV) * 100 : 0}%`,
+                  background: p.yr === String(pts[pts.length - 1].yr) ? color : "#475569",
+                }}
+              />
+            </div>
+            <span className="text-xs text-slate-300 w-16 text-right">
+              {(p.v / 1e6).toFixed(1)}M
+            </span>
           </div>
         ))}
       </div>
+      <p className="text-xs text-slate-600 mt-2">{label}</p>
     </div>
   );
 }
@@ -237,7 +240,7 @@ export default function BuildingPanel({ building, onClose }) {
         <Section title="Energy & Demand">
           <Row label="SC Class"      value={b.sc_class || null} />
           <Row label="Steam Demand"  value={b.steam != null ? `${(b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 })} M kBtu` : null} />
-          <SteamSparkline building={b} />
+          <SteamTrend building={b} />
           <Row
             label="Steam EUI"
             value={b.eui != null ? `${b.eui} kBtu/ft²` : null}

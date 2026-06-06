@@ -20,7 +20,8 @@ import csv, json, math, os, sys
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import classification_report
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -84,8 +85,14 @@ FEATURES = [
     "use_type_ord", "cluster_id",
     "ll97_penalty_2024_log", "ll97_penalty_2030_log",
     "ll97_over_2024",
+    "steam_ghg_share",
     # steam_signal_ord excluded — it IS the label source
 ]
+
+# NYC district steam emission factor per NYC DOB LL97 Technical Guidance (Chapter 103 Rules)
+# 0.00004493 MT CO₂e per kBtu — the LL97-specific coefficient used in NYC compliance calculations
+# Note: EPA eGRID cites ~6.68e-5 (higher); LL97 uses 4.493e-5 as the binding regulatory value
+STEAM_EMISSION_FACTOR = 4.493e-5
 
 
 # ── Loaders ───────────────────────────────────────────────────────────────────
@@ -176,6 +183,11 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
         sig_raw   = signals.get(addr, {}).get("signal", "none")
         sig_ord   = 2 if sig_raw == "big_drop" else 1 if sig_raw == "mod_drop" else 0
 
+        # Fraction of total GHG attributable to steam — addresses Edwin's causal gap:
+        # LL97 pressure only points at steam if steam IS the dominant emissions source.
+        steam_ghg = steam * STEAM_EMISSION_FACTOR  # MT CO₂e from steam
+        steam_ghg_share = min(steam_ghg / ghg, 1.0) if ghg > 0 else 0.0
+
         rows.append({
             "address":              addr,
             "log_steam":            math.log(steam),
@@ -189,6 +201,7 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
             "ll97_penalty_2024_log": math.log1p(ll97["ll97_penalty_2024"]),
             "ll97_penalty_2030_log": math.log1p(ll97["ll97_penalty_2030"]),
             "ll97_over_2024":       float(ll97["ll97_over_2024"]),
+            "steam_ghg_share":      steam_ghg_share,
             "steam_signal_ord":     float(sig_ord),
             # raw outputs for enrichment write
             "ll97_penalty_2024":    ll97["ll97_penalty_2024"],
@@ -240,18 +253,21 @@ def train(labeled_rows):
     X = np.array([[r[f] for f in FEATURES] for r, _ in labeled_rows])
     y = np.array([lbl for _, lbl in labeled_rows])
 
-    scaler = StandardScaler()
-    X_sc   = scaler.fit_transform(X)
-
     clf = GradientBoostingClassifier(
         n_estimators=300, learning_rate=0.05,
         max_depth=4, subsample=0.8,
         random_state=42,
     )
 
-    cv_scores = cross_val_score(clf, X_sc, y, cv=5, scoring="roc_auc")
-    print(f"5-fold CV AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
+    # Pipeline prevents scaler fit-leakage across CV folds
+    pipe = Pipeline([("scaler", StandardScaler()), ("clf", clf)])
+    skf  = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = cross_val_score(pipe, X, y, cv=skf, scoring="roc_auc")
+    print(f"5-fold stratified CV AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
 
+    # Fit final model on full training set
+    scaler = StandardScaler()
+    X_sc   = scaler.fit_transform(X)
     sample_w = _class_weights(y)
     clf.fit(X_sc, y, sample_weight=sample_w)
 
@@ -286,6 +302,7 @@ def update_enrichment(enrichment, rows, probs):
         enrichment[addr]["ll97_cap_2024"]     = row["ll97_cap_2024"]
         enrichment[addr]["ll97_cap_2030"]     = row["ll97_cap_2030"]
         enrichment[addr]["floor_sqft"]        = int(row["floor_sqft"])
+        enrichment[addr]["steam_ghg_share"]   = round(row["steam_ghg_share"], 3)
         enrichment[addr]["ml_risk"]           = round(float(prob), 4)
 
 

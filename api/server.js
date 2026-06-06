@@ -62,6 +62,14 @@ if (!DASHBOARD_PASSWORD) {
 const activeSessions = new Map(); // token → expiresAt
 const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 hours
 
+// Sweep expired sessions hourly to prevent unbounded Map growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, expiresAt] of activeSessions) {
+    if (expiresAt < now) activeSessions.delete(token);
+  }
+}, 60 * 60 * 1000).unref();
+
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
