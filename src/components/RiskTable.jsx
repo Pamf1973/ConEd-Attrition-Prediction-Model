@@ -4,6 +4,7 @@ import { riskTier, signalMeta, isUncertain } from "../data/useBuildings";
 const COLS = [
   { key: "address",           label: "Address",        sortable: true  },
   { key: "cluster_name",      label: "Archetype",       sortable: true  },
+  { key: "sc_class",          label: "SC Class",        sortable: true  },
   { key: "risk",              label: "Attrition Score", sortable: true  },
   { key: "ll97_penalty_2024", label: "LL97 Penalty",    sortable: true  },
   { key: "steam",             label: "Steam (M kBtu)",  sortable: true  },
@@ -25,6 +26,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
   const [clusterFilter, setClusterFilter] = useState("All");
   const [signalFilter,  setSignalFilter]  = useState("All");
   const [ll97Filter,    setLl97Filter]    = useState("All");
+  const [scFilter,      setScFilter]      = useState("All");
   const [demandMin,     setDemandMin]     = useState("");
   const [demandMax,     setDemandMax]     = useState("");
   const [search,        setSearch]        = useState("");
@@ -76,6 +78,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       rows = rows.filter(b => b.ll97_over_2024 === 0);
     }
 
+    if (scFilter !== "All") {
+      rows = rows.filter(b => b.sc_class === scFilter);
+    }
+
     const min = parseFloat(demandMin);
     const max = parseFloat(demandMax);
     if (!isNaN(min)) rows = rows.filter(b => b.steam >= min * 1e6);
@@ -93,7 +99,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       if (av > bv) return sortDir === "asc" ?  1 : -1;
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, demandMin, demandMax, sortKey, sortDir]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, demandMin, demandMax, sortKey, sortDir]);
 
   function exportCSV() {
     // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
@@ -101,10 +107,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       const s = String(v ?? "").replace(/"/g, '""');
       return /^[\s]*[=+\-@\t\r\n]/.test(s) ? `"'${s}"` : `"${s}"`;
     };
-    const header = ["Address","Type","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","Signal","DOB HVAC Jobs","Last Sale"].join(",");
+    const header = ["Address","Type","SC Class","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","Signal","DOB HVAC Jobs","Last Sale"].join(",");
     const rows = filtered.map(b => [
       cell(b.address),
       cell(b.use),
+      cell(b.sc_class),
       Number.isFinite(b.risk) ? (b.risk * 100).toFixed(1) + "%" : "",
       b.ll97_penalty_2024 ?? "",
       b.ll97_penalty_2030 ?? "",
@@ -230,6 +237,18 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           <option value="Over Limit">Over Limit</option>
           <option value="Compliant">Compliant</option>
         </select>
+        <select
+          value={scFilter}
+          onChange={e => setScFilter(e.target.value)}
+          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+        >
+          <option value="All">All SC Classes</option>
+          <option value="SC-1* (Small Commercial)">SC-1* (Small Commercial)</option>
+          <option value="SC-2* (Annual Power)">SC-2* (Annual Power)</option>
+          <option value="SC-3* (Residential)">SC-3* (Residential)</option>
+          <option value="SC-4* (Dual-Supply — est.)">SC-4* (Dual-Supply — est.)</option>
+          <option value="SC-5* (Negotiated — est.)">SC-5* (Negotiated — est.)</option>
+        </select>
         <input
           value={demandMin}
           onChange={e => setDemandMin(e.target.value)}
@@ -275,7 +294,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
               const active = b.address === selectedAddress;
               return (
                 <tr
-                  key={b.address ?? i}
+                  key={`${b.address}_${b.bbl}_${i}`}
                   onClick={() => onSelect(b)}
                   className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
                     active
@@ -295,6 +314,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                           {b.cluster_risk} risk archetype
                         </div>
                       </div>
+                    ) : <span className="text-slate-600">—</span>}
+                  </td>
+                  <td className="px-4 py-2.5 whitespace-nowrap">
+                    {b.sc_class ? (
+                      <span className="text-xs text-slate-300">{b.sc_class}</span>
                     ) : <span className="text-slate-600">—</span>}
                   </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">

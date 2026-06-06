@@ -1,19 +1,34 @@
+/* global process */
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
+import dotenv from "dotenv";
+
+// Keep track of inherited keys before dotenv overrides them
+const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+const originalGroqKey = process.env.GROQ_API_KEY;
+
 // Load .env explicitly so it overrides any inherited shell env vars
 // (important when running inside Claude Code which sets ANTHROPIC_API_KEY)
-try {
-  const envPath = resolve(process.cwd(), ".env");
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const [k, ...v] = line.split("=");
-    if (k?.trim() && !k.trim().startsWith("#")) {
-      process.env[k.trim()] = v.join("=").trim();
-    }
+dotenv.config({ override: true });
+
+// If dotenv overrode with placeholders, restore the original inherited keys
+if (process.env.ANTHROPIC_API_KEY === "sk-ant-..." || (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY.includes("..."))) {
+  if (originalAnthropicKey && originalAnthropicKey !== "sk-ant-..." && !originalAnthropicKey.includes("...")) {
+    process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+  } else {
+    delete process.env.ANTHROPIC_API_KEY;
   }
-} catch { /* no .env file — rely on actual env */ }
+}
+if (process.env.GROQ_API_KEY === "gsk_..." || (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.includes("..."))) {
+  if (originalGroqKey && originalGroqKey !== "gsk_..." && !originalGroqKey.includes("...")) {
+    process.env.GROQ_API_KEY = originalGroqKey;
+  } else {
+    delete process.env.GROQ_API_KEY;
+  }
+}
 
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
@@ -30,6 +45,105 @@ const limiter = rateLimit({
   message: { error: "Too many requests — try again in a minute" },
 });
 app.use("/api", limiter);
+
+// ── Authentication & Sessions ──────────────────────────────────────────────────
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || "coned-steam-2026";
+if (!process.env.DASHBOARD_PASSWORD) {
+  console.warn("[api] WARNING: DASHBOARD_PASSWORD not set in environment. Using default 'coned-steam-2026'.");
+}
+
+const activeSessions = new Set();
+
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized — missing token" });
+  }
+  const token = authHeader.substring(7);
+  if (!activeSessions.has(token)) {
+    return res.status(401).json({ error: "Unauthorized — invalid session" });
+  }
+  next();
+}
+
+// ── Auth Endpoints ────────────────────────────────────────────────────────────
+app.post("/api/auth/login", (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+  if (password === DASHBOARD_PASSWORD) {
+    const token = "token_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    activeSessions.add(token);
+    return res.json({ token });
+  }
+  return res.status(401).json({ error: "Invalid password" });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    activeSessions.delete(token);
+  }
+  res.json({ ok: true });
+});
+
+app.get("/api/auth/check", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    if (activeSessions.has(token)) {
+      return res.json({ valid: true });
+    }
+  }
+  res.json({ valid: false });
+});
+
+// Helper to read JSON safely from public or dist
+function readJsonFile(filename) {
+  try {
+    return readFileSync(resolve(process.cwd(), "public", filename), "utf8");
+  } catch {
+    return readFileSync(resolve(process.cwd(), "dist", filename), "utf8");
+  }
+}
+
+// ── Protected Data Endpoints ──────────────────────────────────────────────────
+app.get("/api/data/buildings", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("buildings.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read buildings data" });
+  }
+});
+
+app.get("/api/data/enrichment", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("buildingEnrichment.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read enrichment data" });
+  }
+});
+
+app.get("/api/data/yearly", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("yearly.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read yearly data" });
+  }
+});
+
+// Protect public JSON files from direct exposure in production build folder
+app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json"], (req, res) => {
+  res.status(403).json({ error: "Access Forbidden — Data is protected" });
+});
+
+// Serve built frontend assets in production (if built)
+app.use(express.static(resolve(process.cwd(), "dist")));
 
 // ── LLM provider detection ────────────────────────────────────────────────────
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
@@ -169,7 +283,7 @@ function validateSpec(raw) {
 }
 
 // ── /api/query ────────────────────────────────────────────────────────────────
-app.post("/api/query", async (req, res) => {
+app.post("/api/query", requireAuth, async (req, res) => {
   const question = req.body?.question;
 
   if (typeof question !== "string" || !question.trim()) {

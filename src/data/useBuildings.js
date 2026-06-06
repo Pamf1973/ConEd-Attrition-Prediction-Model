@@ -1,25 +1,73 @@
 import { useState, useEffect } from "react";
 
-export function useBuildings() {
+export function estimateScClass(useType, steamKbtu, dobJobs) {
+  const steam = steamKbtu || 0;
+  const jobs = parseInt(dobJobs || 0, 10);
+  const use = (useType || "").trim();
+
+  // SC-3: Residential multifamily (>=50% residential, >=3 units per tariff definition)
+  if (["Multifamily", "Apartment", "Residence Hall", "Dormitory"].some(x => use.includes(x))) {
+    return "SC-3* (Residential)";
+  }
+
+  // SC-5 candidates: large buildings with active boiler permit activity
+  // Indicator: steam > 50M kBtu AND >=2 DOB HVAC/boiler job filings
+  if (steam > 50000000 && jobs >= 2) {
+    return "SC-5* (Negotiated — est.)";
+  }
+
+  // SC-4 candidates: dual-supply / backup indicators
+  // Indicator: any DOB boiler filings + meaningful steam demand
+  if (jobs >= 1 && steam > 5000000) {
+    return "SC-4* (Dual-Supply — est.)";
+  }
+
+  // SC-1: small users — low steam demand or small-format use types
+  if (steam < 5000000 || ["Retail Store", "Other"].includes(use)) {
+    return "SC-1* (Small Commercial)";
+  }
+
+  // SC-2: large commercial / institutional (year-round demand, no backup signals)
+  return "SC-2* (Annual Power)";
+}
+
+export function useBuildings(token) {
   const [buildings,  setBuildings]  = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
 
   useEffect(() => {
+    if (!token) {
+      const t = setTimeout(() => {
+        setBuildings([]);
+        setLoading(false);
+        setError(null);
+      }, 0);
+      return () => clearTimeout(t);
+    }
+
     let cancelled = false;
 
     async function load() {
       try {
-        const bldgRes = await fetch("/buildings.json");
-        if (!bldgRes.ok) throw new Error(`buildings.json: HTTP ${bldgRes.status}`);
+        setLoading(true);
+        setError(null);
+
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const bldgRes = await fetch("/api/data/buildings", { headers });
+        if (bldgRes.status === 401) throw new Error("UNAUTHORIZED");
+        if (!bldgRes.ok) throw new Error(`buildings data: HTTP ${bldgRes.status}`);
         const bldgs = await bldgRes.json();
 
         // Enrichment is optional — degrade gracefully if it fails
         let enrich = {};
         try {
-          const enrichRes = await fetch("/buildingEnrichment.json");
+          const enrichRes = await fetch("/api/data/enrichment", { headers });
+          if (enrichRes.status === 401) throw new Error("UNAUTHORIZED");
           if (enrichRes.ok) enrich = await enrichRes.json();
-        } catch {
+        } catch (err) {
+          if (err.message === "UNAUTHORIZED") throw err;
           console.warn("buildingEnrichment.json failed to load — continuing without enrichment");
         }
 
@@ -28,11 +76,15 @@ export function useBuildings() {
         // yearly.json is optional — year-over-year steam trend (steam_2022/2023/2024)
         let yearly = {};
         try {
-          const yearlyRes = await fetch("/yearly.json");
+          const yearlyRes = await fetch("/api/data/yearly", { headers });
+          if (yearlyRes.status === 401) throw new Error("UNAUTHORIZED");
           if (yearlyRes.ok) yearly = await yearlyRes.json();
-        } catch {
+        } catch (err) {
+          if (err.message === "UNAUTHORIZED") throw err;
           console.warn("yearly.json failed to load");
         }
+
+        if (cancelled) return;
 
         // Enrichment keys are uppercased by ll97_model.py / kmeans_model.py
         const merged = bldgs.map(b => {
@@ -42,7 +94,9 @@ export function useBuildings() {
           const has_ml_risk = e.ml_risk != null;
           const risk   = has_ml_risk ? e.ml_risk : b.risk;
           const signal = e.signal || null;
-          return { ...b, ...e, ...y, risk, has_ml_risk, signal };
+          const dobJobs = e.dob_jobs || 0;
+          const sc_class = estimateScClass(b.use, b.steam, dobJobs);
+          return { ...b, ...e, ...y, risk, has_ml_risk, signal, sc_class };
         });
         setBuildings(merged);
       } catch (err) {
@@ -54,7 +108,7 @@ export function useBuildings() {
 
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [token]);
 
   return { buildings, loading, error };
 }
