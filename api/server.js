@@ -3,6 +3,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { randomBytes } from "crypto";
 
 import dotenv from "dotenv";
 
@@ -14,16 +15,22 @@ const originalGroqKey = process.env.GROQ_API_KEY;
 // (important when running inside Claude Code which sets ANTHROPIC_API_KEY)
 dotenv.config({ override: true });
 
+// Helper to identify if a key is a template placeholder (e.g. from .env.example)
+const isPlaceholder = (key) => {
+  if (!key) return true;
+  return key === "sk-ant-..." || key.startsWith("sk-ant-...") || key === "gsk_..." || key.startsWith("gsk_...");
+};
+
 // If dotenv overrode with placeholders, restore the original inherited keys
-if (process.env.ANTHROPIC_API_KEY === "sk-ant-..." || (process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_API_KEY.includes("..."))) {
-  if (originalAnthropicKey && originalAnthropicKey !== "sk-ant-..." && !originalAnthropicKey.includes("...")) {
+if (isPlaceholder(process.env.ANTHROPIC_API_KEY)) {
+  if (originalAnthropicKey && !isPlaceholder(originalAnthropicKey)) {
     process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
   } else {
     delete process.env.ANTHROPIC_API_KEY;
   }
 }
-if (process.env.GROQ_API_KEY === "gsk_..." || (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.includes("..."))) {
-  if (originalGroqKey && originalGroqKey !== "gsk_..." && !originalGroqKey.includes("...")) {
+if (isPlaceholder(process.env.GROQ_API_KEY)) {
+  if (originalGroqKey && !isPlaceholder(originalGroqKey)) {
     process.env.GROQ_API_KEY = originalGroqKey;
   } else {
     delete process.env.GROQ_API_KEY;
@@ -47,12 +54,13 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // ── Authentication & Sessions ──────────────────────────────────────────────────
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || "coned-steam-2026";
-if (!process.env.DASHBOARD_PASSWORD) {
-  console.warn("[api] WARNING: DASHBOARD_PASSWORD not set in environment. Using default 'coned-steam-2026'.");
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (!DASHBOARD_PASSWORD) {
+  throw new Error("FATAL: DASHBOARD_PASSWORD must be set in .env");
 }
 
-const activeSessions = new Set();
+const activeSessions = new Map(); // token → expiresAt
+const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 hours
 
 function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -60,21 +68,31 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ error: "Unauthorized — missing token" });
   }
   const token = authHeader.substring(7);
-  if (!activeSessions.has(token)) {
-    return res.status(401).json({ error: "Unauthorized — invalid session" });
+  const expiresAt = activeSessions.get(token);
+  if (!expiresAt || expiresAt < Date.now()) {
+    activeSessions.delete(token); // clean up if expired
+    return res.status(401).json({ error: "Unauthorized — invalid or expired session" });
   }
   next();
 }
 
 // ── Auth Endpoints ────────────────────────────────────────────────────────────
-app.post("/api/auth/login", (req, res) => {
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts — try again in 15 minutes" },
+});
+
+app.post("/api/auth/login", loginLimiter, (req, res) => {
   const { password } = req.body;
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
   if (password === DASHBOARD_PASSWORD) {
-    const token = "token_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
-    activeSessions.add(token);
+    const token = randomBytes(32).toString("hex");
+    activeSessions.set(token, Date.now() + SESSION_TTL);
     return res.json({ token });
   }
   return res.status(401).json({ error: "Invalid password" });
@@ -93,9 +111,11 @@ app.get("/api/auth/check", (req, res) => {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
-    if (activeSessions.has(token)) {
+    const expiresAt = activeSessions.get(token);
+    if (expiresAt && expiresAt > Date.now()) {
       return res.json({ valid: true });
     }
+    activeSessions.delete(token); // clean up
   }
   res.json({ valid: false });
 });
