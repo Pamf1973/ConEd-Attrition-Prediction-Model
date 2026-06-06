@@ -238,6 +238,7 @@ export default function BuildingPanel({ building, onClose }) {
 
         {/* Energy & demand */}
         <Section title="Energy & Demand">
+          <Row label="SC Class"      value={b.sc_class || null} />
           <Row label="Steam Demand"  value={b.steam != null ? `${(b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 })} M kBtu` : null} />
           <SteamTrend building={b} />
           <Row

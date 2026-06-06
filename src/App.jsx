@@ -1,21 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useBuildings } from "./data/useBuildings";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
 import AIAgent from "./components/AIAgent";
+import Login from "./components/Login";
 
 export default function App() {
-  const { buildings, loading, error } = useBuildings();
+  const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
+  const { buildings, loading, error } = useBuildings(token);
   const [selected,    setSelected]    = useState(null);
   const [activeTab,   setActiveTab]   = useState("rankings");
+
+  const handleLogout = useCallback(() => {
+    if (token) {
+      fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => {});
+    }
+    sessionStorage.removeItem("coned_token");
+    setToken(null);
+    setSelected(null);
+  }, [token]);
+
+  useEffect(() => {
+    if (error === "UNAUTHORIZED") {
+      const t = setTimeout(() => {
+        handleLogout();
+      }, 0);
+      return () => clearTimeout(t);
+    }
+  }, [error, handleLogout]);
+
+  function handleLogin(newToken) {
+    sessionStorage.setItem("coned_token", newToken);
+    setToken(newToken);
+  }
 
   function handleSelect(b) {
     setSelected(prev => prev?.address === b.address ? null : b);
   }
 
+  // Render Login if no token
+  if (!token) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-slate-400 text-sm">
+      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-slate-950">
         <div className="text-center">
           <div className="text-4xl mb-4 opacity-30">⚡</div>
           Loading building data…
@@ -26,7 +59,7 @@ export default function App() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen text-slate-400 text-sm">
+      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-slate-950">
         <div className="text-center">
           <div className="text-2xl mb-3 text-red-500">Failed to load</div>
           <p className="text-slate-500 mb-4">{error}</p>
@@ -73,13 +106,19 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-4">
           <span className="text-xs px-2 py-0.5 rounded border border-slate-700 text-slate-500">
             Phase 1 · Decision-Support Ranking
           </span>
           <span className="text-xs text-slate-600">
             {buildings.length.toLocaleString()} active steam customers
           </span>
+          <button
+            onClick={handleLogout}
+            className="px-2.5 py-1 rounded border border-slate-700 hover:border-red-500/40 text-[11px] font-bold text-slate-400 hover:text-red-400 bg-slate-800/40 transition-colors"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
@@ -112,6 +151,7 @@ export default function App() {
                 buildings={buildings}
                 onSelect={handleSelect}
                 selectedAddress={selected?.address}
+                token={token}
               />
             </div>
             {selected && (

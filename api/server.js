@@ -1,19 +1,41 @@
+/* global process */
 import express from "express";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { randomBytes } from "crypto";
+
+import dotenv from "dotenv";
+
+// Keep track of inherited keys before dotenv overrides them
+const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+const originalGroqKey = process.env.GROQ_API_KEY;
 
 // Load .env explicitly so it overrides any inherited shell env vars
 // (important when running inside Claude Code which sets ANTHROPIC_API_KEY)
-try {
-  const envPath = resolve(process.cwd(), ".env");
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const [k, ...v] = line.split("=");
-    if (k?.trim() && !k.trim().startsWith("#")) {
-      process.env[k.trim()] = v.join("=").trim();
-    }
+dotenv.config({ override: true });
+
+// Helper to identify if a key is a template placeholder (e.g. from .env.example)
+const isPlaceholder = (key) => {
+  if (!key) return true;
+  return key === "sk-ant-..." || key.startsWith("sk-ant-...") || key === "gsk_..." || key.startsWith("gsk_...");
+};
+
+// If dotenv overrode with placeholders, restore the original inherited keys
+if (isPlaceholder(process.env.ANTHROPIC_API_KEY)) {
+  if (originalAnthropicKey && !isPlaceholder(originalAnthropicKey)) {
+    process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+  } else {
+    delete process.env.ANTHROPIC_API_KEY;
   }
-} catch { /* no .env file — rely on actual env */ }
+}
+if (isPlaceholder(process.env.GROQ_API_KEY)) {
+  if (originalGroqKey && !isPlaceholder(originalGroqKey)) {
+    process.env.GROQ_API_KEY = originalGroqKey;
+  } else {
+    delete process.env.GROQ_API_KEY;
+  }
+}
 
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
@@ -30,6 +52,126 @@ const limiter = rateLimit({
   message: { error: "Too many requests — try again in a minute" },
 });
 app.use("/api", limiter);
+
+// ── Authentication & Sessions ──────────────────────────────────────────────────
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (!DASHBOARD_PASSWORD) {
+  throw new Error("FATAL: DASHBOARD_PASSWORD must be set in .env");
+}
+
+const activeSessions = new Map(); // token → expiresAt
+const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 hours
+
+// Sweep expired sessions hourly to prevent unbounded Map growth
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, expiresAt] of activeSessions) {
+    if (expiresAt < now) activeSessions.delete(token);
+  }
+}, 60 * 60 * 1000).unref();
+
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized — missing token" });
+  }
+  const token = authHeader.substring(7);
+  const expiresAt = activeSessions.get(token);
+  if (!expiresAt || expiresAt < Date.now()) {
+    activeSessions.delete(token); // clean up if expired
+    return res.status(401).json({ error: "Unauthorized — invalid or expired session" });
+  }
+  next();
+}
+
+// ── Auth Endpoints ────────────────────────────────────────────────────────────
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts — try again in 15 minutes" },
+});
+
+app.post("/api/auth/login", loginLimiter, (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+  if (password === DASHBOARD_PASSWORD) {
+    const token = randomBytes(32).toString("hex");
+    activeSessions.set(token, Date.now() + SESSION_TTL);
+    return res.json({ token });
+  }
+  return res.status(401).json({ error: "Invalid password" });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    activeSessions.delete(token);
+  }
+  res.json({ ok: true });
+});
+
+app.get("/api/auth/check", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    const expiresAt = activeSessions.get(token);
+    if (expiresAt && expiresAt > Date.now()) {
+      return res.json({ valid: true });
+    }
+    activeSessions.delete(token); // clean up
+  }
+  res.json({ valid: false });
+});
+
+// Helper to read JSON safely from public or dist
+function readJsonFile(filename) {
+  try {
+    return readFileSync(resolve(process.cwd(), "public", filename), "utf8");
+  } catch {
+    return readFileSync(resolve(process.cwd(), "dist", filename), "utf8");
+  }
+}
+
+// ── Protected Data Endpoints ──────────────────────────────────────────────────
+app.get("/api/data/buildings", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("buildings.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read buildings data" });
+  }
+});
+
+app.get("/api/data/enrichment", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("buildingEnrichment.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read enrichment data" });
+  }
+});
+
+app.get("/api/data/yearly", requireAuth, (req, res) => {
+  try {
+    const data = readJsonFile("yearly.json");
+    res.type("json").send(data);
+  } catch {
+    res.status(500).json({ error: "Failed to read yearly data" });
+  }
+});
+
+// Protect public JSON files from direct exposure in production build folder
+app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json"], (req, res) => {
+  res.status(403).json({ error: "Access Forbidden — Data is protected" });
+});
+
+// Serve built frontend assets in production (if built)
+app.use(express.static(resolve(process.cwd(), "dist")));
 
 // ── LLM provider detection ────────────────────────────────────────────────────
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
@@ -169,7 +311,7 @@ function validateSpec(raw) {
 }
 
 // ── /api/query ────────────────────────────────────────────────────────────────
-app.post("/api/query", async (req, res) => {
+app.post("/api/query", requireAuth, async (req, res) => {
   const question = req.body?.question;
 
   if (typeof question !== "string" || !question.trim()) {

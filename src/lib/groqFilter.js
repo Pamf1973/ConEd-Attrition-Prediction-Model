@@ -1,8 +1,12 @@
 // Calls the backend proxy at /api/query — no API keys in frontend code
-export async function queryBuildings(question) {
+export async function queryBuildings(question, token) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
   const res = await fetch("/api/query", {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body:    JSON.stringify({ question }),
   });
 

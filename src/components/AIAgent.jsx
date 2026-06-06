@@ -10,7 +10,7 @@ const EXAMPLES = [
   "Large commercial buildings sorted by LL97 penalty",
 ];
 
-export default function AIAgent({ buildings, onSelect, selectedAddress }) {
+export default function AIAgent({ buildings, onSelect, selectedAddress, token }) {
   const [query,       setQuery]       = useState("");
   const [results,     setResults]     = useState(null);
   const [explanation, setExplanation] = useState("");
@@ -27,7 +27,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress }) {
     setExplanation("");
 
     try {
-      const spec    = await queryBuildings(question);
+      const spec    = await queryBuildings(question, token);
       const matched = applyFilterSpec(buildings, spec);
       setResults(matched);
       setExplanation(spec.explanation ?? "");
