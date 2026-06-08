@@ -70,13 +70,23 @@ if (!DASHBOARD_PASSWORD) {
 }
 
 const activeSessions = new Map(); // token → expiresAt
-const SESSION_TTL = 8 * 60 * 60 * 1000; // 8 hours
+const SESSION_TTL  = 8 * 60 * 60 * 1000; // 8 hours
+const MAX_SESSIONS = 10_000; // cap to prevent OOM from session flood attacks
 
-// Sweep expired sessions hourly to prevent unbounded Map growth
+// Sweep expired sessions hourly; if still over cap, evict oldest entries (FIFO)
 setInterval(() => {
   const now = Date.now();
   for (const [token, expiresAt] of activeSessions) {
     if (expiresAt < now) activeSessions.delete(token);
+  }
+  // Secondary cap: evict oldest entries if still over limit after TTL sweep
+  if (activeSessions.size > MAX_SESSIONS) {
+    const overflow = activeSessions.size - MAX_SESSIONS;
+    let evicted = 0;
+    for (const token of activeSessions.keys()) {
+      activeSessions.delete(token);
+      if (++evicted >= overflow) break;
+    }
   }
 }, 60 * 60 * 1000).unref();
 
@@ -109,6 +119,10 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
     return res.status(400).json({ error: "Password is required" });
   }
   if (password === DASHBOARD_PASSWORD) {
+    // Enforce hard cap inline: if at limit, reject new sessions immediately
+    if (activeSessions.size >= MAX_SESSIONS) {
+      return res.status(503).json({ error: "Server at session capacity — try again later" });
+    }
     const token = randomBytes(32).toString("hex");
     activeSessions.set(token, Date.now() + SESSION_TTL);
     return res.json({ token });
@@ -353,7 +367,11 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : "NO KEY SET";
   console.log(`[api] listening on :${PORT} | provider: ${provider}`);
 });
+
+// Kill slow/stalled connections — prevents Slowloris exhaustion attacks
+server.requestTimeout  = 30_000; // 30s to complete request
+server.headersTimeout  = 35_000; // slightly longer than requestTimeout
