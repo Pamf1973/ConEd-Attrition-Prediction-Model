@@ -40,11 +40,16 @@ if (isPlaceholder(process.env.GROQ_API_KEY)) {
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
 
-app.set("trust proxy", 1);
+// trust proxy only when behind a real reverse proxy (nginx in prod)
+// Do NOT set "trust proxy" in dev — X-Forwarded-For would be client-controlled
+// and would allow rate limit bypass by spoofing different IPs per request.
+// In production: set to the specific nginx IP, e.g. app.set("trust proxy", "loopback")
 app.use(express.json({ limit: "16kb" }));
 app.use((err, req, res, next) => {
   if (err.status === 413 || err.type === "entity.too.large")
     return res.status(413).json({ error: "Request too large — max 16kb" });
+  if (err.type === "entity.parse.failed" || err instanceof SyntaxError)
+    return res.status(400).json({ error: "Invalid JSON in request body" });
   next(err);
 });
 
