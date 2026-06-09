@@ -1,9 +1,10 @@
 /* global process */
 import express from "express";
+import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve } from "path";
-import { randomBytes } from "crypto";
+import { randomBytes, timingSafeEqual } from "crypto";
 
 import dotenv from "dotenv";
 
@@ -40,6 +41,8 @@ if (isPlaceholder(process.env.GROQ_API_KEY)) {
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
 
+app.use(helmet());
+
 // trust proxy only when behind a real reverse proxy (nginx in prod)
 // Do NOT set "trust proxy" in dev — X-Forwarded-For would be client-controlled
 // and would allow rate limit bypass by spoofing different IPs per request.
@@ -53,10 +56,10 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Rate limit: 30 queries / minute per IP
+// Rate limit: 100 queries / minute per IP (raised from 30 — concurrent SPA fetches exhaust 30 quickly)
 const limiter = rateLimit({
   windowMs: 60_000,
-  max: 30,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests — try again in a minute" },
@@ -118,7 +121,11 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
-  if (password === DASHBOARD_PASSWORD) {
+  const pwdBuf  = Buffer.from(password);
+  const hashBuf = Buffer.from(DASHBOARD_PASSWORD);
+  const match   = pwdBuf.length === hashBuf.length &&
+                  timingSafeEqual(pwdBuf, hashBuf);
+  if (match) {
     // Enforce hard cap inline: if at limit, reject new sessions immediately
     if (activeSessions.size >= MAX_SESSIONS) {
       return res.status(503).json({ error: "Server at session capacity — try again later" });
@@ -152,42 +159,24 @@ app.get("/api/auth/check", (req, res) => {
   res.json({ valid: false });
 });
 
-// Helper to read JSON safely from public or dist
-function readJsonFile(filename) {
+// Preload JSON files at startup — avoids blocking readFileSync on every request
+function loadJsonFile(filename) {
   try {
     return readFileSync(resolve(process.cwd(), "public", filename), "utf8");
   } catch {
     return readFileSync(resolve(process.cwd(), "dist", filename), "utf8");
   }
 }
+const DATA_CACHE = {
+  buildings:  loadJsonFile("buildings.json"),
+  enrichment: loadJsonFile("buildingEnrichment.json"),
+  yearly:     loadJsonFile("yearly.json"),
+};
 
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
-app.get("/api/data/buildings", requireAuth, (req, res) => {
-  try {
-    const data = readJsonFile("buildings.json");
-    res.type("json").send(data);
-  } catch {
-    res.status(500).json({ error: "Failed to read buildings data" });
-  }
-});
-
-app.get("/api/data/enrichment", requireAuth, (req, res) => {
-  try {
-    const data = readJsonFile("buildingEnrichment.json");
-    res.type("json").send(data);
-  } catch {
-    res.status(500).json({ error: "Failed to read enrichment data" });
-  }
-});
-
-app.get("/api/data/yearly", requireAuth, (req, res) => {
-  try {
-    const data = readJsonFile("yearly.json");
-    res.type("json").send(data);
-  } catch {
-    res.status(500).json({ error: "Failed to read yearly data" });
-  }
-});
+app.get("/api/data/buildings",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.buildings));
+app.get("/api/data/enrichment", requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.enrichment));
+app.get("/api/data/yearly",     requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
 
 // Protect public JSON files from direct exposure in production build folder
 app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json"], (req, res) => {
