@@ -52,11 +52,11 @@ USE_TYPE_RISK = {
 # ── Cluster archetype definitions (set after reviewing K-selection output) ────
 # Keyed by cluster_id (int). Update these after running the K-selection loop.
 ARCHETYPES = {
-    0: {"name": "Post-War Multifamily — LL97 Pressure",       "risk": "High"},
-    1: {"name": "Pre-War Stable — Low Signal",                "risk": "Low"},
-    2: {"name": "Large Commercial — Capital Mobilized",       "risk": "Medium"},
-    3: {"name": "Mid-Century Residential — Quiet Attrition",  "risk": "High"},
-    4: {"name": "Small Commercial — Neighborhood Contagion",  "risk": "High"},
+    0: {"name": "Pre-War Active — Permit-Driven Churn",       "risk": "High"},
+    1: {"name": "Mid-Size Post-War — Moderate Signal",        "risk": "Medium"},
+    2: {"name": "Pre-War Stable — Low Signal",                "risk": "Low"},
+    3: {"name": "Large Commercial — Capital Mobilized",       "risk": "Medium"},
+    4: {"name": "Low-Compliance Residential — Quiet Attrition", "risk": "High"},
 }
 
 # ── K to use (set after reviewing elbow/silhouette output) ───────────────────

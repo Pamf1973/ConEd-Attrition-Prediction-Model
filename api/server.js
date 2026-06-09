@@ -203,11 +203,11 @@ AVAILABLE FIELDS on each building:
 - ll97_penalty_2024 (integer USD): annual LL97 fine. 0 = compliant
 - steam (number kBtu): annual steam demand. "large" > 50M kBtu, "small" < 5M kBtu
 - cluster_name (string): one of:
-    "Post-War Multifamily — LL97 Pressure"
+    "Pre-War Active — Permit-Driven Churn"
+    "Mid-Size Post-War — Moderate Signal"
     "Pre-War Stable — Low Signal"
     "Large Commercial — Capital Mobilized"
-    "Mid-Century Residential — Quiet Attrition"
-    "Small Commercial — Neighborhood Contagion"
+    "Low-Compliance Residential — Quiet Attrition"
 - address (string): building address. Use for partial text search.
 - yr (integer): year built. "pre-war" = yr < 1940, "post-war" = yr >= 1940 && yr < 1980
 - peer_score (number 0–1): fraction of nearby buildings also showing attrition signals
@@ -286,11 +286,11 @@ const ALLOWED_USES     = [
   "Retail Store", "Other", null,
 ];
 const ALLOWED_CLUSTERS = [
-  "Post-War Multifamily — LL97 Pressure",
+  "Pre-War Active — Permit-Driven Churn",
+  "Mid-Size Post-War — Moderate Signal",
   "Pre-War Stable — Low Signal",
   "Large Commercial — Capital Mobilized",
-  "Mid-Century Residential — Quiet Attrition",
-  "Small Commercial — Neighborhood Contagion",
+  "Low-Compliance Residential — Quiet Attrition",
   null,
 ];
 
