@@ -13,7 +13,7 @@ const originalGroqKey = process.env.GROQ_API_KEY;
 
 // Load .env explicitly so it overrides any inherited shell env vars
 // (important when running inside Claude Code which sets ANTHROPIC_API_KEY)
-dotenv.config({ override: true });
+dotenv.config({ override: true, quiet: true });
 
 // Helper to identify if a key is a template placeholder (e.g. from .env.example)
 const isPlaceholder = (key) => {

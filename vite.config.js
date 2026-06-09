@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:3001",
+      "/buildings.json": "http://localhost:3001",
+      "/buildingEnrichment.json": "http://localhost:3001",
+      "/yearly.json": "http://localhost:3001",
     },
   },
 })
