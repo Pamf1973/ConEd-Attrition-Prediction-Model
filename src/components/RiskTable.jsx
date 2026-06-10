@@ -212,11 +212,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none max-w-[220px]"
         >
           <option value="All">All Archetypes</option>
-          <option>Post-War Multifamily — LL97 Pressure</option>
+          <option>Pre-War Active — Permit-Driven Churn</option>
           <option>Pre-War Stable — Low Signal</option>
           <option>Large Commercial — Capital Mobilized</option>
-          <option>Mid-Century Residential — Quiet Attrition</option>
-          <option>Small Commercial — Neighborhood Contagion</option>
+          <option>Low-Compliance Residential — Quiet Attrition</option>
+          <option>Mid-Size Post-War — Moderate Signal</option>
         </select>
         <select
           value={signalFilter}
