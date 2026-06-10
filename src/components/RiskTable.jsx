@@ -8,6 +8,7 @@ const COLS = [
   { key: "risk",              label: "Attrition Score", sortable: true  },
   { key: "ll97_penalty_2024", label: "LL97 Penalty",    sortable: true  },
   { key: "steam",             label: "Steam (M kBtu)",  sortable: true  },
+  { key: "norm_delta_23_24",  label: "YoY Δ (norm)",    sortable: true  },
   { key: "signal",            label: "Top Signal",      sortable: false },
   { key: "dob_jobs",          label: "DOB HVAC Jobs",   sortable: true  },
 ];
@@ -18,7 +19,7 @@ const USE_TYPES = [
   "Other", "Retail Store",
 ];
 
-export default function RiskTable({ buildings, onSelect, selectedAddress }) {
+export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch }) {
   const [sortKey,       setSortKey]       = useState("risk");
   const [sortDir,       setSortDir]       = useState("desc");
   const [tierFilter,    setTierFilter]    = useState("All");
@@ -27,6 +28,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
   const [signalFilter,  setSignalFilter]  = useState("All");
   const [ll97Filter,    setLl97Filter]    = useState("All");
   const [scFilter,      setScFilter]      = useState("All");
+  const [outlierFilter, setOutlierFilter] = useState("All");
   const [demandMin,     setDemandMin]     = useState("");
   const [demandMax,     setDemandMax]     = useState("");
   const [search,        setSearch]        = useState("");
@@ -82,6 +84,12 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       rows = rows.filter(b => b.sc_class === scFilter);
     }
 
+    if (outlierFilter === "Outliers Only") {
+      rows = rows.filter(b => b.outlier_23_24 || b.outlier_22_23);
+    } else if (outlierFilter === "Non-Outliers") {
+      rows = rows.filter(b => !b.outlier_23_24 && !b.outlier_22_23);
+    }
+
     const min = parseFloat(demandMin);
     const max = parseFloat(demandMax);
     if (!isNaN(min)) rows = rows.filter(b => b.steam >= min * 1e6);
@@ -99,7 +107,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       if (av > bv) return sortDir === "asc" ?  1 : -1;
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, demandMin, demandMax, sortKey, sortDir]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, sortKey, sortDir]);
 
   function exportCSV() {
     // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
@@ -107,7 +115,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       const s = String(v ?? "").replace(/"/g, '""');
       return /^[\s]*[=+\-@\t\r\n]/.test(s) ? `"'${s}"` : `"${s}"`;
     };
-    const header = ["Address","Type","SC Class","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","Signal","DOB HVAC Jobs","Last Sale"].join(",");
+    const header = ["Address","Type","SC Class","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","YoY Delta 23-24 (norm)","YoY Delta 22-23 (norm)","Outlier","Signal","DOB HVAC Jobs","Last Sale"].join(",");
     const rows = filtered.map(b => [
       cell(b.address),
       cell(b.use),
@@ -116,6 +124,9 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
       b.ll97_penalty_2024 ?? "",
       b.ll97_penalty_2030 ?? "",
       b.steam != null ? (b.steam / 1e6).toFixed(1) : "",
+      b.norm_delta_23_24 != null ? b.norm_delta_23_24.toFixed(1) + "%" : "",
+      b.norm_delta_22_23 != null ? b.norm_delta_22_23.toFixed(1) + "%" : "",
+      (b.outlier_23_24 || b.outlier_22_23) ? "YES" : "",
       cell(b.signal),
       b.dob_jobs ?? 0,
       cell(b.deed_date),
@@ -249,6 +260,15 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
           <option value="SC-4* (Dual-Supply — est.)">SC-4* (Dual-Supply — est.)</option>
           <option value="SC-5* (Negotiated — est.)">SC-5* (Negotiated — est.)</option>
         </select>
+        <select
+          value={outlierFilter}
+          onChange={e => setOutlierFilter(e.target.value)}
+          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+        >
+          <option value="All">All YoY</option>
+          <option value="Outliers Only">Outliers Only</option>
+          <option value="Non-Outliers">Non-Outliers</option>
+        </select>
         <input
           value={demandMin}
           onChange={e => setDemandMin(e.target.value)}
@@ -363,6 +383,26 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                   <td className="px-4 py-2.5 text-slate-300">
                     {b.steam != null ? (b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—"}
                   </td>
+                  <td className="px-4 py-2.5 text-right font-mono text-xs">
+                    {(() => {
+                      const delta = b.norm_delta_23_24 ?? b.norm_delta_22_23;
+                      const isOutlier = b.outlier_23_24 || b.outlier_22_23;
+                      const period = b.norm_delta_23_24 != null ? "23→24" : b.norm_delta_22_23 != null ? "22→23" : null;
+                      if (delta == null) return <span className="text-slate-600">—</span>;
+                      const color = delta <= -20 ? "#ef4444" : delta <= -5 ? "#f97316" : delta >= 15 ? "#22c55e" : "#94a3b8";
+                      return (
+                        <span className="flex items-center justify-end gap-1">
+                          {isOutlier && (
+                            <span className="px-1 py-0.5 rounded text-[10px] font-bold bg-yellow-900 text-yellow-300">!</span>
+                          )}
+                          <span style={{ color }}>
+                            {delta > 0 ? "+" : ""}{delta.toFixed(1)}%
+                          </span>
+                          <span className="text-slate-600 text-[10px]">{period}</span>
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td className="px-4 py-2.5">
                     {b.signal ? (
                       <span className="text-xs font-semibold" style={{ color: sig.color }}>
@@ -382,6 +422,17 @@ export default function RiskTable({ buildings, onSelect, selectedAddress }) {
                       <span className="px-2 py-0.5 rounded bg-slate-700 text-xs">{b.dob_jobs}</span>
                     ) : "—"}
                   </td>
+                  {onWatch && (
+                    <td className="px-3 py-2.5 text-center">
+                      <button
+                        onClick={e => { e.stopPropagation(); onWatch(b.address); }}
+                        className={`text-base transition-colors ${watchlist.includes(b.address) ? "text-yellow-400" : "text-slate-700 hover:text-yellow-500"}`}
+                        title={watchlist.includes(b.address) ? "Remove from watchlist" : "Add to watchlist"}
+                      >
+                        ★
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}

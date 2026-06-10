@@ -1,3 +1,29 @@
+export async function summarizeResults(question, results, token) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  try {
+    const res = await fetch("/api/summarize", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        question,
+        count: results.length,
+        sample: results.slice(0, 5).map(b => ({
+          address: b.address,
+          risk: b.risk,
+          ll97_penalty_2024: b.ll97_penalty_2024,
+          use: b.use,
+        })),
+      }),
+    });
+    if (!res.ok) return null;
+    const { summary } = await res.json();
+    return summary ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // Calls the backend proxy at /api/query — no API keys in frontend code
 export async function queryBuildings(question, token) {
   const headers = { "Content-Type": "application/json" };

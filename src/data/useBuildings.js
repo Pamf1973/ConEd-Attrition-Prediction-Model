@@ -73,7 +73,7 @@ export function useBuildings(token) {
 
         if (cancelled) return;
 
-        // yearly.json is optional — year-over-year steam trend (steam_2022/2023/2024)
+        // yearly.json is optional — raw year-over-year steam values (steam_2022/2023/2024)
         let yearly = {};
         try {
           const yearlyRes = await fetch("/api/data/yearly", { headers });
@@ -84,6 +84,17 @@ export function useBuildings(token) {
           console.warn("yearly.json failed to load");
         }
 
+        // yoy_deltas.json — HDD-normalized deltas + outlier flags per building
+        let yoyDeltas = {};
+        try {
+          const yoyRes = await fetch("/api/data/yoy-deltas", { headers });
+          if (yoyRes.status === 401) throw new Error("UNAUTHORIZED");
+          if (yoyRes.ok) yoyDeltas = await yoyRes.json();
+        } catch (err) {
+          if (err.message === "UNAUTHORIZED") throw err;
+          console.warn("yoy_deltas.json failed to load");
+        }
+
         if (cancelled) return;
 
         // Enrichment keys are uppercased by ll97_model.py / kmeans_model.py
@@ -91,12 +102,13 @@ export function useBuildings(token) {
           const key = b.address?.toUpperCase();
           const e = enrich[key] ?? {};
           const y = yearly[key] ?? {};
+          const yoy = yoyDeltas[key] ?? {};
           const has_ml_risk = e.ml_risk != null;
           const risk   = has_ml_risk ? e.ml_risk : b.risk;
           const signal = e.signal || null;
           const dobJobs = e.dob_jobs || 0;
           const sc_class = estimateScClass(b.use, b.steam, dobJobs);
-          return { ...b, ...e, ...y, risk, has_ml_risk, signal, sc_class };
+          return { ...b, ...e, ...y, ...yoy, risk, has_ml_risk, signal, sc_class };
         });
         setBuildings(merged);
       } catch (err) {

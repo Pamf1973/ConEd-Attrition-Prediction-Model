@@ -4,12 +4,17 @@ import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
 import AIAgent from "./components/AIAgent";
 import Login from "./components/Login";
+import YoYScatter from "./components/YoYScatter";
+import RiskHistogram from "./components/RiskHistogram";
+import Watchlist, { useWatchlist } from "./components/Watchlist";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
   const { buildings, loading, error } = useBuildings(token);
   const [selected,    setSelected]    = useState(null);
   const [activeTab,   setActiveTab]   = useState("rankings");
+  const { watchlist, toggle: toggleWatch, clear: clearWatch } = useWatchlist();
 
   const handleLogout = useCallback(() => {
     if (token) {
@@ -43,7 +48,7 @@ export default function App() {
 
   // Render Login if no token
   if (!token) {
-    return <Login onLogin={handleLogin} />;
+    return <ErrorBoundary><Login onLogin={handleLogin} /></ErrorBoundary>;
   }
 
   if (loading) {
@@ -75,6 +80,7 @@ export default function App() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="flex flex-col h-dvh bg-slate-950">
       {/* Top nav */}
       <header className="flex items-center gap-4 px-5 py-3 border-b border-slate-800 bg-slate-900 shrink-0">
@@ -85,10 +91,10 @@ export default function App() {
         <div className="w-px h-8 bg-slate-700 mx-1" />
         <nav className="flex gap-1">
           {[
-            { id: "rankings", label: "Attrition Rankings", enabled: true  },
-            { id: "forecast", label: "Load Forecast",       enabled: false },
-            { id: "watchlist",label: "Watch List",          enabled: false },
-            { id: "agent",    label: "AI Agent",            enabled: true  },
+            { id: "rankings",  label: "Attrition Rankings", enabled: true  },
+            { id: "trends",    label: "YoY Trends",          enabled: true  },
+            { id: "watchlist", label: `Watch List${watchlist.length ? ` (${watchlist.length})` : ""}`, enabled: true },
+            { id: "agent",     label: "AI Agent",            enabled: true  },
           ].map(tab => (
             <button
               key={tab.id}
@@ -131,6 +137,8 @@ export default function App() {
                 buildings={buildings}
                 onSelect={handleSelect}
                 selectedAddress={selected?.address}
+                watchlist={watchlist}
+                onWatch={toggleWatch}
               />
             </div>
             {selected && (
@@ -139,6 +147,32 @@ export default function App() {
                   building={selected}
                   onClose={() => setSelected(null)}
                 />
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === "trends" && (
+          <div className="flex-1 min-w-0 overflow-y-auto p-5 grid gap-5">
+            <RiskHistogram buildings={buildings} />
+            <YoYScatter buildings={buildings} />
+          </div>
+        )}
+
+        {activeTab === "watchlist" && (
+          <>
+            <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
+              <Watchlist
+                buildings={buildings}
+                watchlist={watchlist}
+                onToggle={toggleWatch}
+                onSelect={handleSelect}
+                selectedAddress={selected?.address}
+              />
+            </div>
+            {selected && (
+              <div className="w-[380px] shrink-0 overflow-hidden">
+                <BuildingPanel building={selected} onClose={() => setSelected(null)} />
               </div>
             )}
           </>
@@ -166,5 +200,6 @@ export default function App() {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

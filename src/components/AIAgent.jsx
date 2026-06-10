@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { queryBuildings, applyFilterSpec } from "../lib/groqFilter";
+import { queryBuildings, applyFilterSpec, summarizeResults } from "../lib/groqFilter";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 const EXAMPLES = [
@@ -14,6 +14,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [query,       setQuery]       = useState("");
   const [results,     setResults]     = useState(null);
   const [explanation, setExplanation] = useState("");
+  const [insight,     setInsight]     = useState("");
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const inputRef = useRef(null);
@@ -25,12 +26,15 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     setError(null);
     setResults(null);
     setExplanation("");
+    setInsight("");
 
     try {
       const spec    = await queryBuildings(question, token);
       const matched = applyFilterSpec(buildings, spec);
       setResults(matched);
       setExplanation(spec.explanation ?? "");
+      // Fire NL summary in background — doesn't block table render
+      summarizeResults(question, matched, token).then(s => s && setInsight(s));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,6 +51,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     setQuery("");
     setResults(null);
     setExplanation("");
+    setInsight("");
     setError(null);
     inputRef.current?.focus();
   }
@@ -115,10 +120,23 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         {results !== null && !loading && (
           <>
             {/* Explanation + count */}
-            <div className="px-4 pt-4 pb-3 flex items-center justify-between gap-4">
+            <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-4">
               <p className="text-sm text-slate-400 italic">{explanation}</p>
               <span className="text-xs text-slate-500 shrink-0">{results.length} buildings</span>
             </div>
+
+            {/* NL insight */}
+            {insight ? (
+              <div className="mx-4 mb-3 px-4 py-2.5 rounded-lg bg-orange-950/40 border border-orange-800/30 text-sm text-orange-200">
+                <span className="text-orange-500 font-semibold mr-2">⚡ Insight:</span>
+                {insight}
+              </div>
+            ) : results.length > 0 && (
+              <div className="mx-4 mb-3 px-4 py-2 rounded-lg bg-slate-800/40 border border-slate-700/30 text-xs text-slate-500 flex items-center gap-2">
+                <div className="w-3 h-3 border border-orange-500/40 border-t-orange-400 rounded-full animate-spin shrink-0" />
+                Generating insight…
+              </div>
+            )}
 
             {results.length === 0 && (
               <div className="text-center text-slate-500 py-16 text-sm">

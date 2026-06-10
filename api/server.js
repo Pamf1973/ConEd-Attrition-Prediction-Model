@@ -171,15 +171,17 @@ const DATA_CACHE = {
   buildings:  loadJsonFile("buildings.json"),
   enrichment: loadJsonFile("buildingEnrichment.json"),
   yearly:     loadJsonFile("yearly.json"),
+  yoyDeltas:  loadJsonFile("yoy_deltas.json"),
 };
 
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
-app.get("/api/data/buildings",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.buildings));
-app.get("/api/data/enrichment", requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.enrichment));
-app.get("/api/data/yearly",     requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
+app.get("/api/data/buildings",   requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.buildings));
+app.get("/api/data/enrichment",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.enrichment));
+app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
+app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
 
 // Protect public JSON files from direct exposure in production build folder
-app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json"], (req, res) => {
+app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json"], (req, res) => {
   res.status(403).json({ error: "Access Forbidden — Data is protected" });
 });
 
@@ -189,6 +191,15 @@ app.use(express.static(resolve(process.cwd(), "dist")));
 // ── LLM provider detection ────────────────────────────────────────────────────
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
 const GROQ_KEY      = process.env.GROQ_API_KEY;
+
+// Wrap user input in XML tags to structurally isolate it from the system prompt,
+// and strip the most common injection patterns. This is defense-in-depth —
+// validateSpec() still enforces the schema on output regardless.
+const INJECTION_RE = /\b(ignore|forget|disregard|override|system prompt|instructions|you are now|act as|jailbreak|new task|pretend|roleplay)\b/gi;
+function sanitizeQuestion(q) {
+  const stripped = q.replace(INJECTION_RE, "[filtered]").trim();
+  return `<user_query>${stripped}</user_query>`;
+}
 
 const SYSTEM_PROMPT = `You are a data query assistant for a ConEd steam customer attrition dashboard.
 The user asks questions in plain English. You translate them into a JSON filter spec — nothing else.
@@ -232,7 +243,7 @@ FILTER SPEC (return ONLY valid JSON, no explanation text, no markdown):
   "explanation": ""
 }`;
 
-async function callClaude(question) {
+async function callClaude(question, systemOverride) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     signal: AbortSignal.timeout(10_000),
@@ -244,7 +255,7 @@ async function callClaude(question) {
     body: JSON.stringify({
       model:      "claude-haiku-4-5-20251001",
       max_tokens: 512,
-      system:     SYSTEM_PROMPT,
+      system:     systemOverride ?? SYSTEM_PROMPT,
       messages:   [{ role: "user", content: question }],
     }),
   });
@@ -253,7 +264,7 @@ async function callClaude(question) {
   return data.content?.[0]?.text ?? "";
 }
 
-async function callGroq(question) {
+async function callGroq(question, systemOverride) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     signal: AbortSignal.timeout(10_000),
@@ -266,7 +277,7 @@ async function callGroq(question) {
       temperature: 0,
       max_tokens:  512,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemOverride ?? SYSTEM_PROMPT },
         { role: "user",   content: question },
       ],
     }),
@@ -338,7 +349,8 @@ app.post("/api/query", requireAuth, async (req, res) => {
   }
 
   try {
-    const raw     = ANTHROPIC_KEY ? await callClaude(question) : await callGroq(question);
+    const safe    = sanitizeQuestion(question);
+    const raw     = ANTHROPIC_KEY ? await callClaude(safe) : await callGroq(safe);
     const cleaned = raw.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
     const parsed  = JSON.parse(cleaned);
     const spec    = validateSpec(parsed);
@@ -346,6 +358,37 @@ app.post("/api/query", requireAuth, async (req, res) => {
   } catch (err) {
     console.error("[/api/query]", err.message);
     res.status(502).json({ error: "LLM query failed — try again" });
+  }
+});
+
+// ── /api/summarize ────────────────────────────────────────────────────────────
+app.post("/api/summarize", requireAuth, async (req, res) => {
+  const { question, count, sample } = req.body ?? {};
+
+  if (typeof question !== "string" || !question.trim()) {
+    return res.status(400).json({ error: "question is required" });
+  }
+  if (!ANTHROPIC_KEY && !GROQ_KEY) {
+    return res.status(503).json({ error: "No LLM API key configured" });
+  }
+
+  const top = (Array.isArray(sample) ? sample.slice(0, 5) : []).map(b =>
+    `${b.address} (risk ${Math.round((b.risk ?? 0) * 100)}%, LL97 $${(b.ll97_penalty_2024 ?? 0).toLocaleString()}, ${b.use ?? "unknown use"})`
+  ).join("; ");
+
+  const summaryPrompt = `The user asked: "${sanitizeQuestion(question).slice(0, 220)}"
+Results: ${count} buildings matched.
+Top matches: ${top || "none"}.
+Write ONE concise sentence (max 25 words) summarizing what was found. Be specific with numbers. No preamble.`;
+
+  try {
+    const raw = ANTHROPIC_KEY
+      ? await callClaude(summaryPrompt, "You are a data analyst summarizing building search results. Reply with one sentence only.")
+      : await callGroq(summaryPrompt,   "You are a data analyst summarizing building search results. Reply with one sentence only.");
+    res.json({ summary: raw.trim().replace(/^["']|["']$/g, "") });
+  } catch (err) {
+    console.error("[/api/summarize]", err.message);
+    res.status(502).json({ error: "summarize failed" });
   }
 });
 

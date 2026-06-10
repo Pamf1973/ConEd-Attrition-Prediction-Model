@@ -1,0 +1,27 @@
+{
+  "hdd_factors": {
+    "2022": 1.031,
+    "2023": 1.227,
+    "2024": 1.227
+  },
+  "hdd_2024_provisional": true,
+  "outlier_method": "IQR 1.5x",
+  "period_22_23": {
+    "n": 743,
+    "mean": 78.07,
+    "median": 5.34,
+    "stdev": 1727.6,
+    "p10": -23.6,
+    "p90": 34.21,
+    "outlier_count": 93
+  },
+  "period_23_24": {
+    "n": 422,
+    "mean": 185.26,
+    "median": -16.29,
+    "stdev": 3927.58,
+    "p10": -34.67,
+    "p90": 14.68,
+    "outlier_count": 64
+  }
+}
