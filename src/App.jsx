@@ -166,6 +166,7 @@ export default function App() {
                 buildings={buildings}
                 watchlist={watchlist}
                 onToggle={toggleWatch}
+                onClear={clearWatch}
                 onSelect={handleSelect}
                 selectedAddress={selected?.address}
               />

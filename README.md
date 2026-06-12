@@ -25,13 +25,13 @@ Groups buildings into 5 behavioral profiles using 7 public features (building si
 
 | Cluster | Archetype | Risk |
 |---|---|---|
-| 0 | Post-War Multifamily — LL97 Pressure | High |
-| 1 | Pre-War Stable — Low Signal | Low |
-| 2 | Large Commercial — Capital Mobilized | Medium |
-| 3 | Mid-Century Residential — Quiet Attrition | High |
-| 4 | Small Commercial — Neighborhood Contagion | High |
+| 0 | Pre-War Active — Permit-Driven Churn | High |
+| 1 | Mid-Size Post-War — Moderate Signal | Medium |
+| 2 | Pre-War Stable — Low Signal | Low |
+| 3 | Large Commercial — Capital Mobilized | Medium |
+| 4 | Low-Compliance Residential — Quiet Attrition | High |
 
-Run: `/opt/homebrew/bin/python3.13 kmeans_model.py`
+Run: `python3 kmeans_model.py`
 
 ### Layer 2 — LL97 Penalty Calculator
 Computes the annual dollar fine each building faces under NYC Local Law 97 of 2019:
@@ -64,7 +64,7 @@ Trained on **real observed behavior** — not synthetic labels:
 | DOB permit activity | 9% |
 | LL97 2024 penalty | 6% |
 
-Run: `/opt/homebrew/bin/python3.13 ll97_model.py`
+Run: `python3 ll97_model.py`
 
 ### The K-Shaped Distribution
 The model finds very little middle ground: **58 High risk / 7 Medium / 1,145 Low / 50 Uncertain**. This reflects the real customer landscape — buildings either have converging signals (LL97 pressure + neighbors leaving + HVAC permits filed) and are heading out, or they have none of those and are staying. The retention strategy should focus on the 58 high-risk buildings.
@@ -108,10 +108,10 @@ Run these scripts in order when source data updates:
 
 ```bash
 # 1. K-means archetypes
-/opt/homebrew/bin/python3.13 kmeans_model.py
+python3 kmeans_model.py
 
 # 2. LL97 penalties + supervised attrition model
-/opt/homebrew/bin/python3.13 ll97_model.py
+python3 ll97_model.py
 ```
 
 Both scripts write to `public/buildingEnrichment.json` atomically (via `.tmp` + replace). The dashboard reads this file at load time.

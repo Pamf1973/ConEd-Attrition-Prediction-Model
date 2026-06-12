@@ -30,7 +30,7 @@ export function useWatchlist() {
   return { watchlist, toggle, clear };
 }
 
-export default function Watchlist({ buildings, watchlist, onToggle, onSelect, selectedAddress }) {
+export default function Watchlist({ buildings, watchlist, onToggle, onClear, onSelect, selectedAddress }) {
   const watched = buildings.filter(b => watchlist.includes(b.address));
 
   if (watchlist.length === 0) {
@@ -48,7 +48,7 @@ export default function Watchlist({ buildings, watchlist, onToggle, onSelect, se
       <div className="px-5 py-3 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
         <span className="text-sm text-slate-300 font-semibold">{watched.length} saved buildings</span>
         <button
-          onClick={onToggle.clear ?? (() => {})}
+          onClick={onClear ?? (() => {})}
           className="text-xs text-slate-500 hover:text-red-400 transition-colors"
         >
           Clear all
