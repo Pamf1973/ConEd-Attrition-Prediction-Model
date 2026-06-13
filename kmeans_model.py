@@ -56,7 +56,7 @@ ARCHETYPES = {
     1: {"name": "Mid-Size Post-War — Moderate Signal",        "risk": "Medium"},
     2: {"name": "Pre-War Stable — Low Signal",                "risk": "Low"},
     3: {"name": "Large Commercial — Capital Mobilized",       "risk": "Medium"},
-    4: {"name": "Low-Compliance Residential — Quiet Attrition", "risk": "High"},
+    4: {"name": "Low-Compliance Commercial — Quiet Attrition",  "risk": "High"},
 }
 
 # ── K to use (set after reviewing elbow/silhouette output) ───────────────────

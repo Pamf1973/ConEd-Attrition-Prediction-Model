@@ -29,7 +29,7 @@ Groups buildings into 5 behavioral profiles using 7 public features (building si
 | 1 | Mid-Size Post-War — Moderate Signal | Medium |
 | 2 | Pre-War Stable — Low Signal | Low |
 | 3 | Large Commercial — Capital Mobilized | Medium |
-| 4 | Low-Compliance Residential — Quiet Attrition | High |
+| 4 | Low-Compliance Commercial — Quiet Attrition | High |
 
 Run: `python3 kmeans_model.py`
 
