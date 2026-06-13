@@ -27,12 +27,14 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   async function handleSubmit(q) {
     const question = q ?? query;
     if (!question.trim()) return;
+    // Always clear both modes before starting — prevents stale state bleed
     setLoading(true);
     setError(null);
     setResults(null);
     setExplanation("");
     setInsight("");
     setExplainAnswer(null);
+    setMode("filter");
 
     const explaining = isExplainQuery(question);
     setMode(explaining ? "explain" : "filter");

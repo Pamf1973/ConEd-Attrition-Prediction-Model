@@ -1,10 +1,20 @@
 // Detect if the question is asking for an explanation vs. a building filter.
-// Explain intent: starts with question words or contains explanation verbs.
-const EXPLAIN_STARTS = /^(what|how|why|explain|tell|describe|define|can you|what's|who|help|what does|what is|what are|show me how)/i;
-const EXPLAIN_CONTAINS = /\b(mean|means|meaning|calculate|calculated|calculation|explain|explains|work|works|function|functions|what is|what are|how does|how do|how is|describe|definition|understand|difference between|tell me about|about the|guide|overview|purpose|interpret|interpreting)\b/i;
+//
+// Strategy: be conservative — when ambiguous, default to FILTER.
+// Explain only when question clearly asks for meaning, calculation, or description.
+
+// Phrases that are clearly filter intent — override even if explain pattern matches
+const FILTER_OVERRIDE = /^(what\s+buildings|which\s+buildings|how\s+many|how\s+much|find\s+|show\s+|list\s+|filter\s+|give\s+me\s+buildings|buildings\s+with|buildings\s+that|buildings\s+over|buildings\s+under)/i;
+
+// "What IS X", "What ARE X", "How IS X calculated", "How DOES X work" — clearly definitional
+const EXPLAIN_STARTS = /^(what\s+(is|are|does|do|'s|was)\s|how\s+(is|are|does|do|was|were)\s|why\s+(is|are|does|do)\s|explain\s+|tell\s+me\s+(about|what|how|why)|describe\s+|define\s+|help\s+me\s+(understand|with)|can\s+you\s+explain|what's\s+the\s+(difference|meaning|purpose|formula|definition))/i;
+
+// Domain-specific explain signals anywhere in the question
+const EXPLAIN_CONTAINS = /\b(formula|definition|meaning|explanation|overview|purpose|interpret|interpreting|difference\s+between|how\s+does\s+it\s+work|how\s+is\s+it\s+calculated|tell\s+me\s+about\s+the)\b/i;
 
 export function isExplainQuery(question) {
   const q = question.trim();
+  if (FILTER_OVERRIDE.test(q)) return false;
   return EXPLAIN_STARTS.test(q) || EXPLAIN_CONTAINS.test(q);
 }
 
