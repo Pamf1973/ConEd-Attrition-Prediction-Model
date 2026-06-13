@@ -508,10 +508,36 @@ so account managers can intervene before customers act. Think of it as a churn m
 
 === RISK SCORE ===
 Each building has a risk score from 0.0 to 1.0 produced by a Gradient Boosting Machine (GBM) classifier.
-Score ≥ 0.70 = High risk (58 buildings). Score 0.30–0.70 = Medium (11 buildings). Score < 0.30 = Low (1,141 buildings).
+Score ≥ 0.80 = Very high risk (4 buildings). Score ≥ 0.70 = High risk (52 buildings total). Score 0.40–0.70 = Medium (945 buildings). Score < 0.40 = Low (213 buildings).
 The model is binary by design — it was trained on buildings with confirmed big steam drops vs. stable accounts.
 Buildings with "moderate" drops were excluded from training, which is why the distribution is strongly bimodal.
 The score is NOT a nuanced 0–100 rating; it's a signal that a building probably will or won't churn.
+
+=== ACTIONABILITY — WHAT TO DO WITH HIGH ATTRITION RISK ===
+The dashboard is designed to drive three types of action:
+
+Tier 1 — Very High Risk (score ≥ 0.80, 4 buildings): Immediate account manager outreach.
+  These combine the strongest churn signals: large LL97 fines + active HVAC permits + sustained steam drops.
+  Action: Direct contact with building owner/manager within 1–2 weeks. Ask: "Are you considering switching
+  off steam?" Understand their timeline, offer rate negotiation or LL97 compliance assistance if applicable.
+
+Tier 2 — High Risk (score 0.70–0.80, 48 buildings): Proactive monitoring + scheduled outreach.
+  Action: Add to watch list. Flag for quarterly account review. Look for new DOB permit filings as a
+  leading indicator that capital is being mobilized for electrification.
+
+Tier 3 — Medium Risk (score 0.40–0.70, 945 buildings): Monitor passively.
+  Action: Watch for YoY steam drops ≥20% in two consecutive years — that's the primary early warning.
+  The YoY scatter chart bottom-left quadrant surfaces these automatically.
+
+Tier 4 — Low Risk (score < 0.40, 213 buildings): No immediate action needed.
+  These buildings show stable steam usage and no major LL97 exposure.
+
+Key signals that should ESCALATE a building's priority:
+- New HVAC or boiler DOB permit filed in the last 6 months (dob_jobs metric)
+- LL97 fine crossing $200K/year threshold in 2024, or $500K/year projected for 2030
+- Two consecutive years of normalized steam decline (bottom-left quadrant of YoY chart)
+- Peer score turning significantly negative (building becoming far more efficient than peers — may signal
+  they already partially switched and are reducing steam load)
 
 === GBM FEATURES (12 total, in order of importance) ===
 1. LL97 penalty 2024 (log) — ~22% importance. Biggest driver: financial pressure to switch.
