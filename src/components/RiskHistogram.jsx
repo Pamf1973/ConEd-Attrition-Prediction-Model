@@ -36,11 +36,11 @@ function CustomTooltip({ active, payload, label }) {
   const d = payload[0]?.payload;
   if (!d) return null;
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded p-3 text-xs shadow-xl">
+    <div className="bg-[#001748] border border-[#0F3B7E] rounded p-3 text-xs shadow-xl">
       <div className="font-semibold text-slate-200 mb-1">{label}</div>
       <div className="text-slate-400">{d.count} buildings</div>
       {d.high > 0   && <div className="text-red-400">High risk: {d.high}</div>}
-      {d.medium > 0 && <div className="text-orange-400">Medium: {d.medium}</div>}
+      {d.medium > 0 && <div className="text-[#E87722]">Medium: {d.medium}</div>}
       {d.low > 0    && <div className="text-green-400">Low: {d.low}</div>}
     </div>
   );
@@ -55,7 +55,7 @@ export default function RiskHistogram({ buildings }) {
   const low    = scored.filter(b => b.risk <= 0.4).length;
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <div className="bg-[#001748] border border-[#082244] rounded-xl p-5">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-slate-100 font-semibold text-sm">Attrition Risk Distribution</h3>
@@ -63,7 +63,7 @@ export default function RiskHistogram({ buildings }) {
         </div>
         <div className="flex gap-3 text-xs">
           <span className="text-red-400"><span className="font-bold">{high}</span> High</span>
-          <span className="text-orange-400"><span className="font-bold">{medium}</span> Medium</span>
+          <span className="text-[#E87722]"><span className="font-bold">{medium}</span> Medium</span>
           <span className="text-green-400"><span className="font-bold">{low}</span> Low</span>
         </div>
       </div>

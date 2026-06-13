@@ -148,7 +148,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   return (
     <div className="flex flex-col h-full">
       {/* Stats bar */}
-      <div className="flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 border-b border-slate-800 items-center">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 px-4 py-3 border-b border-[#082244] items-center">
         {[
           { label: "High Attrition", count: high,             color: "#ef4444" },
           { label: "Med Attrition",  count: medium,           color: "#f97316" },
@@ -163,7 +163,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         ))}
 
         {/* LL97 divider */}
-        <div className="w-px h-8 bg-slate-700 mx-1 hidden sm:block" />
+        <div className="w-px h-8 bg-[#0041A8] mx-1 hidden sm:block" />
 
         <div className="text-center">
           <div className="text-2xl font-bold" style={{ color: overCap > 0 ? "#ef4444" : "#22c55e" }}>{overCap}</div>
@@ -183,7 +183,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <div className="ml-auto flex items-center">
           <button
             onClick={exportCSV}
-            className="px-3 py-1.5 text-xs rounded border border-slate-700 text-slate-300 hover:bg-slate-800 transition-colors"
+            className="px-3 py-1.5 text-xs rounded border border-[#0F3B7E] text-slate-300 hover:bg-[#002469] transition-colors"
           >
             Export CSV
           </button>
@@ -191,17 +191,17 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-2 p-3 border-b border-slate-800 bg-slate-900/50">
+      <div className="flex flex-wrap gap-2 p-3 border-b border-[#082244] bg-[#001748]/50">
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search address…"
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-500 w-48"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#2A6FBF] w-48"
         />
         <select
           value={tierFilter}
           onChange={e => setTierFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option>All</option>
           <option>High</option>
@@ -212,7 +212,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={typeFilter}
           onChange={e => setTypeFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option>All</option>
           {USE_TYPES.map(t => <option key={t}>{t}</option>)}
@@ -220,7 +220,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={clusterFilter}
           onChange={e => setClusterFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none max-w-[220px]"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none max-w-[220px]"
         >
           <option value="All">All Archetypes</option>
           <option>Pre-War Active — Permit-Driven Churn</option>
@@ -232,7 +232,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={signalFilter}
           onChange={e => setSignalFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All Signals</option>
           <option value="Big Drop">Big Drop (≥50%)</option>
@@ -242,7 +242,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={ll97Filter}
           onChange={e => setLl97Filter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All LL97</option>
           <option value="Over Limit">Over Limit</option>
@@ -251,7 +251,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={scFilter}
           onChange={e => setScFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All SC Classes</option>
           <option value="SC-1* (Small Commercial)">SC-1* (Small Commercial)</option>
@@ -263,7 +263,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <select
           value={outlierFilter}
           onChange={e => setOutlierFilter(e.target.value)}
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 focus:outline-none"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All YoY</option>
           <option value="Outliers Only">Outliers Only</option>
@@ -274,14 +274,14 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           onChange={e => setDemandMin(e.target.value)}
           placeholder="Min M kBtu"
           type="number"
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none w-28"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none w-28"
         />
         <input
           value={demandMax}
           onChange={e => setDemandMax(e.target.value)}
           placeholder="Max M kBtu"
           type="number"
-          className="px-3 py-1.5 text-sm rounded bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none w-28"
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none w-28"
         />
         <span className="ml-auto text-xs text-slate-500 self-center">
           {filtered.length} buildings
@@ -291,13 +291,13 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       {/* Table */}
       <div className="overflow-auto flex-1">
         <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 bg-slate-900 z-10">
+          <thead className="sticky top-0 bg-[#001748] z-10">
             <tr>
               {COLS.map(col => (
                 <th
                   key={col.key}
                   onClick={col.sortable ? () => handleSort(col.key) : undefined}
-                  className={`px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800 whitespace-nowrap ${col.sortable ? "cursor-pointer hover:text-slate-200 select-none" : ""}`}
+                  className={`px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap ${col.sortable ? "cursor-pointer hover:text-slate-200 select-none" : ""}`}
                 >
                   {col.label}
                   {col.sortable && sortKey === col.key && (
@@ -306,7 +306,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                 </th>
               ))}
               {onWatch && (
-                <th className="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800" />
+                <th className="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244]" />
               )}
             </tr>
           </thead>
@@ -319,12 +319,12 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                 <tr
                   key={`${b.address}_${b.bbl}_${i}`}
                   onClick={() => onSelect(b)}
-                  className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
+                  className={`border-b border-[#082244]/60 cursor-pointer transition-colors ${
                     active
-                      ? "bg-slate-700/50"
+                      ? "bg-[#0041A8]/50"
                       : i % 2 === 0
-                        ? "bg-slate-900/30 hover:bg-slate-800/50"
-                        : "hover:bg-slate-800/50"
+                        ? "bg-[#001748]/30 hover:bg-[#002469]/50"
+                        : "hover:bg-[#002469]/50"
                   }`}
                 >
                   <td className="px-4 py-2.5 font-medium text-slate-200 max-w-xs truncate">{b.address}</td>
@@ -422,7 +422,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                   </td>
                   <td className="px-4 py-2.5 text-slate-400 text-center">
                     {b.dob_jobs ? (
-                      <span className="px-2 py-0.5 rounded bg-slate-700 text-xs">{b.dob_jobs}</span>
+                      <span className="px-2 py-0.5 rounded bg-[#0041A8] text-xs">{b.dob_jobs}</span>
                     ) : "—"}
                   </td>
                   {onWatch && (

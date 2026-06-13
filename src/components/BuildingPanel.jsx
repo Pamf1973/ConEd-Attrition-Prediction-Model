@@ -32,7 +32,7 @@ function SteamTrend({ building }) {
         {pts.map(p => (
           <div key={p.yr} className="flex items-center gap-2">
             <span className="text-xs text-slate-500 w-10">{p.yr}</span>
-            <div className="flex-1 h-3 bg-slate-800 rounded overflow-hidden">
+            <div className="flex-1 h-3 bg-[#002469] rounded overflow-hidden">
               <div
                 className="h-full rounded"
                 style={{
@@ -64,7 +64,7 @@ const EUI_MEDIANS = {
 function Row({ label, value, color, note }) {
   if (value == null || value === "" || value === "—") return null;
   return (
-    <div className="flex justify-between items-start gap-4 py-2 border-b border-slate-800/60">
+    <div className="flex justify-between items-start gap-4 py-2 border-b border-[#082244]/60">
       <span className="text-sm text-slate-500 shrink-0">{label}</span>
       <span className="text-sm font-semibold text-right" style={{ color: color ?? "#e2e8f0" }}>
         {value}
@@ -95,9 +95,9 @@ export default function BuildingPanel({ building, onClose }) {
   const euiDelta  = b.eui != null ? Math.round(((b.eui - euiMedian) / euiMedian) * 100) : null;
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 border-l border-slate-800 overflow-y-auto">
+    <div className="flex flex-col h-full bg-[#001748] border-l border-[#082244] overflow-y-auto">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-slate-900 border-b border-slate-800 px-5 pt-5 pb-4">
+      <div className="sticky top-0 z-10 bg-[#001748] border-b border-[#082244] px-5 pt-5 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h2 className="text-base font-bold text-slate-100 leading-snug">{b.address}</h2>

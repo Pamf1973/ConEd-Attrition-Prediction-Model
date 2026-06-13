@@ -33,7 +33,7 @@ function CustomTooltip({ active, payload }) {
   const b = payload[0]?.payload;
   if (!b) return null;
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded p-3 text-xs max-w-xs shadow-xl">
+    <div className="bg-[#001748] border border-[#0F3B7E] rounded p-3 text-xs max-w-xs shadow-xl">
       <div className="font-semibold text-slate-100 mb-1">{b.address}</div>
       <div className="text-slate-400">{b.cluster_name ?? "—"}</div>
       <div className="mt-1.5 space-y-0.5">
@@ -84,7 +84,7 @@ export default function YoYScatter({ buildings }) {
   }
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <div className="bg-[#001748] border border-[#082244] rounded-xl p-5">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-slate-100 font-semibold text-sm">
@@ -102,23 +102,23 @@ export default function YoYScatter({ buildings }) {
 
       <ResponsiveContainer width="100%" height={360}>
         <ScatterChart margin={{ top: 8, right: 16, bottom: 24, left: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#082244" />
           <XAxis
             type="number" dataKey="x"
             domain={[-CAP, CAP]}
             tickFormatter={v => `${v > 0 ? "+" : ""}${v}%`}
-            tick={{ fill: "#64748b", fontSize: 11 }}
-            label={{ value: "2022→2023 Δ (norm %)", position: "insideBottom", offset: -12, fill: "#64748b", fontSize: 11 }}
+            tick={{ fill: "#4A7AAA", fontSize: 11 }}
+            label={{ value: "2022→2023 Δ (norm %)", position: "insideBottom", offset: -12, fill: "#4A7AAA", fontSize: 11 }}
           />
           <YAxis
             type="number" dataKey="y"
             domain={[-CAP, CAP]}
             tickFormatter={v => `${v > 0 ? "+" : ""}${v}%`}
-            tick={{ fill: "#64748b", fontSize: 11 }}
-            label={{ value: "2023→2024 Δ (norm %)", angle: -90, position: "insideLeft", offset: 12, fill: "#64748b", fontSize: 11 }}
+            tick={{ fill: "#4A7AAA", fontSize: 11 }}
+            label={{ value: "2023→2024 Δ (norm %)", angle: -90, position: "insideLeft", offset: 12, fill: "#4A7AAA", fontSize: 11 }}
           />
-          <ReferenceLine x={0} stroke="#334155" strokeWidth={1} />
-          <ReferenceLine y={0} stroke="#334155" strokeWidth={1} />
+          <ReferenceLine x={0} stroke="#0F3B7E" strokeWidth={1} />
+          <ReferenceLine y={0} stroke="#0F3B7E" strokeWidth={1} />
           <Tooltip content={<CustomTooltip />} />
           <Legend
             wrapperStyle={{ fontSize: 11, paddingTop: 8 }}

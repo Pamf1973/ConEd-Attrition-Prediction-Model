@@ -45,7 +45,7 @@ export default function Watchlist({ buildings, watchlist, onToggle, onClear, onS
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-3 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between">
+      <div className="px-5 py-3 border-b border-[#082244] bg-[#001748]/60 flex items-center justify-between">
         <span className="text-sm text-slate-300 font-semibold">{watched.length} saved buildings</span>
         <button
           onClick={onClear ?? (() => {})}
@@ -57,10 +57,10 @@ export default function Watchlist({ buildings, watchlist, onToggle, onClear, onS
 
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm border-collapse">
-          <thead className="sticky top-0 bg-slate-900 z-10">
+          <thead className="sticky top-0 bg-[#001748] z-10">
             <tr>
               {["Address", "Attrition Score", "LL97 Penalty", "Steam (M kBtu)", "Signal", ""].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800 whitespace-nowrap">
+                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -75,8 +75,8 @@ export default function Watchlist({ buildings, watchlist, onToggle, onClear, onS
                 <tr
                   key={b.address}
                   onClick={() => onSelect(b)}
-                  className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
-                    active ? "bg-slate-700/50" : i % 2 === 0 ? "bg-slate-900/30 hover:bg-slate-800/50" : "hover:bg-slate-800/50"
+                  className={`border-b border-[#082244]/60 cursor-pointer transition-colors ${
+                    active ? "bg-[#0041A8]/50" : i % 2 === 0 ? "bg-[#001748]/30 hover:bg-[#002469]/50" : "hover:bg-[#002469]/50"
                   }`}
                 >
                   <td className="px-4 py-2.5 font-medium text-slate-200 max-w-xs truncate">{b.address}</td>

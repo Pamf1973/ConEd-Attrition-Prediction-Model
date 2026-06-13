@@ -59,7 +59,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   return (
     <div className="flex flex-col h-full">
       {/* Query bar */}
-      <div className="p-4 border-b border-slate-800 bg-slate-900/60">
+      <div className="p-4 border-b border-[#082244] bg-[#001748]/60">
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -67,19 +67,19 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSubmit()}
             placeholder="Ask about the steam portfolio… e.g. high risk hotels with HVAC permits"
-            className="flex-1 px-4 py-2.5 text-sm rounded-lg bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-orange-500/60 transition-colors"
+            className="flex-1 px-4 py-2.5 text-sm rounded-lg bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#E87722]/60 transition-colors"
           />
           <button
             onClick={() => handleSubmit()}
             disabled={loading || !query.trim()}
-            className="px-4 py-2.5 rounded-lg bg-orange-500/20 border border-orange-500/40 text-orange-300 text-sm font-semibold hover:bg-orange-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2.5 rounded-lg bg-orange-500/20 border border-[#E87722]/40 text-[#F09040] text-sm font-semibold hover:bg-[#E87722]/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? "…" : "Ask"}
           </button>
           {results !== null && (
             <button
               onClick={handleClear}
-              className="px-3 py-2.5 rounded-lg border border-slate-700 text-slate-400 text-sm hover:bg-slate-800 transition-colors"
+              className="px-3 py-2.5 rounded-lg border border-[#0F3B7E] text-slate-400 text-sm hover:bg-[#002469] transition-colors"
             >
               Clear
             </button>
@@ -93,7 +93,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
               <button
                 key={ex}
                 onClick={() => handleExample(ex)}
-                className="px-2.5 py-1 text-xs rounded-full border border-slate-700 text-slate-400 hover:border-orange-500/40 hover:text-orange-300 transition-colors"
+                className="px-2.5 py-1 text-xs rounded-full border border-[#0F3B7E] text-slate-400 hover:border-[#E87722]/40 hover:text-[#F09040] transition-colors"
               >
                 {ex}
               </button>
@@ -106,7 +106,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
       <div className="flex-1 overflow-auto">
         {loading && (
           <div className="flex items-center justify-center h-48 text-slate-500 text-sm gap-3">
-            <div className="w-4 h-4 border-2 border-orange-500/40 border-t-orange-400 rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-[#E87722]/40 border-t-orange-400 rounded-full animate-spin" />
             Thinking…
           </div>
         )}
@@ -127,13 +127,13 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
 
             {/* NL insight */}
             {insight ? (
-              <div className="mx-4 mb-3 px-4 py-2.5 rounded-lg bg-orange-950/40 border border-orange-800/30 text-sm text-orange-200">
-                <span className="text-orange-500 font-semibold mr-2">⚡ Insight:</span>
+              <div className="mx-4 mb-3 px-4 py-2.5 rounded-lg bg-orange-950/40 border border-orange-800/30 text-sm text-[#F5B070]">
+                <span className="text-[#E87722] font-semibold mr-2">⚡ Insight:</span>
                 {insight}
               </div>
             ) : results.length > 0 && (
-              <div className="mx-4 mb-3 px-4 py-2 rounded-lg bg-slate-800/40 border border-slate-700/30 text-xs text-slate-500 flex items-center gap-2">
-                <div className="w-3 h-3 border border-orange-500/40 border-t-orange-400 rounded-full animate-spin shrink-0" />
+              <div className="mx-4 mb-3 px-4 py-2 rounded-lg bg-[#002469]/40 border border-[#0F3B7E]/30 text-xs text-slate-500 flex items-center gap-2">
+                <div className="w-3 h-3 border border-[#E87722]/40 border-t-orange-400 rounded-full animate-spin shrink-0" />
                 Generating insight…
               </div>
             )}
@@ -147,10 +147,10 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
             {/* Results table */}
             {results.length > 0 && (
               <table className="w-full text-sm border-collapse">
-                <thead className="sticky top-0 bg-slate-900 z-10">
+                <thead className="sticky top-0 bg-[#001748] z-10">
                   <tr>
                     {["Address", "Attrition Score", "LL97 Penalty", "Steam (M kBtu)", "Signal", "DOB Jobs"].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800 whitespace-nowrap">
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap">
                         {h}
                       </th>
                     ))}
@@ -165,8 +165,8 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
                       <tr
                         key={b.address + i}
                         onClick={() => onSelect(b)}
-                        className={`border-b border-slate-800/60 cursor-pointer transition-colors ${
-                          active ? "bg-slate-700/50" : i % 2 === 0 ? "bg-slate-900/30 hover:bg-slate-800/50" : "hover:bg-slate-800/50"
+                        className={`border-b border-[#082244]/60 cursor-pointer transition-colors ${
+                          active ? "bg-[#0041A8]/50" : i % 2 === 0 ? "bg-[#001748]/30 hover:bg-[#002469]/50" : "hover:bg-[#002469]/50"
                         }`}
                       >
                         <td className="px-4 py-2.5 font-medium text-slate-200 max-w-xs truncate">{b.address}</td>
@@ -201,7 +201,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
                             : <span className="text-slate-600">—</span>}
                         </td>
                         <td className="px-4 py-2.5 text-slate-400 text-center">
-                          {b.dob_jobs ? <span className="px-2 py-0.5 rounded bg-slate-700 text-xs">{b.dob_jobs}</span> : "—"}
+                          {b.dob_jobs ? <span className="px-2 py-0.5 rounded bg-[#0041A8] text-xs">{b.dob_jobs}</span> : "—"}
                         </td>
                       </tr>
                     );

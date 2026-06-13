@@ -36,21 +36,21 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div className="relative flex items-center justify-center min-h-dvh bg-slate-950 overflow-hidden font-sans">
+    <div className="relative flex items-center justify-center min-h-dvh bg-[#030D1A] overflow-hidden font-sans">
       {/* Decorative ambient glowing backdrops */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#003087]/20 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main Container */}
       <div className="relative z-10 w-full max-w-md px-6 py-12">
-        <div className="backdrop-blur-lg bg-slate-900/75 border border-slate-800/80 rounded-2xl p-8 shadow-2xl shadow-slate-950/50">
+        <div className="backdrop-blur-lg bg-[#001748]/75 border border-[#082244]/80 rounded-2xl p-8 shadow-2xl shadow-slate-950/50">
           
           {/* Logo & Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg shadow-orange-500/20 text-white font-black text-lg mb-4 select-none">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#E87722] to-[#003087] shadow-lg shadow-orange-500/20 text-white font-black text-lg mb-4 select-none">
               ⚡
             </div>
-            <span className="block text-xs font-bold text-orange-400 tracking-widest uppercase mb-1">
+            <span className="block text-xs font-bold text-[#E87722] tracking-widest uppercase mb-1">
               Con Edison
             </span>
             <h2 className="text-xl font-extrabold text-slate-100 leading-tight">
@@ -80,10 +80,10 @@ export default function Login({ onLogin }) {
                 }}
                 disabled={loading}
                 placeholder="Enter dashboard password…"
-                className={`w-full px-4 py-3 text-sm text-slate-100 placeholder-slate-600 bg-slate-950/60 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-4 py-3 text-sm text-slate-100 placeholder-slate-600 bg-[#030D1A]/60 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                   error 
                     ? "border-red-500/50 focus:ring-red-500/30" 
-                    : "border-slate-800 focus:border-orange-500/50 focus:ring-orange-500/20"
+                    : "border-[#082244] focus:border-orange-500/50 focus:ring-[#E87722]/20"
                 }`}
               />
               {error && (
@@ -96,7 +96,7 @@ export default function Login({ onLogin }) {
             <button
               type="submit"
               disabled={loading}
-              className="relative w-full py-3 px-4 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 text-white text-sm font-bold shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 hover:from-orange-400 hover:to-amber-500 focus:outline-none focus:ring-2 focus:ring-orange-500/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="relative w-full py-3 px-4 rounded-lg bg-gradient-to-r from-[#E87722] to-[#003087] text-white text-sm font-bold shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 hover:from-[#E87722] hover:to-[#003087] focus:outline-none focus:ring-2 focus:ring-[#E87722]/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
@@ -113,8 +113,8 @@ export default function Login({ onLogin }) {
           </form>
 
           {/* Footer Info */}
-          <div className="mt-8 pt-6 border-t border-slate-800/40 text-center">
-            <span className="inline-block text-[10px] text-slate-600 px-2 py-0.5 rounded border border-slate-800 bg-slate-950/20">
+          <div className="mt-8 pt-6 border-t border-[#082244]/40 text-center">
+            <span className="inline-block text-[10px] text-slate-600 px-2 py-0.5 rounded border border-[#082244] bg-[#030D1A]/20">
               Access Restricted · Authorized Personnel Only
             </span>
           </div>

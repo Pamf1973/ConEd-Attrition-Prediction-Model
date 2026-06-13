@@ -53,7 +53,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-slate-950">
+      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-[#030D1A]">
         <div className="text-center">
           <div className="text-4xl mb-4 opacity-30">⚡</div>
           Loading building data…
@@ -64,13 +64,13 @@ export default function App() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-slate-950">
+      <div className="flex items-center justify-center h-screen text-slate-400 text-sm bg-[#030D1A]">
         <div className="text-center">
           <div className="text-2xl mb-3 text-red-500">Failed to load</div>
           <p className="text-slate-500 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 rounded bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-colors"
+            className="px-4 py-2 rounded bg-[#002469] border border-[#0F3B7E] text-slate-300 hover:bg-[#0041A8] transition-colors"
           >
             Retry
           </button>
@@ -81,14 +81,14 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-    <div className="flex flex-col h-dvh bg-slate-950">
+    <div className="flex flex-col h-dvh bg-[#030D1A]">
       {/* Top nav */}
-      <header className="flex items-center gap-4 px-5 py-3 border-b border-slate-800 bg-slate-900 shrink-0">
+      <header className="flex items-center gap-4 px-5 py-3 border-b border-[#082244] bg-[#001748] shrink-0">
         <div>
-          <span className="text-xs font-bold text-orange-400 tracking-widest">CONED</span>
+          <span className="text-xs font-bold text-[#E87722] tracking-widest">CONED</span>
           <h1 className="text-sm font-bold text-slate-100 leading-tight">Steam Operations — Attrition Intelligence</h1>
         </div>
-        <div className="w-px h-8 bg-slate-700 mx-1" />
+        <div className="w-px h-8 bg-[#0041A8] mx-1" />
         <nav className="flex gap-1">
           {[
             { id: "rankings",  label: "Attrition Rankings", enabled: true  },
@@ -102,9 +102,9 @@ export default function App() {
               onClick={() => tab.enabled && setActiveTab(tab.id)}
               className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "bg-slate-700 text-slate-100"
+                  ? "bg-[#0041A8] text-slate-100"
                   : tab.enabled
-                    ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                    ? "text-slate-400 hover:text-slate-200 hover:bg-[#002469]"
                     : "text-slate-600 cursor-not-allowed"
               }`}
             >
@@ -113,7 +113,7 @@ export default function App() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-4">
-          <span className="text-xs px-2 py-0.5 rounded border border-slate-700 text-slate-500">
+          <span className="text-xs px-2 py-0.5 rounded border border-[#0F3B7E] text-slate-500">
             Phase 1 · Decision-Support Ranking
           </span>
           <span className="text-xs text-slate-600">
@@ -121,7 +121,7 @@ export default function App() {
           </span>
           <button
             onClick={handleLogout}
-            className="px-2.5 py-1 rounded border border-slate-700 hover:border-red-500/40 text-[11px] font-bold text-slate-400 hover:text-red-400 bg-slate-800/40 transition-colors"
+            className="px-2.5 py-1 rounded border border-[#0F3B7E] hover:border-red-500/40 text-[11px] font-bold text-slate-400 hover:text-red-400 bg-[#002469]/40 transition-colors"
           >
             Logout
           </button>
