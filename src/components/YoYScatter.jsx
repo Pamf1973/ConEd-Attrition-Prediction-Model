@@ -8,7 +8,7 @@ const CLUSTER_COLORS = {
   "Mid-Size Post-War — Moderate Signal":         "#f97316",
   "Pre-War Stable — Low Signal":                 "#22c55e",
   "Large Commercial — Capital Mobilized":        "#3b82f6",
-  "Low-Compliance Residential — Quiet Attrition":"#a855f7",
+  "Low-Compliance Commercial — Quiet Attrition":  "#a855f7",
   "Unknown": "#64748b",
 };
 

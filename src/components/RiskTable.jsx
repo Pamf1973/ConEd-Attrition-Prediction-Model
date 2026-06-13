@@ -226,7 +226,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           <option>Pre-War Active — Permit-Driven Churn</option>
           <option>Pre-War Stable — Low Signal</option>
           <option>Large Commercial — Capital Mobilized</option>
-          <option>Low-Compliance Residential — Quiet Attrition</option>
+          <option>Low-Compliance Commercial — Quiet Attrition</option>
           <option>Mid-Size Post-War — Moderate Signal</option>
         </select>
         <select
