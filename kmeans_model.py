@@ -9,7 +9,7 @@ Reads:  public/buildings.json + public/buildingEnrichment.json
 Writes: public/buildingEnrichment.json  (adds cluster_id, cluster_name, cluster_risk)
         cluster_profiles.json           (per-cluster summary for inspection)
 
-Run:    /opt/homebrew/bin/python3.13 kmeans_model.py
+Run:    python3 kmeans_model.py
 """
 
 import json, math, sys

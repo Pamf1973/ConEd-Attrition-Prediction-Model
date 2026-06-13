@@ -13,7 +13,7 @@ Writes:
   public/buildingEnrichment.json  (adds ll97_penalty_2024, ll97_penalty_2030,
                                         ll97_over_2024, ll97_over_2030, ml_risk)
 
-Run: /opt/homebrew/bin/python3.13 ll97_model.py
+Run: python ll97_model.py
 """
 
 import csv, json, math, os, sys
