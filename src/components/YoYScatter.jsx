@@ -61,7 +61,7 @@ function CustomTooltip({ active, payload }) {
 }
 
 export default function YoYScatter({ buildings }) {
-  // Only buildings that have both deltas — the most informative set
+  // Include both real both-delta buildings AND projected ones (cluster-median imputed)
   const bothPeriods = buildings.filter(
     b => b.norm_delta_22_23 != null && b.norm_delta_23_24 != null
   );
@@ -74,6 +74,7 @@ export default function YoYScatter({ buildings }) {
     y: Math.max(-CAP, Math.min(CAP, b.norm_delta_23_24)),
   }));
 
+  const projectedCount = data.filter(b => b.norm_delta_23_24_projected).length;
   const outlierCount = data.filter(b => b.outlier_22_23 || b.outlier_23_24).length;
 
   // Group by cluster for separate Scatter series (Legend)

@@ -307,7 +307,7 @@ const ALLOWED_CLUSTERS = [
   "Mid-Size Post-War — Moderate Signal",
   "Pre-War Stable — Low Signal",
   "Large Commercial — Capital Mobilized",
-  "Low-Compliance Residential — Quiet Attrition",
+  "Low-Compliance Commercial — Quiet Attrition",
   null,
 ];
 
@@ -472,7 +472,13 @@ YoY CHART (ELI5):
   A building in the bottom-left corner = steam going down both years. That's the biggest red flag.
   A building in the top-right = steam going UP both years. Totally stable customer.
 
-=== YoY COVERAGE — WHY ONLY 422 OF 1,210 BUILDINGS APPEAR IN THE SCATTER CHART ===
+=== CRITICAL FACTS — DO NOT HALLUCINATE ===
+- LL84 benchmarking is administered by the NYC DEPARTMENT OF BUILDINGS (DOB), NOT the Department of Energy. Never say "DOE" or "Department of Energy."
+- The 213 "skip-year" buildings (2022 + 2024 data, missing 2023) have unknown root cause. Do NOT speculate about "alternative heating sources" or "briefly trialed alternatives." The actual possible causes are: missed LL84 submission, management/ownership change, DOB data rejection, BBL lot merge/split, or temporary closure for renovation. Use the neutral language provided in the section below.
+- The 254 buildings with only 2022 data are not necessarily churned. They may have left the steam system, changed ownership, or simply stopped filing. Data alone cannot distinguish these.
+- Dataset snapshot: June 2026. This is the pull date — use this when asked "when was the data pulled?"
+
+=== YOY COVERAGE — WHY ONLY 422 OF 1,210 BUILDINGS APPEAR IN THE SCATTER CHART ===
 Dataset snapshot: June 2026. LL84 steam benchmarking data sourced from NYC Open Data / Portfolio Manager.
 The scatter chart requires confirmed data for BOTH the 22→23 AND 23→24 consecutive periods.
 Here is the exact breakdown of all 1,210 buildings:

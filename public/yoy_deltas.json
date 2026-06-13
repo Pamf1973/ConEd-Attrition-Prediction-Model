@@ -9,10 +9,11 @@
     "raw_delta_22_23": -1.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1 CENTRAL PARK SOUTH": {
     "steam_2022": 43283115,
@@ -129,10 +130,11 @@
     "raw_delta_22_23": -2.5,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1 NEW YORK PLAZA": {
     "steam_2022": 78823726,
@@ -189,10 +191,11 @@
     "raw_delta_22_23": -41.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -30.06,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1 POLICE PLZ": {
     "steam_2022": 31649299,
@@ -249,10 +252,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1 UNITED NATIONS PLAZA": {
     "steam_2022": 27244159,
@@ -309,10 +313,11 @@
     "raw_delta_22_23": -87.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -84.83,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1 WHITEHALL STREET": {
     "steam_2022": 13468850,
@@ -369,10 +374,11 @@
     "raw_delta_22_23": -32.92,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -20.17,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "10 E 70TH ST": {
     "steam_2022": 7224488,
@@ -444,10 +450,11 @@
     "raw_delta_22_23": -22.1,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.3,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "10 W 57TH STREET": {
     "steam_2022": 1958826,
@@ -639,10 +646,11 @@
     "raw_delta_22_23": -41.5,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -30.38,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "100 WEST 57TH STREET": {
     "steam_2022": 12291094,
@@ -744,10 +752,11 @@
     "raw_delta_22_23": -33.12,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -20.41,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "101 AVENUE OF THE AMERICAS": {
     "steam_2022": 13166763,
@@ -759,10 +768,11 @@
     "raw_delta_22_23": -7.1,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 10.56,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "101 EAST 69TH STREET": {
     "steam_2022": 7761000,
@@ -834,10 +844,11 @@
     "raw_delta_22_23": -38.42,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -26.71,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1025 FIFTH AVENUE": {
     "steam_2022": 16122512,
@@ -894,10 +905,11 @@
     "raw_delta_22_23": 6.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 26.39,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1045 FIFTH AVE": {
     "steam_2022": 1340829,
@@ -939,10 +951,11 @@
     "raw_delta_22_23": -12.97,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "106 CENTRAL PARK SOUTH": {
     "steam_2022": 18046635,
@@ -969,10 +982,11 @@
     "raw_delta_22_23": -31.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -18.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "108 WEST 39TH STREET": {
     "steam_2022": 2643808,
@@ -999,10 +1013,11 @@
     "raw_delta_22_23": -7.1,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 10.56,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "109 E 42ND ST": {
     "steam_2022": 67406044,
@@ -1149,10 +1164,11 @@
     "raw_delta_22_23": -27.7,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -13.96,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "11 WEST 53RD STREET": {
     "steam_2022": 96938738,
@@ -1179,10 +1195,11 @@
     "raw_delta_22_23": -11.77,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "110 EAST 42ND": {
     "steam_2022": 14483036,
@@ -1209,10 +1226,11 @@
     "raw_delta_22_23": -43.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -33.25,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "110 EAST 71ST STREET": {
     "steam_2022": 1212778,
@@ -1224,10 +1242,11 @@
     "raw_delta_22_23": -17.44,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.74,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "110 THIRD AVENUE": {
     "steam_2022": 1929631,
@@ -1239,10 +1258,11 @@
     "raw_delta_22_23": -6.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.25,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "110 WALL STREET": {
     "steam_2022": 11020252,
@@ -1299,10 +1319,11 @@
     "raw_delta_22_23": -8.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.49,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1100 AVENUE OF THE AMERICAS": {
     "steam_2022": 356475,
@@ -1389,10 +1410,11 @@
     "raw_delta_22_23": -42.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -31.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "111 EAST 48TH STREET": {
     "steam_2022": 24536592,
@@ -1434,10 +1456,11 @@
     "raw_delta_22_23": -13.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.44,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "111 EAST 85TH STREET": {
     "steam_2022": 7637736,
@@ -1449,10 +1472,11 @@
     "raw_delta_22_23": -8.71,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.64,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "111 JOHN STREET": {
     "steam_2022": 8894495,
@@ -1479,10 +1503,11 @@
     "raw_delta_22_23": -7.8,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.73,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "111 WALL STREET": {
     "steam_2022": 13006893,
@@ -1554,10 +1579,11 @@
     "raw_delta_22_23": -1.24,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1120 AVENUE OF THE AMERICAS": {
     "steam_2022": 22465326,
@@ -1629,10 +1655,11 @@
     "raw_delta_22_23": -6.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.49,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1140 AVENUE OF AMERICAS": {
     "steam_2022": 4733035,
@@ -1734,10 +1761,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1166 AVENUE OF THE AMERICAS": {
     "steam_2022": 93540479,
@@ -1749,10 +1777,11 @@
     "raw_delta_22_23": -20.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -4.88,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "117 EAST 72ND ST": {
     "steam_2022": 5714308,
@@ -1764,10 +1793,11 @@
     "raw_delta_22_23": -56.16,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -47.83,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1175-1185 THIRD AVE": {
     "steam_2022": 30929787,
@@ -1794,10 +1824,11 @@
     "raw_delta_22_23": -18.24,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -2.7,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "118 EAST 60TH STREET": {
     "steam_2022": 12529702,
@@ -1824,10 +1855,11 @@
     "raw_delta_22_23": -20.29,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1185 AVE OF THE AMERICAS": {
     "steam_2022": 44216988,
@@ -1839,10 +1871,11 @@
     "raw_delta_22_23": -11.55,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.26,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "119 WEST 57TH STREET": {
     "steam_2022": 5219522,
@@ -1854,10 +1887,11 @@
     "raw_delta_22_23": -15.68,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "12 BEEKMAN PLACE": {
     "steam_2022": 3827570,
@@ -1959,10 +1993,11 @@
     "raw_delta_22_23": -12.97,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.57,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "120 E 87 ST": {
     "steam_2022": 18851864,
@@ -1974,10 +2009,11 @@
     "raw_delta_22_23": 2.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 21.77,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "120 EAST 87TH STREET": {
     "steam_2022": 21290538,
@@ -2004,10 +2040,11 @@
     "raw_delta_22_23": -11.48,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.34,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "120 W 14TH STREET": {
     "steam_2022": 19804736,
@@ -2139,10 +2176,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "122 AMSTERDAM AVENUE": {
     "steam_2022": 14981118,
@@ -2169,10 +2207,11 @@
     "raw_delta_22_23": -8.61,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.77,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "122 EAST 76TH STREET": {
     "steam_2022": 5389716,
@@ -2184,10 +2223,11 @@
     "raw_delta_22_23": -33.76,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -21.17,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "122 HENRY STREET": {
     "steam_2022": 4715106,
@@ -2229,10 +2269,11 @@
     "raw_delta_22_23": -27.34,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -13.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "123 WASHINGTON STREET": {
     "steam_2022": 15779659,
@@ -2289,10 +2330,11 @@
     "raw_delta_22_23": -16.34,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -0.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1233 YORK AVENUE": {
     "steam_2022": 19732363,
@@ -2304,10 +2346,11 @@
     "raw_delta_22_23": -20.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "124 EAST 79TH STREET": {
     "steam_2022": 3255224,
@@ -2334,10 +2377,11 @@
     "raw_delta_22_23": -24.5,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -10.15,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "125 COLUMBUS AVENUE": {
     "steam_2022": 16887833,
@@ -2379,10 +2423,11 @@
     "raw_delta_22_23": -27.9,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -14.19,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "125 WEST 45TH STREET": {
     "steam_2022": 1968726,
@@ -2409,10 +2454,11 @@
     "raw_delta_22_23": -59.33,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -51.6,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "125 WEST END AVENUE": {
     "steam_2022": 14149514,
@@ -2499,10 +2545,11 @@
     "raw_delta_22_23": 1.73,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 21.08,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1270 BROADWAY": {
     "steam_2022": 5033659,
@@ -2619,10 +2666,11 @@
     "raw_delta_22_23": -10.02,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.09,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1293 BROADWAY": {
     "steam_2022": 3053586,
@@ -2679,10 +2727,11 @@
     "raw_delta_22_23": -6.24,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "130 WEST 56TH ST": {
     "steam_2022": 8063817,
@@ -2799,10 +2848,11 @@
     "raw_delta_22_23": -14.21,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "131 WEST 35TH STREET": {
     "steam_2022": 14388160,
@@ -2859,10 +2909,11 @@
     "raw_delta_22_23": 7.37,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 27.78,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1325 AVENUE OF THE AMERICAS": {
     "steam_2022": 10304018,
@@ -2874,10 +2925,11 @@
     "raw_delta_22_23": 22.24,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 45.48,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "133 EAST 58TH STREET": {
     "steam_2022": 7836518,
@@ -2889,10 +2941,11 @@
     "raw_delta_22_23": -62.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -55.8,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1330 AVENUE OF THE AMERICAS": {
     "steam_2022": 30775507,
@@ -2964,10 +3017,11 @@
     "raw_delta_22_23": 6.83,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 27.14,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "135 EAST 57TH STREET": {
     "steam_2022": 8936064,
@@ -3039,10 +3093,11 @@
     "raw_delta_22_23": -13.67,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.75,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1350 BROADWAY": {
     "steam_2022": 4152226,
@@ -3069,10 +3124,11 @@
     "raw_delta_22_23": -8.56,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.82,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "136 E 57TH ST": {
     "steam_2022": 818615,
@@ -3084,10 +3140,11 @@
     "raw_delta_22_23": -97.45,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -96.96,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "136 EAST 56TH STREET": {
     "steam_2022": 10172697,
@@ -3099,10 +3156,11 @@
     "raw_delta_22_23": -3.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 15.14,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1370 AVENUE OF THE AMERICAS": {
     "steam_2022": 14129592,
@@ -3159,10 +3217,11 @@
     "raw_delta_22_23": 296.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 372.36,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "139 EAST 79TH STREET": {
     "steam_2022": 1857052,
@@ -3174,10 +3233,11 @@
     "raw_delta_22_23": 15.77,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 37.78,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "14 EAST 47 STREET": {
     "steam_2022": 1642581,
@@ -3234,10 +3294,11 @@
     "raw_delta_22_23": 2.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 21.67,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "14 WALL STREET": {
     "steam_2022": 65871845,
@@ -3279,10 +3340,11 @@
     "raw_delta_22_23": -10.57,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "140 EAST 63RD STREET": {
     "steam_2022": 18844132,
@@ -3309,10 +3371,11 @@
     "raw_delta_22_23": -4.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.01,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "140 W 62ND ST": {
     "steam_2022": 3207036,
@@ -3324,10 +3387,11 @@
     "raw_delta_22_23": 11.75,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 33.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "140 WEST END AVENUE": {
     "steam_2022": 26385442,
@@ -3354,10 +3418,11 @@
     "raw_delta_22_23": 98.82,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 136.61,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "140 WILLIAM STREET": {
     "steam_2022": 1433994,
@@ -3444,10 +3509,11 @@
     "raw_delta_22_23": -4.38,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.8,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "142 EAST 16TH STREET": {
     "steam_2022": 5711712,
@@ -3459,10 +3525,11 @@
     "raw_delta_22_23": -10.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.82,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "143 WEST 46 STREET": {
     "steam_2022": 673102,
@@ -3579,10 +3646,11 @@
     "raw_delta_22_23": -70.11,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -64.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1450 BROADWAY": {
     "steam_2022": 6044959,
@@ -3609,10 +3677,11 @@
     "raw_delta_22_23": -10.01,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "146 WEST 57TH STREET": {
     "steam_2022": 18125928,
@@ -3624,10 +3693,11 @@
     "raw_delta_22_23": -10.01,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1460 BROADWAY": {
     "steam_2022": 36406,
@@ -3729,10 +3799,11 @@
     "raw_delta_22_23": -3.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 15.14,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "15 EAST 69TH STREET": {
     "steam_2022": 7263034,
@@ -3744,10 +3815,11 @@
     "raw_delta_22_23": -20.81,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.75,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "15 MAIDEN LANE": {
     "steam_2022": 3528902,
@@ -3789,10 +3861,11 @@
     "raw_delta_22_23": -17.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "15 WILLIAM STREET": {
     "steam_2022": 12601920,
@@ -3819,10 +3892,11 @@
     "raw_delta_22_23": -18.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "150 COLUMBUS AVE": {
     "steam_2022": 8300600,
@@ -3879,10 +3953,11 @@
     "raw_delta_22_23": -22.68,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.98,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "150 EAST 52ND STREET": {
     "steam_2022": 489198,
@@ -3909,10 +3984,11 @@
     "raw_delta_22_23": -12.28,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.4,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "150 NASSAU STREET": {
     "steam_2022": 5373520,
@@ -3924,10 +4000,11 @@
     "raw_delta_22_23": -17.76,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -2.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "150 WEST 51ST STREET": {
     "steam_2022": 2246367,
@@ -4044,10 +4121,11 @@
     "raw_delta_22_23": -9.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "151 EAST 85TH STREET": {
     "steam_2022": 2219184,
@@ -4059,10 +4137,11 @@
     "raw_delta_22_23": 63.47,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 94.54,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1515 BROADWAY": {
     "steam_2022": 86709784,
@@ -4119,10 +4198,11 @@
     "raw_delta_22_23": -18.54,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.05,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "155 E 52 STREET": {
     "steam_2022": 1028542,
@@ -4209,10 +4289,11 @@
     "raw_delta_22_23": -21.58,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -6.67,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "155 WEST 11TH STREET": {
     "steam_2022": 42441948,
@@ -4374,10 +4455,11 @@
     "raw_delta_22_23": -4.85,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.23,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "160 E 34TH STREET": {
     "steam_2022": 5782349,
@@ -4434,10 +4516,11 @@
     "raw_delta_22_23": -34.7,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -22.28,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "160 WATER ST": {
     "steam_2022": 10595598,
@@ -4509,10 +4592,11 @@
     "raw_delta_22_23": 5.58,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 25.65,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "161 WILLIAM ST": {
     "steam_2022": 6495744,
@@ -4524,10 +4608,11 @@
     "raw_delta_22_23": -36.51,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -24.44,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "162 EAST 68 STREET": {
     "steam_2022": 4978650,
@@ -4569,10 +4654,11 @@
     "raw_delta_22_23": 110.38,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 150.37,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1646 1 AVE": {
     "steam_2022": 10548382,
@@ -4599,10 +4685,11 @@
     "raw_delta_22_23": -17.73,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -2.09,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "165 E 56TH STREET": {
     "steam_2022": 2258848,
@@ -4644,10 +4731,11 @@
     "raw_delta_22_23": -8.94,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.38,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "165 WEST 66TH STREET": {
     "steam_2022": 63418,
@@ -4659,10 +4747,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "165 WEST END AVE.": {
     "steam_2022": 11283249,
@@ -4689,10 +4778,11 @@
     "raw_delta_22_23": -7.87,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.65,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1657 BROADWAY": {
     "steam_2022": 4924342,
@@ -4764,10 +4854,11 @@
     "raw_delta_22_23": -10.16,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.92,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "167 EAST 67TH ST": {
     "steam_2022": 7018743,
@@ -4779,10 +4870,11 @@
     "raw_delta_22_23": -17.28,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.56,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "1675 BROADWAY": {
     "steam_2022": 10601837,
@@ -4824,10 +4916,11 @@
     "raw_delta_22_23": -5.73,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 12.19,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "17 LEXINGTON AVE": {
     "steam_2022": 26378433,
@@ -4899,10 +4992,11 @@
     "raw_delta_22_23": -11.61,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.19,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "170 WEST END AVENUE": {
     "steam_2022": 16446452,
@@ -4959,10 +5053,11 @@
     "raw_delta_22_23": 62.95,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 93.93,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "171 EAST 84TH STREET": {
     "steam_2022": 11353048,
@@ -5034,10 +5129,11 @@
     "raw_delta_22_23": -5.9,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.99,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "177 E. 75TH STREET": {
     "steam_2022": 9286352,
@@ -5064,10 +5160,11 @@
     "raw_delta_22_23": -11.72,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.07,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "178 EAST 70TH STREET": {
     "steam_2022": 3890894,
@@ -5139,10 +5236,11 @@
     "raw_delta_22_23": -7.98,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "180 MADISON AVENUE": {
     "steam_2022": 4880736,
@@ -5154,10 +5252,11 @@
     "raw_delta_22_23": -45.41,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -35.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "180 MAIDEN LANE": {
     "steam_2022": 26120266,
@@ -5214,10 +5313,11 @@
     "raw_delta_22_23": -30.95,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -17.83,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "184 5TH AVENUE": {
     "steam_2022": 38739,
@@ -5229,10 +5329,11 @@
     "raw_delta_22_23": 704.41,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 857.34,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "185 MADISON AVENUE, NEW YORK": {
     "steam_2022": 3974174,
@@ -5304,10 +5405,11 @@
     "raw_delta_22_23": -9.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.91,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "188 EAST 70TH STREET": {
     "steam_2022": 3890894,
@@ -5319,10 +5421,11 @@
     "raw_delta_22_23": 5.59,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 25.66,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "188 EAST 76TH ST": {
     "steam_2022": 7801018,
@@ -5334,10 +5437,11 @@
     "raw_delta_22_23": -18.39,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -2.88,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "19 EAST 54TH STREET": {
     "steam_2022": 402061,
@@ -5364,10 +5468,11 @@
     "raw_delta_22_23": -73.28,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -68.2,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "195 BROADWAY": {
     "steam_2022": 25475106,
@@ -5409,10 +5514,11 @@
     "raw_delta_22_23": 31.22,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 56.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "199 CHAMBERS ST": {
     "steam_2022": 30796140,
@@ -5439,10 +5545,11 @@
     "raw_delta_22_23": -21.15,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -6.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "19E 57TH STREET": {
     "steam_2022": 2918598,
@@ -5559,10 +5666,11 @@
     "raw_delta_22_23": -3.78,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "2 EAST 70TH STREET": {
     "steam_2022": 3520174,
@@ -5574,10 +5682,11 @@
     "raw_delta_22_23": -7.36,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 10.25,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "2 EAST 88TH ST": {
     "steam_2022": 3408133,
@@ -5589,10 +5698,11 @@
     "raw_delta_22_23": -6.66,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.08,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "2 LEXINGTON AVENUE": {
     "steam_2022": 6638265,
@@ -5634,10 +5744,11 @@
     "raw_delta_22_23": -31.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -17.97,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "2 UNITED NATIONS PLAZA": {
     "steam_2022": 25559384,
@@ -5769,10 +5880,11 @@
     "raw_delta_22_23": 22.38,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 45.64,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "200  EAST  42ND  ST.": {
     "steam_2022": 13624288,
@@ -5844,10 +5956,11 @@
     "raw_delta_22_23": 47.15,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 75.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "200 EAST 58TH ST": {
     "steam_2022": 5188726,
@@ -5964,10 +6077,11 @@
     "raw_delta_22_23": -9.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.02,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "200 PARK AVE": {
     "steam_2022": 172023046,
@@ -5979,10 +6093,11 @@
     "raw_delta_22_23": -27.35,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -13.54,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "200 VESEY STREET": {
     "steam_2022": 41896633,
@@ -6054,10 +6169,11 @@
     "raw_delta_22_23": -27.26,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -13.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "201 PARK AVENUE SOUTH": {
     "steam_2022": 9339886,
@@ -6129,10 +6245,11 @@
     "raw_delta_22_23": -14.99,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 1.18,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "205 LEXINGTON AVENUE": {
     "steam_2022": 4381548,
@@ -6174,10 +6291,11 @@
     "raw_delta_22_23": -1.02,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.8,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "206 WEST 46TH STREET": {
     "steam_2022": 263146,
@@ -6204,10 +6322,11 @@
     "raw_delta_22_23": -8.96,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "208 E 79 ST": {
     "steam_2022": 15284884,
@@ -6264,10 +6383,11 @@
     "raw_delta_22_23": -13.36,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.11,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "21 WEST END AVENUE": {
     "steam_2022": 17003696,
@@ -6339,10 +6459,11 @@
     "raw_delta_22_23": 16.39,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 38.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "210 WEST 27TH STREET": {
     "steam_2022": 6853560,
@@ -6444,10 +6565,11 @@
     "raw_delta_22_23": 21.98,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 45.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "213 EAST 63RD STREET": {
     "steam_2022": 4247058,
@@ -6669,10 +6791,11 @@
     "raw_delta_22_23": 14.05,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 35.73,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "220 EAST 72ND STREET": {
     "steam_2022": 17192003,
@@ -6834,10 +6957,11 @@
     "raw_delta_22_23": -47.76,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -37.82,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "225 EAST 72ND STREET": {
     "steam_2022": 7450679,
@@ -6849,10 +6973,11 @@
     "raw_delta_22_23": -58.98,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -51.18,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "225 LIBERTY STREET": {
     "steam_2022": 48422434,
@@ -6909,10 +7034,11 @@
     "raw_delta_22_23": 31.84,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 56.9,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "227 EAST 30TH STREET": {
     "steam_2022": 26760222,
@@ -7029,10 +7155,11 @@
     "raw_delta_22_23": 1.78,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 21.12,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "230 EAST 21ST ST": {
     "steam_2022": 21804195,
@@ -7104,10 +7231,11 @@
     "raw_delta_22_23": -7.59,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.97,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "230 W 49TH STEET": {
     "steam_2022": 638627,
@@ -7224,10 +7352,11 @@
     "raw_delta_22_23": -15.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 1.06,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "233 EAST 70TH STREET": {
     "steam_2022": 5604682,
@@ -7239,10 +7368,11 @@
     "raw_delta_22_23": -8.28,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.15,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "234 WEST 44TH STREET": {
     "steam_2022": 3053732,
@@ -7269,10 +7399,11 @@
     "raw_delta_22_23": -2.14,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.46,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "235 EAST 42ND STREET": {
     "steam_2022": 40481328,
@@ -7299,10 +7430,11 @@
     "raw_delta_22_23": -9.35,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.88,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "235 WEST 46TH STREET": {
     "steam_2022": 9996941,
@@ -7344,10 +7476,11 @@
     "raw_delta_22_23": -3.63,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.69,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "236 EAST 47TH STREET": {
     "steam_2022": 6828209,
@@ -7404,10 +7537,11 @@
     "raw_delta_22_23": -0.65,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 18.23,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "240 2ND AVENUE": {
     "steam_2022": 1998756,
@@ -7434,10 +7568,11 @@
     "raw_delta_22_23": -10.34,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.7,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "240 EAST 38TH STREET": {
     "steam_2022": 68786494,
@@ -7464,10 +7599,11 @@
     "raw_delta_22_23": -7.71,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.83,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "240 MADISON AVE": {
     "steam_2022": 2410795,
@@ -7509,10 +7645,11 @@
     "raw_delta_22_23": 22.36,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 45.62,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "243 WEST 42ND STREET": {
     "steam_2022": 7029687,
@@ -7689,10 +7826,11 @@
     "raw_delta_22_23": -6.31,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.5,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "25 WEST 39TH STREET": {
     "steam_2022": 10044581,
@@ -7839,10 +7977,11 @@
     "raw_delta_22_23": 3.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 22.96,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "255 GREENWICH STREET": {
     "steam_2022": 4801374,
@@ -7854,10 +7993,11 @@
     "raw_delta_22_23": -11.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.89,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "260 MADISON AVE": {
     "steam_2022": 14980107,
@@ -7899,10 +8039,11 @@
     "raw_delta_22_23": -18.75,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.3,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "27 BARCLAY ST": {
     "steam_2022": 34315242,
@@ -7959,10 +8100,11 @@
     "raw_delta_22_23": -7.75,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.79,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "27 MADISON AVE": {
     "steam_2022": 3053113,
@@ -8124,10 +8266,11 @@
     "raw_delta_22_23": -1.58,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "28 LIBERTY ST": {
     "steam_2022": 98220309,
@@ -8154,10 +8297,11 @@
     "raw_delta_22_23": 1.85,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 21.22,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "280 BROADWAY": {
     "steam_2022": 3707071,
@@ -8454,10 +8598,11 @@
     "raw_delta_22_23": -18.59,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.12,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "30 BROAD STREET": {
     "steam_2022": 5650411,
@@ -8559,10 +8704,11 @@
     "raw_delta_22_23": 3.03,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 22.62,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "30 SUTTON PL": {
     "steam_2022": 6314292,
@@ -8574,10 +8720,11 @@
     "raw_delta_22_23": -23.22,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -8.62,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "30 VESEY STREET": {
     "steam_2022": 3785035,
@@ -8739,10 +8886,11 @@
     "raw_delta_22_23": -17.42,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "300 WEST 57TH STREET": {
     "steam_2022": 20527792,
@@ -8844,10 +8992,11 @@
     "raw_delta_22_23": -21.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.99,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "303 EAST 60TH STREET": {
     "steam_2022": 11948176,
@@ -8859,10 +9008,11 @@
     "raw_delta_22_23": -24.94,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -10.67,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "303 EAST 60TH STREET, NEW YORK": {
     "steam_2022": 10312525,
@@ -8919,10 +9069,11 @@
     "raw_delta_22_23": -9.56,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.63,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "308 EAST 72ND STREET": {
     "steam_2022": 7220394,
@@ -8934,10 +9085,11 @@
     "raw_delta_22_23": -20.68,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.6,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "31 CHAMBERS ST": {
     "steam_2022": 6643378,
@@ -8964,10 +9116,11 @@
     "raw_delta_22_23": -0.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.98,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "31 W 34 ST": {
     "steam_2022": 1129872,
@@ -9009,10 +9162,11 @@
     "raw_delta_22_23": -46.69,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -36.55,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "310 EAST 14TH ST": {
     "steam_2022": 28576488,
@@ -9024,10 +9178,11 @@
     "raw_delta_22_23": -5.41,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 12.57,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "310 EAST 24TH ST": {
     "steam_2022": 2604122,
@@ -9039,10 +9194,11 @@
     "raw_delta_22_23": -8.39,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.02,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "310 EAST 67TH STREET": {
     "steam_2022": 42715350,
@@ -9099,10 +9255,11 @@
     "raw_delta_22_23": -7.7,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.85,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "311 EAST 75TH STREET": {
     "steam_2022": 2832555,
@@ -9129,10 +9286,11 @@
     "raw_delta_22_23": -13.83,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.56,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "315 WEST 70TH STREET": {
     "steam_2022": 8718362,
@@ -9264,10 +9422,11 @@
     "raw_delta_22_23": 18.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 41.05,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "320 EAST 43RD STREET": {
     "steam_2022": 15924555,
@@ -9414,10 +9573,11 @@
     "raw_delta_22_23": 8.59,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 29.23,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "33 RECTOR STREET": {
     "steam_2022": 3068828,
@@ -9444,10 +9604,11 @@
     "raw_delta_22_23": 0.38,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 19.47,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "33 WEST 56TH STREET": {
     "steam_2022": 3269896,
@@ -9459,10 +9620,11 @@
     "raw_delta_22_23": -15.61,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "33 WHITEHALL STREET": {
     "steam_2022": 6721317,
@@ -9489,10 +9651,11 @@
     "raw_delta_22_23": -2.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.4,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "330 EAST 21ST ST": {
     "steam_2022": 3785959,
@@ -9549,10 +9712,11 @@
     "raw_delta_22_23": -7.97,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "330 HUDSON ST": {
     "steam_2022": 7839070,
@@ -9594,10 +9758,11 @@
     "raw_delta_22_23": 41.5,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 68.4,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "330 W 42ND ST": {
     "steam_2022": 18400186,
@@ -9624,10 +9789,11 @@
     "raw_delta_22_23": -9.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.2,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "333 E. 38TH ST": {
     "steam_2022": 24270514,
@@ -9819,10 +9985,11 @@
     "raw_delta_22_23": -9.11,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "345 E 37TH ST": {
     "steam_2022": 55880871,
@@ -9864,10 +10031,11 @@
     "raw_delta_22_23": -0.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 18.78,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "345 EAST 56TH ST": {
     "steam_2022": 10577250,
@@ -9879,10 +10047,11 @@
     "raw_delta_22_23": -27.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -14.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "345 EAST 59TH ST": {
     "steam_2022": 3353516,
@@ -9909,10 +10078,11 @@
     "raw_delta_22_23": 133.11,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 177.43,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "345 PARK AVE": {
     "steam_2022": 143932122,
@@ -9984,10 +10154,11 @@
     "raw_delta_22_23": -10.82,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "35 EAST 76TH STREET": {
     "steam_2022": 35752792,
@@ -10119,10 +10290,11 @@
     "raw_delta_22_23": -21.51,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -6.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "350 WEST 50TH STREET": {
     "steam_2022": 28399422,
@@ -10134,10 +10306,11 @@
     "raw_delta_22_23": -3.77,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "351 E 68 ST": {
     "steam_2022": 2987945,
@@ -10164,10 +10337,11 @@
     "raw_delta_22_23": -13.12,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.4,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "353 EAST 83RD STREET": {
     "steam_2022": 7129507,
@@ -10254,10 +10428,11 @@
     "raw_delta_22_23": 0.48,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 19.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "36 EAST 72ND ST (34 EAST 72ND)": {
     "steam_2022": 3886930,
@@ -10269,10 +10444,11 @@
     "raw_delta_22_23": -11.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.82,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "360 EAST 72ND STREET": {
     "steam_2022": 15779415,
@@ -10284,10 +10460,11 @@
     "raw_delta_22_23": -98.83,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -98.6,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "360 FIRST AVENUE": {
     "steam_2022": 103807864,
@@ -10359,10 +10536,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "365 5TH AVENUE": {
     "steam_2022": 16551066,
@@ -10524,10 +10702,11 @@
     "raw_delta_22_23": -7.11,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 10.54,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "385 5TH AVENUE": {
     "steam_2022": 5374786,
@@ -10719,10 +10898,11 @@
     "raw_delta_22_23": -3.42,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.94,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "4 NEW YORK PLAZA": {
     "steam_2022": 13353424,
@@ -10794,10 +10974,11 @@
     "raw_delta_22_23": -34.22,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -21.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "40 BROAD ST": {
     "steam_2022": 12687033,
@@ -10869,10 +11050,11 @@
     "raw_delta_22_23": 71.03,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 103.55,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "40 EAST 80TH STREET": {
     "steam_2022": 2758113,
@@ -10884,10 +11066,11 @@
     "raw_delta_22_23": -32.68,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -19.88,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "40 EAST 84TH ST": {
     "steam_2022": 3534890,
@@ -10899,10 +11082,11 @@
     "raw_delta_22_23": 88.71,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 124.59,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "40 IRVING PLACE": {
     "steam_2022": 28722863,
@@ -11199,10 +11383,11 @@
     "raw_delta_22_23": -4.15,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.07,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "410 MADISON AVENUE": {
     "steam_2022": 5651700,
@@ -11544,10 +11729,11 @@
     "raw_delta_22_23": -8.66,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.71,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "422 EAST 72ND ST": {
     "steam_2022": 21257068,
@@ -11559,10 +11745,11 @@
     "raw_delta_22_23": -9.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "424 MADISON AVENUE": {
     "steam_2022": 2435874,
@@ -11589,10 +11776,11 @@
     "raw_delta_22_23": -28.34,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -14.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "425 LEXINGTON AVE": {
     "steam_2022": 14239729,
@@ -11619,10 +11807,11 @@
     "raw_delta_22_23": -15.95,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "425 WEST 50TH STREET": {
     "steam_2022": 12190610,
@@ -11709,10 +11898,11 @@
     "raw_delta_22_23": -8.42,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.99,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "430 E 67 ST": {
     "steam_2022": 7231933,
@@ -11724,10 +11914,11 @@
     "raw_delta_22_23": -19.56,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -4.27,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "430 PARK AVENUE, NEW YORK": {
     "steam_2022": 10690986,
@@ -11919,10 +12110,11 @@
     "raw_delta_22_23": -22.44,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.69,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "444 EAST 82ND STREET": {
     "steam_2022": 26749732,
@@ -11949,10 +12141,11 @@
     "raw_delta_22_23": -23.97,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -9.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "445 EAST 69TH ST": {
     "steam_2022": 6220002,
@@ -11994,10 +12187,11 @@
     "raw_delta_22_23": 45.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 72.84,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "446-460 7TH AVENUE": {
     "steam_2022": 7308659,
@@ -12024,10 +12218,11 @@
     "raw_delta_22_23": -6.73,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "45 BROADWAY": {
     "steam_2022": 6373088,
@@ -12114,10 +12309,11 @@
     "raw_delta_22_23": -10.82,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.13,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "45 EAST 81ST STREET": {
     "steam_2022": 5351508,
@@ -12144,10 +12340,11 @@
     "raw_delta_22_23": -1.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.8,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "45 WEST 44TH STREET": {
     "steam_2022": 15357837,
@@ -12159,10 +12356,11 @@
     "raw_delta_22_23": -5.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.06,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "45 WEST 54TH STREET": {
     "steam_2022": 2186701,
@@ -12174,10 +12372,11 @@
     "raw_delta_22_23": 0.03,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 19.04,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "450 LEXINGTON AVENUE": {
     "steam_2022": 13333733,
@@ -12189,10 +12388,11 @@
     "raw_delta_22_23": -22.78,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -8.11,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "450 PARK AVENUE": {
     "steam_2022": 18760312,
@@ -12219,10 +12419,11 @@
     "raw_delta_22_23": 9.76,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 30.63,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "452 5TH AVENUE": {
     "steam_2022": 14808312,
@@ -12294,10 +12495,11 @@
     "raw_delta_22_23": -1.19,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 17.6,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "460 PARK AVENUE": {
     "steam_2022": 12145143,
@@ -12339,10 +12541,11 @@
     "raw_delta_22_23": -36.79,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -24.77,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "462 1ST AVE": {
     "steam_2022": 255329084,
@@ -12504,10 +12707,11 @@
     "raw_delta_22_23": -21.87,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.02,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "485 PARK AVE": {
     "steam_2022": 3763269,
@@ -12519,10 +12723,11 @@
     "raw_delta_22_23": -35.64,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -23.4,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "488 MADISON AVENUE": {
     "steam_2022": 6554095,
@@ -12594,10 +12799,11 @@
     "raw_delta_22_23": 5.94,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 26.07,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "49 EAST 79TH STREET": {
     "steam_2022": 3820203,
@@ -12624,10 +12830,11 @@
     "raw_delta_22_23": -19.04,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.65,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "5 BRYANT PARK": {
     "steam_2022": 12415818,
@@ -12789,10 +12996,11 @@
     "raw_delta_22_23": -9.66,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "50 GRAMERCY PARK NORTH": {
     "steam_2022": 1448271,
@@ -12804,10 +13012,11 @@
     "raw_delta_22_23": 18.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 40.81,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "50 ROCKEFELLER PLAZA": {
     "steam_2022": 21994500,
@@ -12819,10 +13028,11 @@
     "raw_delta_22_23": -4.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.98,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "50 UN PLAZA": {
     "steam_2022": 20741960,
@@ -12894,10 +13104,11 @@
     "raw_delta_22_23": 28.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 52.63,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "500 5TH AVENUE": {
     "steam_2022": 7433052,
@@ -12924,10 +13135,11 @@
     "raw_delta_22_23": 435.26,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 537.02,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "500-518 E. 63RD STREET": {
     "steam_2022": 17313048,
@@ -12969,10 +13181,11 @@
     "raw_delta_22_23": -15.73,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.3,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "502 PARK AVENUE": {
     "steam_2022": 12116728,
@@ -12999,10 +13212,11 @@
     "raw_delta_22_23": -12.47,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.17,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "505 FIFTH AVENUE": {
     "steam_2022": 5556890,
@@ -13044,10 +13258,11 @@
     "raw_delta_22_23": -19.31,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.97,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "509 MADISON AVENUE": {
     "steam_2022": 4558495,
@@ -13119,10 +13334,11 @@
     "raw_delta_22_23": -32.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -19.07,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "510 MADISON AVENUE": {
     "steam_2022": 4742568,
@@ -13134,10 +13350,11 @@
     "raw_delta_22_23": -22.28,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "511 EAST 71ST STREET": {
     "steam_2022": 46202972,
@@ -13149,10 +13366,11 @@
     "raw_delta_22_23": -4.64,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.48,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "511 LEXINGTON AVENUE": {
     "steam_2022": 8142734,
@@ -13224,10 +13442,11 @@
     "raw_delta_22_23": -21.04,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -6.03,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "515 WEST 59TH STREET": {
     "steam_2022": 25566323,
@@ -13239,10 +13458,11 @@
     "raw_delta_22_23": -4.62,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "518 E. 63RD STREET": {
     "steam_2022": 29997014,
@@ -13254,10 +13474,11 @@
     "raw_delta_22_23": -12.48,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "518 W57TH ST": {
     "steam_2022": 67313981,
@@ -13374,10 +13595,11 @@
     "raw_delta_22_23": -4.35,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.83,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "521 PARK AVENUE": {
     "steam_2022": 4797097,
@@ -13404,10 +13626,11 @@
     "raw_delta_22_23": 6.49,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 26.73,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "522 FIFTH AVENUE": {
     "steam_2022": 7214108,
@@ -13434,10 +13657,11 @@
     "raw_delta_22_23": -20.19,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.02,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "525 PARK AVE": {
     "steam_2022": 5800552,
@@ -13449,10 +13673,11 @@
     "raw_delta_22_23": -11.89,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.87,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "529 FIFTH AVENUE": {
     "steam_2022": 4126657,
@@ -13539,10 +13764,11 @@
     "raw_delta_22_23": -3.22,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 15.18,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "535 FIFTH AVENUE": {
     "steam_2022": 10740031,
@@ -13569,10 +13795,11 @@
     "raw_delta_22_23": -29.65,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -16.27,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "535 PARK AVENUE": {
     "steam_2022": 4685438,
@@ -13704,10 +13931,11 @@
     "raw_delta_22_23": -28.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -14.93,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "55 EAST 52ND STREET": {
     "steam_2022": 20822702,
@@ -13719,10 +13947,11 @@
     "raw_delta_22_23": -4.47,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 13.69,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "55 EAST 59TH STREET": {
     "steam_2022": 2578581,
@@ -13794,10 +14023,11 @@
     "raw_delta_22_23": -9.21,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.05,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "55 WATER ST": {
     "steam_2022": 70468445,
@@ -13899,10 +14129,11 @@
     "raw_delta_22_23": -20.78,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -5.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "555 MADISON AVE": {
     "steam_2022": 13978763,
@@ -13944,10 +14175,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "56 LEONARD STREET": {
     "steam_2022": 24557300,
@@ -14019,10 +14251,11 @@
     "raw_delta_22_23": 12.77,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 34.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "565 5TH AVENUE": {
     "steam_2022": 7273007,
@@ -14229,10 +14462,11 @@
     "raw_delta_22_23": -13.06,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.47,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "59 JOHN STREET": {
     "steam_2022": 3844086,
@@ -14334,10 +14568,11 @@
     "raw_delta_22_23": -8.97,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.33,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "592 FIFTH AVENUE": {
     "steam_2022": 1292709,
@@ -14349,10 +14584,11 @@
     "raw_delta_22_23": 60.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 91.5,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "595 MADISON AVENUE": {
     "steam_2022": 11350906,
@@ -14409,10 +14645,11 @@
     "raw_delta_22_23": -15.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.54,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "6 EAST 43RD STREET": {
     "steam_2022": 12084056,
@@ -14499,10 +14736,11 @@
     "raw_delta_22_23": 7.37,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 27.78,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "60 E 56TH ST": {
     "steam_2022": 793210,
@@ -14649,10 +14887,11 @@
     "raw_delta_22_23": -2.46,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.08,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "600 FIFTH AVENUE": {
     "steam_2022": 17085674,
@@ -14664,10 +14903,11 @@
     "raw_delta_22_23": -10.4,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.63,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "600 LEXINGTON AVENUE": {
     "steam_2022": 4432818,
@@ -14679,10 +14919,11 @@
     "raw_delta_22_23": -9.3,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.95,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "600 MADISON AVENUE": {
     "steam_2022": 16428658,
@@ -14709,10 +14950,11 @@
     "raw_delta_22_23": -6.57,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.2,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "605 3RD AVENUE": {
     "steam_2022": 26184532,
@@ -14724,10 +14966,11 @@
     "raw_delta_22_23": -6.13,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "605 WATER STREET": {
     "steam_2022": 11510821,
@@ -14754,10 +14997,11 @@
     "raw_delta_22_23": -26.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -12.23,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "609 COLUMBUS AVE": {
     "steam_2022": 6663333,
@@ -14799,10 +15043,11 @@
     "raw_delta_22_23": -6.3,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.52,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "61 BROADWAY": {
     "steam_2022": 14018563,
@@ -14889,10 +15134,11 @@
     "raw_delta_22_23": 9.65,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 30.49,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "620 FIFTH AVENUE": {
     "steam_2022": 75140,
@@ -14904,10 +15150,11 @@
     "raw_delta_22_23": 182.69,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 236.44,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "622 3RD AVENUE": {
     "steam_2022": 50139798,
@@ -14949,10 +15196,11 @@
     "raw_delta_22_23": -28.58,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -15.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "63 MADISON AVE": {
     "steam_2022": 50121626,
@@ -14979,10 +15227,11 @@
     "raw_delta_22_23": -19.56,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -4.26,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "630 FIFTH AVENUE": {
     "steam_2022": 62819152,
@@ -14994,10 +15243,11 @@
     "raw_delta_22_23": 1.13,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 20.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "630 FIRST AVENUE": {
     "steam_2022": 19214694,
@@ -15039,10 +15289,11 @@
     "raw_delta_22_23": -8.07,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.41,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "635 MADISON AVE": {
     "steam_2022": 4025406,
@@ -15069,10 +15320,11 @@
     "raw_delta_22_23": -19.66,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -4.39,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "641 AVENUE OF THE AMERICAS": {
     "steam_2022": 3441672,
@@ -15249,10 +15501,11 @@
     "raw_delta_22_23": -24.14,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -9.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "650 PARK AVENUE": {
     "steam_2022": 11324913,
@@ -15264,10 +15517,11 @@
     "raw_delta_22_23": -3.23,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 15.16,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "650 WEST 57TH ST": {
     "steam_2022": 98709198,
@@ -15309,10 +15563,11 @@
     "raw_delta_22_23": -30.48,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -17.26,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "655 PARK AVE": {
     "steam_2022": 10616472,
@@ -15324,10 +15579,11 @@
     "raw_delta_22_23": -15.52,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.54,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "655 SIXTH AVENUE": {
     "steam_2022": 3787372,
@@ -15354,10 +15610,11 @@
     "raw_delta_22_23": 5.94,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 26.08,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "66 PARK AVENUE": {
     "steam_2022": 8665811,
@@ -15549,10 +15806,11 @@
     "raw_delta_22_23": -21.65,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -6.75,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "681 FIFTH AVENUE": {
     "steam_2022": 128030,
@@ -15624,10 +15882,11 @@
     "raw_delta_22_23": -30.03,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -16.72,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "69 FIFTH AVENUE": {
     "steam_2022": 8714526,
@@ -15639,10 +15898,11 @@
     "raw_delta_22_23": -14.67,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 1.55,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "693 5 AVENUE": {
     "steam_2022": 2263820,
@@ -15654,10 +15914,11 @@
     "raw_delta_22_23": -6.35,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 11.45,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "7 EAST 12TH STREET": {
     "steam_2022": 3215261,
@@ -15669,10 +15930,11 @@
     "raw_delta_22_23": -8.1,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.37,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "7 GRAMERCY PARK": {
     "steam_2022": 1920730,
@@ -15714,10 +15976,11 @@
     "raw_delta_22_23": -13.33,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.15,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "7 WEST 43RD STREET": {
     "steam_2022": 1226301,
@@ -15834,10 +16097,11 @@
     "raw_delta_22_23": -0.48,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 18.44,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "700 PARK AVENUE": {
     "steam_2022": 9392055,
@@ -15939,10 +16203,11 @@
     "raw_delta_22_23": -16.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.11,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "712 7TH AVENUE": {
     "steam_2022": 17216281,
@@ -15969,10 +16234,11 @@
     "raw_delta_22_23": -11.21,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.67,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "715 PARK AVENUE": {
     "steam_2022": 4458989,
@@ -15999,10 +16265,11 @@
     "raw_delta_22_23": -13.42,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.04,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "720 FIFTH AVENUE": {
     "steam_2022": 2128667,
@@ -16029,10 +16296,11 @@
     "raw_delta_22_23": -56.95,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -48.76,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "724 FIFTH AVENUE": {
     "steam_2022": 832940,
@@ -16134,10 +16402,11 @@
     "raw_delta_22_23": -12.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.71,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "730 THIRD AVENUE": {
     "steam_2022": 15647580,
@@ -16149,10 +16418,11 @@
     "raw_delta_22_23": -4.17,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.05,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "731 LEXINGTON AVE": {
     "steam_2022": 39216934,
@@ -16164,10 +16434,11 @@
     "raw_delta_22_23": -9.08,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "732 LEXINGTON AVENUE": {
     "steam_2022": 2566606,
@@ -16209,10 +16480,11 @@
     "raw_delta_22_23": -9.05,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.24,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "745 FIFTH AVE.": {
     "steam_2022": 3565690,
@@ -16224,10 +16496,11 @@
     "raw_delta_22_23": -49.04,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -39.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "745 SEVENTH AVE": {
     "steam_2022": 27621940,
@@ -16254,10 +16527,11 @@
     "raw_delta_22_23": -18.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -2.65,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "75 COLUMBIA STREET": {
     "steam_2022": 92249169,
@@ -16314,10 +16588,11 @@
     "raw_delta_22_23": 19.49,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 42.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "75 WALL STREET": {
     "steam_2022": 16475763,
@@ -16344,10 +16619,11 @@
     "raw_delta_22_23": 74.83,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 108.06,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "750 LEXINGTON AVENUE": {
     "steam_2022": 6614314,
@@ -16389,10 +16665,11 @@
     "raw_delta_22_23": -22.94,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -8.29,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "754 5TH AVENUE": {
     "steam_2022": 5631074,
@@ -16449,10 +16726,11 @@
     "raw_delta_22_23": -67.67,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -61.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "77 WATER STREET": {
     "steam_2022": 32117245,
@@ -16494,10 +16772,11 @@
     "raw_delta_22_23": -9.82,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 7.33,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "777 THIRD AVENUE": {
     "steam_2022": 33210586,
@@ -16524,10 +16803,11 @@
     "raw_delta_22_23": -14.25,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.05,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "778 PARK AVENUE": {
     "steam_2022": 4342647,
@@ -16599,10 +16879,11 @@
     "raw_delta_22_23": -18.79,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -3.35,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "787 SEVENTH AVENUE": {
     "steam_2022": 57225030,
@@ -16629,10 +16910,11 @@
     "raw_delta_22_23": -15.85,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.15,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "79 LEONARD STREET": {
     "steam_2022": 953435,
@@ -16674,10 +16956,11 @@
     "raw_delta_22_23": -12.03,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 4.7,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "799 PARK AVENUE": {
     "steam_2022": 5613091,
@@ -16734,10 +17017,11 @@
     "raw_delta_22_23": -15.45,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.62,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "80 & 90 MAIDEN LANE": {
     "steam_2022": 4489053,
@@ -16854,10 +17138,11 @@
     "raw_delta_22_23": -13.55,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.88,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "800 2ND AVENUE": {
     "steam_2022": 8730210,
@@ -16884,10 +17169,11 @@
     "raw_delta_22_23": 3.76,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 23.49,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "800 PARK AVE": {
     "steam_2022": 3234216,
@@ -16899,10 +17185,11 @@
     "raw_delta_22_23": -15.53,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 0.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "805 3RD AVENUE": {
     "steam_2022": 648087,
@@ -16959,10 +17246,11 @@
     "raw_delta_22_23": -17.2,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -1.46,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "812 FIFTH AVENUE": {
     "steam_2022": 6266411,
@@ -16974,10 +17262,11 @@
     "raw_delta_22_23": -14.71,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 1.5,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "812 PARK AVENUE": {
     "steam_2022": 7935708,
@@ -17004,10 +17293,11 @@
     "raw_delta_22_23": 4.62,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 24.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "817 FIFTH AVE": {
     "steam_2022": 2728432,
@@ -17019,10 +17309,11 @@
     "raw_delta_22_23": -14.98,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 1.18,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "820 FIFTH AVE": {
     "steam_2022": 4361988,
@@ -17034,10 +17325,11 @@
     "raw_delta_22_23": -34.95,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -22.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "820 PARK AVENUE": {
     "steam_2022": 3607470,
@@ -17079,10 +17371,11 @@
     "raw_delta_22_23": -16.4,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -0.51,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "825 SEVENTH AVE": {
     "steam_2022": 22699350,
@@ -17094,10 +17387,11 @@
     "raw_delta_22_23": -10.68,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.3,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "83 MAIDEN LANE": {
     "steam_2022": 6114723,
@@ -17139,10 +17433,11 @@
     "raw_delta_22_23": -13.33,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 3.14,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "838 FIFTH AVENUE": {
     "steam_2022": 4372292,
@@ -17229,10 +17524,11 @@
     "raw_delta_22_23": -3.81,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.47,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "850 THIRD AVENUE": {
     "steam_2022": 16434184,
@@ -17244,10 +17540,11 @@
     "raw_delta_22_23": -8.69,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 8.67,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "860 PARK AVENUE": {
     "steam_2022": 3086316,
@@ -17304,10 +17601,11 @@
     "raw_delta_22_23": -1.96,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.68,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "866 UN PLAZA": {
     "steam_2022": 84958016,
@@ -17334,10 +17632,11 @@
     "raw_delta_22_23": -10.86,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.08,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "870 SEVENTH AVE": {
     "steam_2022": 19195350,
@@ -17394,10 +17693,11 @@
     "raw_delta_22_23": -11.72,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 5.06,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.55,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "880 THIRD AVE": {
     "steam_2022": 1624369,
@@ -17409,10 +17709,11 @@
     "raw_delta_22_23": -52.11,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -43.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "881 7TH AVE": {
     "steam_2022": 19369796,
@@ -17439,10 +17740,11 @@
     "raw_delta_22_23": -14.12,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.21,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "885 THIRD AVENUE": {
     "steam_2022": 7734075,
@@ -17499,10 +17801,11 @@
     "raw_delta_22_23": 2.99,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 22.57,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "9 W 57TH STREET": {
     "steam_2022": 83316781,
@@ -17694,10 +17997,11 @@
     "raw_delta_22_23": -16.61,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -0.76,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "909 THIRD AVENUE": {
     "steam_2022": 21707170,
@@ -17709,10 +18013,11 @@
     "raw_delta_22_23": 22.88,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 46.24,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "912 FIFTH AVENUE": {
     "steam_2022": 4717207,
@@ -17724,10 +18029,11 @@
     "raw_delta_22_23": -7.49,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 10.09,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "919 THIRD AVENUE": {
     "steam_2022": 58726348,
@@ -17739,10 +18045,11 @@
     "raw_delta_22_23": -16.79,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -0.97,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "920 FIFTH AVE": {
     "steam_2022": 5542905,
@@ -17754,10 +18061,11 @@
     "raw_delta_22_23": -22.69,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -7.99,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "921 MADISON AVENUE": {
     "steam_2022": 4653519,
@@ -17784,10 +18092,11 @@
     "raw_delta_22_23": 27.22,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 51.41,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "944 FIFTH AVENUE": {
     "steam_2022": 3468405,
@@ -17799,10 +18108,11 @@
     "raw_delta_22_23": -7.66,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 9.89,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "945 MADISON AVE": {
     "steam_2022": 8837535,
@@ -17859,10 +18169,11 @@
     "raw_delta_22_23": -26.5,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -12.53,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "953 FIFTH AVENUE": {
     "steam_2022": 1914041,
@@ -17874,10 +18185,11 @@
     "raw_delta_22_23": -16.46,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -0.58,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "955 FIFTH AVE": {
     "steam_2022": 3676670,
@@ -17889,10 +18201,11 @@
     "raw_delta_22_23": -100.0,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -100.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "960 FIFTH AVE/3 EAST 77TH ST": {
     "steam_2022": 8469192,
@@ -17904,10 +18217,11 @@
     "raw_delta_22_23": 10.91,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 32.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "969 FIFTH AVENUE": {
     "steam_2022": 1895781,
@@ -17964,10 +18278,11 @@
     "raw_delta_22_23": -2.27,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 16.31,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "980 MADISON AVENUE": {
     "steam_2022": 2675146,
@@ -18009,10 +18324,11 @@
     "raw_delta_22_23": -13.78,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.61,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "989 AVE OF THE AMERICAS": {
     "steam_2022": 949397,
@@ -18039,10 +18355,11 @@
     "raw_delta_22_23": -67.32,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -61.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": true,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "990 FIFTH AVENUE": {
     "steam_2022": 1902121,
@@ -18069,10 +18386,11 @@
     "raw_delta_22_23": -10.29,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 6.77,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -15.39,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "995 FIFTH AVENUE": {
     "steam_2022": 3076011,
@@ -18084,10 +18402,11 @@
     "raw_delta_22_23": -14.21,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 2.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -21.015,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "ED SULLIVAN THEATER 1697 BROADWAY": {
     "steam_2022": 2286326,
@@ -18099,10 +18418,11 @@
     "raw_delta_22_23": -4.12,
     "raw_delta_23_24": null,
     "norm_delta_22_23": 14.1,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -12.76,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "ELEVEN PENN PLAZA": {
     "steam_2022": 17735098,
@@ -18114,10 +18434,11 @@
     "raw_delta_22_23": -34.46,
     "raw_delta_23_24": null,
     "norm_delta_22_23": -22.0,
-    "norm_delta_23_24": null,
+    "norm_delta_23_24": -16.18,
     "hdd_2024_provisional": true,
     "outlier_22_23": false,
-    "outlier_23_24": false
+    "outlier_23_24": false,
+    "norm_delta_23_24_projected": true
   },
   "ONE BRYANT PARK": {
     "steam_2022": 1028773,
