@@ -668,7 +668,28 @@ app.post("/api/explain", requireAuth, async (req, res) => {
 });
 
 // ── /api/export/csv ───────────────────────────────────────────────────────────
-app.get("/api/export/csv", requireAuth, (req, res) => {
+// Escape CSV cells: wrap in double-quotes, escape internal quotes, and prefix
+// cells starting with =, +, -, @ with a single-quote to prevent Excel/Sheets
+// formula injection (double-quoting alone does NOT prevent this).
+function csvCell(v) {
+  // Finite numbers are safe as-is — no quoting, no injection risk
+  if (typeof v === "number" && Number.isFinite(v)) return String(v);
+  const s = String(v ?? "").replace(/"/g, '""');
+  // Prefix text cells starting with =, +, -, @ to block Excel formula injection
+  // (double-quoting alone does NOT prevent this — panel verdict: unanimous)
+  const safe = /^[=+\-@]/.test(s) ? `'${s}` : s;
+  return `"${safe}"`;
+}
+
+const exportLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Export rate limit — try again in a minute" },
+});
+
+app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
   const rows = DATA_PARSED.buildings.map(b => {
     const e = DATA_PARSED.enrichment[b.address?.toUpperCase()] ?? {};
     return [
@@ -677,11 +698,12 @@ app.get("/api/export/csv", requireAuth, (req, res) => {
       b.steam, e.cluster_name ?? "", e.floor_sqft ?? "",
       e.energy_star ?? "", e.eui ?? "", e.signal ?? "",
       e.dob_jobs ?? "", e.steam_ghg_share ?? ""
-    ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",");
+    ].map(csvCell).join(",");
   });
   const header = "address,bbl,lat,lon,use,risk,ll97_penalty_2024,ll97_penalty_2030,steam,cluster_name,floor_sqft,energy_star,eui,signal,dob_jobs,steam_ghg_share";
-  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
   res.setHeader("Content-Disposition", 'attachment; filename="coned-steam-portfolio.csv"');
+  res.setHeader("Cache-Control", "no-store, private");
   res.send([header, ...rows].join("\n"));
 });
 
