@@ -2,15 +2,26 @@ import { useState, useRef } from "react";
 import { queryBuildings, applyFilterSpec, summarizeResults, isExplainQuery, explainDashboard } from "../lib/groqFilter";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
-const EXAMPLES = [
-  { label: "How is the risk score calculated?",          explain: true  },
-  { label: "What is LL97 and how is the fine calculated?", explain: true },
-  { label: "Explain the 5 building archetypes",           explain: true  },
-  { label: "What does EUI mean?",                         explain: true  },
-  { label: "High risk hotels with HVAC permits filed",    explain: false },
-  { label: "Office buildings over their LL97 limit with big steam drops", explain: false },
-  { label: "Buildings facing more than $100k LL97 penalty in 2024",      explain: false },
-  { label: "Large commercial buildings sorted by LL97 penalty",           explain: false },
+const EXAMPLES_TECHNICAL = [
+  { label: "How is the risk score calculated?",                           explain: true  },
+  { label: "What is LL97 and how is the fine calculated?",               explain: true  },
+  { label: "Explain the 5 building archetypes",                          explain: true  },
+  { label: "What does peer score mean?",                                  explain: true  },
+  { label: "How does the YoY scatter chart work?",                       explain: true  },
+  { label: "High risk hotels with HVAC permits filed",                   explain: false },
+  { label: "Office buildings over their LL97 limit with big steam drops",explain: false },
+  { label: "Buildings facing more than $100k LL97 penalty in 2024",     explain: false },
+];
+
+const EXAMPLES_SIMPLE = [
+  { label: "What is this dashboard and why does it exist?",              explain: true  },
+  { label: "Explain attrition like I'm 5",                               explain: true  },
+  { label: "What is steam heat in simple terms?",                        explain: true  },
+  { label: "What does the risk score actually mean?",                    explain: true  },
+  { label: "Explain LL97 simply",                                        explain: true  },
+  { label: "What are the building archetypes in plain English?",         explain: true  },
+  { label: "Why does a building get a high risk score?",                 explain: true  },
+  { label: "What does it mean when a building churns?",                  explain: true  },
 ];
 
 export default function AIAgent({ buildings, onSelect, selectedAddress, token }) {
@@ -20,6 +31,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [insight,     setInsight]     = useState("");
   const [explainAnswer, setExplainAnswer] = useState(null);
   const [mode,        setMode]        = useState("filter"); // "filter" | "explain"
+  const [simpleMode,  setSimpleMode]  = useState(false);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const inputRef = useRef(null);
@@ -41,7 +53,8 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
 
     try {
       if (explaining) {
-        const answer = await explainDashboard(question, token);
+        const prefixed = simpleMode ? `[SIMPLE MODE] ${question}` : question;
+        const answer = await explainDashboard(prefixed, token);
         setExplainAnswer(answer);
       } else {
         const spec    = await queryBuildings(question, token);
@@ -77,13 +90,43 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     <div className="flex flex-col h-full">
       {/* Query bar */}
       <div className="p-4 border-b border-[#082244] bg-[#001748]/60">
+        {/* Mode toggle row */}
+        <div className="flex items-center gap-2 mb-2.5">
+          <span className="text-[10px] text-slate-600 uppercase tracking-wider">Explain mode:</span>
+          <button
+            onClick={() => setSimpleMode(false)}
+            className={`px-2.5 py-1 text-[11px] rounded-full font-medium transition-colors border ${
+              !simpleMode
+                ? "bg-[#0041A8] border-[#0041A8] text-white"
+                : "border-[#0F3B7E] text-slate-500 hover:text-slate-300"
+            }`}
+          >
+            🎓 Technical
+          </button>
+          <button
+            onClick={() => setSimpleMode(true)}
+            className={`px-2.5 py-1 text-[11px] rounded-full font-medium transition-colors border ${
+              simpleMode
+                ? "bg-[#E87722] border-[#E87722] text-white"
+                : "border-[#0F3B7E] text-slate-500 hover:text-slate-300"
+            }`}
+          >
+            🧒 Simple / ELI5
+          </button>
+          {simpleMode && (
+            <span className="text-[10px] text-[#E87722] italic">
+              — explanations will use plain language and analogies
+            </span>
+          )}
+        </div>
+
         <div className="flex gap-2">
           <input
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSubmit()}
-            placeholder="Ask about the steam portfolio… e.g. high risk hotels with HVAC permits"
+            placeholder={simpleMode ? "Ask anything — I'll explain it simply…" : "Ask about the portfolio or how the dashboard works…"}
             className="flex-1 px-4 py-2.5 text-sm rounded-lg bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#E87722]/60 transition-colors"
           />
           <button
@@ -93,7 +136,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
           >
             {loading ? "…" : "Ask"}
           </button>
-          {results !== null && (
+          {(results !== null || explainAnswer) && (
             <button
               onClick={handleClear}
               className="px-3 py-2.5 rounded-lg border border-[#0F3B7E] text-slate-400 text-sm hover:bg-[#002469] transition-colors"
@@ -106,19 +149,23 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         {/* Example queries */}
         {results === null && !explainAnswer && !loading && (
           <div className="mt-3">
-            <div className="text-[10px] text-slate-600 mb-1.5 uppercase tracking-wider">Ask a question · or filter the portfolio</div>
+            <div className="text-[10px] text-slate-600 mb-1.5 uppercase tracking-wider">
+              {simpleMode ? "🧒 Simple questions — click to ask" : "💡 Explain · 🔍 Filter"}
+            </div>
             <div className="flex flex-wrap gap-2">
-              {EXAMPLES.map(ex => (
+              {(simpleMode ? EXAMPLES_SIMPLE : EXAMPLES_TECHNICAL).map(ex => (
                 <button
                   key={ex.label}
                   onClick={() => handleExample(ex.label)}
                   className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
-                    ex.explain
-                      ? "border-[#0F3B7E] text-[#7AAAD0] hover:border-[#E87722]/40 hover:text-[#F09040]"
-                      : "border-[#082244] text-slate-500 hover:border-[#0F3B7E] hover:text-slate-300"
+                    simpleMode
+                      ? "border-[#E87722]/30 text-[#E87722]/70 hover:border-[#E87722] hover:text-[#E87722]"
+                      : ex.explain
+                        ? "border-[#0F3B7E] text-[#7AAAD0] hover:border-[#E87722]/40 hover:text-[#F09040]"
+                        : "border-[#082244] text-slate-500 hover:border-[#0F3B7E] hover:text-slate-300"
                   }`}
                 >
-                  {ex.explain ? "💡 " : "🔍 "}{ex.label}
+                  {simpleMode ? "🧒 " : ex.explain ? "💡 " : "🔍 "}{ex.label}
                 </button>
               ))}
             </div>
@@ -160,14 +207,20 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
               </div>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="text-[10px] text-slate-600">Follow-up questions:</span>
-              {[
+              <span className="text-[10px] text-slate-600">Follow-up:</span>
+              {(simpleMode ? [
+                "Explain attrition like I'm 5",
+                "Why would a building leave ConEd?",
+                "What happens if a building has a high risk score?",
+                "Explain LL97 simply",
+                "What are the 5 archetypes in plain English?",
+              ] : [
                 "How is the risk score calculated?",
                 "What are the 5 archetypes?",
                 "How is the LL97 fine calculated?",
                 "What does EUI mean?",
                 "Explain the YoY scatter chart",
-              ].map(q => (
+              ]).map(q => (
                 <button
                   key={q}
                   onClick={() => { setQuery(q); handleSubmit(q); }}
@@ -279,8 +332,17 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         {results === null && !explainAnswer && !loading && !error && (
           <div className="flex flex-col items-center justify-center h-full text-center px-8 pb-16">
             <div className="text-4xl mb-4 opacity-20">⚡</div>
-            <p className="text-slate-400 text-sm mb-1">Ask anything — filter buildings or ask how the dashboard works</p>
-            <p className="text-slate-600 text-xs">💡 Explain mode · 🔍 Filter mode · powered by Groq / Claude Haiku</p>
+            {simpleMode ? (
+              <>
+                <p className="text-[#E87722]/70 text-sm mb-1 font-medium">Simple Mode — ask anything, no jargon</p>
+                <p className="text-slate-600 text-xs">Try: "What is this dashboard?" or "Explain attrition like I'm 5"</p>
+              </>
+            ) : (
+              <>
+                <p className="text-slate-400 text-sm mb-1">Ask anything — filter buildings or ask how the dashboard works</p>
+                <p className="text-slate-600 text-xs">💡 Explain mode · 🔍 Filter mode · powered by Groq / Claude Haiku</p>
+              </>
+            )}
           </div>
         )}
       </div>
