@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { riskTier, signalMeta, isUncertain } from "../data/useBuildings";
+import { riskTier, signalMeta } from "../data/useBuildings";
 
 function buildCols(penaltyYear) {
   return [
@@ -54,11 +54,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
     }
 
     if (tierFilter !== "All") {
-      if (tierFilter === "Uncertain") {
-        rows = rows.filter(b => isUncertain(b));
-      } else {
-        rows = rows.filter(b => !isUncertain(b) && riskTier(b.risk).label === tierFilter);
-      }
+      rows = rows.filter(b => riskTier(b.risk).label === tierFilter);
     }
 
     if (typeFilter !== "All") {
@@ -144,10 +140,9 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const COLS = buildCols(penaltyYear);
   const penaltyKey = penaltyYear === 2030 ? "ll97_penalty_2030" : "ll97_penalty_2024";
 
-  const high         = filtered.filter(b => !isUncertain(b) && b.risk > 0.7).length;
-  const medium       = filtered.filter(b => !isUncertain(b) && b.risk > 0.4 && b.risk <= 0.7).length;
-  const low          = filtered.filter(b => !isUncertain(b) && Number.isFinite(b.risk) && b.risk <= 0.4).length;
-  const uncertain    = filtered.filter(b => isUncertain(b)).length;
+  const high   = filtered.filter(b => b.risk > 0.7).length;
+  const medium = filtered.filter(b => b.risk > 0.4 && b.risk <= 0.7).length;
+  const low    = filtered.filter(b => Number.isFinite(b.risk) && b.risk <= 0.4).length;
   const overCap      = filtered.filter(b => b.ll97_over_2024 === 1).length;
   const totalPenalty = filtered.reduce((sum, b) => sum + (b[penaltyKey] || 0), 0);
 
@@ -168,7 +163,6 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           { label: "High Attrition", count: high,             color: "#ef4444" },
           { label: "Med Attrition",  count: medium,           color: "#f97316" },
           { label: "Low Attrition",  count: low,              color: "#22c55e" },
-          { label: "Uncertain",      count: uncertain,        color: "#a78bfa" },
           { label: "Total",          count: buildings.length, color: "#94a3b8" },
         ].map(s => (
           <div key={s.label} className="text-center">
@@ -230,7 +224,6 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           <option>High</option>
           <option>Medium</option>
           <option>Low</option>
-          <option>Uncertain</option>
         </select>
         <select
           value={typeFilter}
@@ -390,27 +383,15 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                     ) : <span className="text-slate-600">—</span>}
                   </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">
-                    {isUncertain(b) ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-5 rounded-sm" style={{ background: "#a78bfa", opacity: 0.85 }} />
-                        <span className="font-bold" style={{ color: "#a78bfa" }}>
-                          {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
-                        </span>
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: "#a78bfa", background: "#2e1065" }}>
-                          Uncertain
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-5 rounded-sm" style={{ background: tier.color, opacity: 0.85 }} />
-                        <span className="font-bold" style={{ color: tier.color }}>
-                          {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
-                        </span>
-                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: tier.color, background: tier.bg }}>
-                          {tier.label}
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-5 rounded-sm" style={{ background: tier.color, opacity: 0.85 }} />
+                      <span className="font-bold" style={{ color: tier.color }}>
+                        {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
+                      </span>
+                      <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: tier.color, background: tier.bg }}>
+                        {tier.label}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-4 py-2.5 whitespace-nowrap">
                     {(() => {

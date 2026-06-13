@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { riskTier, isUncertain } from "../data/useBuildings";
+import { riskTier } from "../data/useBuildings";
 
 export default function TopTargets({ buildings, onSelect, token: _token }) {
   const top25 = useMemo(() => {
@@ -46,7 +46,6 @@ export default function TopTargets({ buildings, onSelect, token: _token }) {
           <tbody>
             {top25.map((b, i) => {
               const tier = riskTier(b.risk);
-              const uncertain = isUncertain(b);
               return (
                 <tr
                   key={`${b.address}_${i}`}
@@ -69,7 +68,7 @@ export default function TopTargets({ buildings, onSelect, token: _token }) {
                   <td className="px-4 py-2.5 whitespace-nowrap">
                     <span
                       className="text-xs font-bold"
-                      style={{ color: uncertain ? "#a78bfa" : tier.color }}
+                      style={{ color: tier.color }}
                     >
                       {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
                     </span>

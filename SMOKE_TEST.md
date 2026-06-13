@@ -14,7 +14,7 @@ npm run dev
 ```
 
 Open: http://localhost:5173  
-Password: `coned-steam-2026`
+Password: see `.env` file (ask in `#coned-dashboard` Slack if you don't have it)
 
 ---
 
@@ -36,7 +36,7 @@ Password: `coned-steam-2026`
 - [ ] Click row → side panel opens with building details
 - [ ] Click same row again → panel closes
 - [ ] Search bar filters by address
-- [ ] **Tier filter** (All/High/Medium/Low/Uncertain) narrows table
+- [ ] **Tier filter** (All/High/Medium/Low) narrows table
 - [ ] **Use type filter** — narrows by building use type
 - [ ] **Archetype filter** — narrows by K-means cluster
 - [ ] **Signal filter** — narrows by attrition signal
@@ -46,7 +46,7 @@ Password: `coned-steam-2026`
 - [ ] **Demand range** min/max — filter by steam demand
 - [ ] Sort by clicking column headers (ascending/descending toggle)
 - [ ] **Export CSV** — file downloads with all columns
-- [ ] Stats bar shows High/Med/Low/Uncertain/Total counts
+- [ ] Stats bar shows High/Med/Low/Total counts
 - [ ] "Over LL97 cap" count and combined fine shown
 
 ### 3. Building Side Panel

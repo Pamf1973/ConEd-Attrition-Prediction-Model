@@ -1,4 +1,4 @@
-import { riskTier, signalMeta, recommendedAction, isUncertain } from "../data/useBuildings";
+import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
 
 function SteamTrend({ building }) {
   const pts = [
@@ -173,15 +173,9 @@ export default function BuildingPanel({ building, onClose }) {
             </div>
           )}
 
-          {isUncertain(b) ? (
-            <div className="mt-3 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ background: "#1e1a2e", color: "#a78bfa", border: "1px solid #4c1d95" }}>
-              Uncertain — score uses legacy heuristic (building excluded from ML training due to missing features). ConEd classifies similar cases as "Uncertain" pending better data.
-            </div>
-          ) : (
-            <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-              Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
-            </p>
-          )}
+          <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+            Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
+          </p>
         </Section>
 
         {/* Cluster archetype */}
