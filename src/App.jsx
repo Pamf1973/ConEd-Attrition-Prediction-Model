@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useBuildings } from "./data/useBuildings";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
@@ -8,6 +8,7 @@ import YoYScatter from "./components/YoYScatter";
 import RiskHistogram from "./components/RiskHistogram";
 import Watchlist, { useWatchlist } from "./components/Watchlist";
 import ErrorBoundary from "./components/ErrorBoundary";
+import TopTargets from "./components/TopTargets";
 
 export default function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
@@ -43,8 +44,25 @@ export default function App() {
   }
 
   function handleSelect(b) {
+    // Accept either a building object or an address string (from TopTargets)
+    if (typeof b === "string") {
+      const found = buildings.find(bld => bld.address === b);
+      if (found) setSelected(prev => prev?.address === found.address ? null : found);
+      return;
+    }
     setSelected(prev => prev?.address === b.address ? null : b);
   }
+
+  const bannerStats = useMemo(() => {
+    const total2024   = buildings.reduce((s, b) => s + (b.ll97_penalty_2024 || 0), 0);
+    const total2030   = buildings.reduce((s, b) => s + (b.ll97_penalty_2030 || 0), 0);
+    const over2024    = buildings.filter(b => (b.ll97_penalty_2024 ?? 0) > 0).length;
+    const over2030    = buildings.filter(b => (b.ll97_penalty_2030 ?? 0) > 0).length;
+    const extremeRisk = buildings.filter(b => (b.risk ?? 0) >= 0.90).length;
+    const pctIncrease = total2024 > 0 ? Math.round(((total2030 - total2024) / total2024) * 100) : 0;
+    const fmt = v => v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(1)}M` : v > 0 ? `$${Math.round(v / 1000)}k` : "$0";
+    return { total2024, total2030, over2024, over2030, extremeRisk, pctIncrease, fmt };
+  }, [buildings]);
 
   // Render Login if no token
   if (!token) {
@@ -91,10 +109,11 @@ export default function App() {
         <div className="w-px h-8 bg-[#0041A8] mx-1" />
         <nav className="flex gap-1">
           {[
-            { id: "rankings",  label: "Attrition Rankings", enabled: true  },
-            { id: "trends",    label: "YoY Trends",          enabled: true  },
-            { id: "watchlist", label: `Watch List${watchlist.length ? ` (${watchlist.length})` : ""}`, enabled: true },
-            { id: "agent",     label: "AI Agent",            enabled: true  },
+            { id: "rankings",    label: "Attrition Rankings", enabled: true },
+            { id: "trends",      label: "YoY Trends",          enabled: true },
+            { id: "targets",     label: "🎯 Top Targets",      enabled: true },
+            { id: "watchlist",   label: `Watch List${watchlist.length ? ` (${watchlist.length})` : ""}`, enabled: true },
+            { id: "agent",       label: "AI Agent",            enabled: true },
           ].map(tab => (
             <button
               key={tab.id}
@@ -128,6 +147,44 @@ export default function App() {
         </div>
       </header>
 
+      {/* Portfolio Dollar Exposure Banner */}
+      <div className="grid grid-cols-4 gap-px border-b border-[#082244] bg-[#082244] shrink-0">
+        {[
+          {
+            value: bannerStats.fmt(bannerStats.total2024),
+            label: "2024 LL97 Exposure",
+            sub:   `${bannerStats.over2024.toLocaleString()} buildings over cap`,
+            orange: false,
+          },
+          {
+            value: bannerStats.fmt(bannerStats.total2030),
+            label: "2030 LL97 Exposure",
+            sub:   `${bannerStats.over2030.toLocaleString()} buildings over cap`,
+            orange: true,
+          },
+          {
+            value: `${bannerStats.pctIncrease}%`,
+            label: "Penalty Increase →2030",
+            sub:   "cap tightens significantly",
+            orange: false,
+          },
+          {
+            value: bannerStats.extremeRisk.toLocaleString(),
+            label: "Extreme Risk Accounts",
+            sub:   "score ≥ 90%",
+            orange: false,
+          },
+        ].map((card, i) => (
+          <div key={i} className="bg-[#001748] px-4 py-2.5 flex flex-col gap-0.5">
+            <div className={`text-xl font-bold leading-tight ${card.orange ? "text-[#E87722]" : "text-slate-100"}`}>
+              {card.value}
+            </div>
+            <div className="text-xs font-medium text-slate-300">{card.label}</div>
+            <div className={`text-[11px] ${card.orange ? "text-[#E87722]/70" : "text-slate-500"}`}>{card.sub}</div>
+          </div>
+        ))}
+      </div>
+
       {/* Body */}
       <div className="flex flex-1 min-h-0">
         {activeTab === "rankings" && (
@@ -139,6 +196,7 @@ export default function App() {
                 selectedAddress={selected?.address}
                 watchlist={watchlist}
                 onWatch={toggleWatch}
+                token={token}
               />
             </div>
             {selected && (
@@ -157,6 +215,23 @@ export default function App() {
             <RiskHistogram buildings={buildings} />
             <YoYScatter buildings={buildings} />
           </div>
+        )}
+
+        {activeTab === "targets" && (
+          <>
+            <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
+              <TopTargets
+                buildings={buildings}
+                onSelect={handleSelect}
+                token={token}
+              />
+            </div>
+            {selected && (
+              <div className="w-[380px] shrink-0 overflow-hidden">
+                <BuildingPanel building={selected} onClose={() => setSelected(null)} />
+              </div>
+            )}
+          </>
         )}
 
         {activeTab === "watchlist" && (

@@ -174,6 +174,12 @@ const DATA_CACHE = {
   yoyDeltas:  loadJsonFile("yoy_deltas.json"),
 };
 
+// Parsed versions used by endpoints that need to iterate over the data (e.g. CSV export)
+const DATA_PARSED = {
+  buildings:  JSON.parse(DATA_CACHE.buildings),
+  enrichment: JSON.parse(DATA_CACHE.enrichment),
+};
+
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
 app.get("/api/data/buildings",   requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.buildings));
 app.get("/api/data/enrichment",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.enrichment));
@@ -659,6 +665,24 @@ app.post("/api/explain", requireAuth, async (req, res) => {
     console.error("[/api/explain]", err.message);
     res.status(502).json({ error: "explain failed — try again" });
   }
+});
+
+// ── /api/export/csv ───────────────────────────────────────────────────────────
+app.get("/api/export/csv", requireAuth, (req, res) => {
+  const rows = DATA_PARSED.buildings.map(b => {
+    const e = DATA_PARSED.enrichment[b.address?.toUpperCase()] ?? {};
+    return [
+      b.address, b.bbl, b.lat, b.lon, b.use,
+      e.ml_risk ?? b.risk, b.ll97_penalty_2024, b.ll97_penalty_2030,
+      b.steam, e.cluster_name ?? "", e.floor_sqft ?? "",
+      e.energy_star ?? "", e.eui ?? "", e.signal ?? "",
+      e.dob_jobs ?? "", e.steam_ghg_share ?? ""
+    ].map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",");
+  });
+  const header = "address,bbl,lat,lon,use,risk,ll97_penalty_2024,ll97_penalty_2030,steam,cluster_name,floor_sqft,energy_star,eui,signal,dob_jobs,steam_ghg_share";
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", 'attachment; filename="coned-steam-portfolio.csv"');
+  res.send([header, ...rows].join("\n"));
 });
 
 app.get("/api/health", (_req, res) => {
