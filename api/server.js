@@ -467,19 +467,27 @@ YoY CHART (ELI5):
   A building in the top-right = steam going UP both years. Totally stable customer.
 
 === YoY COVERAGE — WHY ONLY 422 OF 1,210 BUILDINGS APPEAR IN THE SCATTER CHART ===
-The scatter chart plots only buildings with confirmed data for BOTH the 22→23 and 23→24 periods.
+Dataset snapshot: June 2026. LL84 steam benchmarking data sourced from NYC Open Data / Portfolio Manager.
+The scatter chart requires confirmed data for BOTH the 22→23 AND 23→24 consecutive periods.
 Here is the exact breakdown of all 1,210 buildings:
+
 - 422 buildings: have both deltas — full YoY data, plotted in the scatter chart.
-- 321 buildings: have 2022 and 2023 steam data but 2024 is missing. Root cause: NYC Local Law 84
-  benchmarking data is self-reported annually (deadline: May 1). Late filers and pending DOE processing
-  mean some 2024 filings were not in our dataset at pull time. These buildings have clean 2022–2023 history
-  and will appear in the chart once 2024 data is filed.
-- 254 buildings: have 2022 data only — stopped filing or left the steam system after 2022.
-- 213 buildings: have 2022 and 2024 data but are MISSING 2023 — skipped a filing year and came back.
-  This is an anomaly worth monitoring; it may indicate buildings that briefly trialed an alternative.
-Total: 422 + 321 + 254 + 213 = 1,210. The chart is conservative: it only plots buildings with verified
-data for both periods. The 743-building 22→23 cohort vs 422-building 23→24 cohort gap is a data timeliness
-issue, not a data integrity problem.
+- 321 buildings: have 2022 and 2023 steam data but 2024 is missing. NYC Local Law 84 benchmarking
+  requires building owners to self-report annually to the NYC Department of Buildings (DOB), with a
+  May 1 deadline. The 2024 filing deadline was May 1, 2025 — over a year before this snapshot.
+  These 321 buildings are likely non-compliant with LL84 reporting as of June 2026 (DOB typically
+  cites ~20% annual non-compliance before enforcement). They have clean 2022–2023 history.
+- 254 buildings: have 2022 data only — stopped filing after 2022. May have left the steam system,
+  changed ownership, or been demolished/converted.
+- 213 buildings: have 2022 and 2024 data but are MISSING 2023. Root cause is unclear — most likely
+  explanations are: missed LL84 submission for 2023, management/ownership change disrupting reporting,
+  NYC DOB data rejection or BBL lot merge/split, or temporary closure for renovation. These are excluded
+  because a complete two-period delta cannot be computed without 2023. Further manual validation required.
+
+Total: 422 + 321 + 254 + 213 = 1,210.
+Selection bias note: the 422 plotted buildings may skew toward larger, better-resourced buildings that
+file LL84 on time — meaning the scatter chart may underrepresent smaller buildings with weaker compliance.
+The chart is conservative: it only plots buildings with verified data for consecutive periods.
 
 GBM / Risk Model (ELI5):
   Imagine each building is a student taking a test. The model is the teacher who's graded 1,000 previous students and knows exactly which answers predict a failing grade. When a new building shows patterns like "steam going down + filed HVAC permits + near a fine limit," the teacher flags it. The risk score is how many alarm bells the teacher hears for that building — rang all of them (90%+), rang a few (40-70%), or none at all (under 30%).
