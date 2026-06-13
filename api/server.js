@@ -421,16 +421,19 @@ ATTRITION / CHURN:
   ConEd loses that recurring revenue. This dashboard tries to catch those buildings BEFORE they cancel.
 
 RISK SCORE (ELI5):
-  Imagine 1,210 kids in school. Some have been absent more and more lately.
-  The risk score is like a nurse's estimate of which kids are most likely to drop out entirely.
-  She looks at: how often they've been sick (steam dropping), whether their parents just enrolled them in a new school (permit activity = switching to electric), and how much trouble they're in (LL97 fines).
-  A score of 95% means "this building is very likely to disconnect soon." A score of 5% means "totally stable."
+  Imagine 1,210 customers at a gym. Some have been coming less and less often.
+  The risk score is the gym's estimate of which members are most likely to cancel their membership.
+  It looks at: are they visiting less (steam usage dropping?), did they just buy a home gym set (permits for new HVAC?), and are they being charged big fees they hate (LL97 fines?).
+  A score near 1.0 (like 95%) is a STRONG WARNING SIGNAL — not a guarantee, but multiple red flags at once.
+  A score near 0.0 means the data shows no warning signs at all. The model is a pattern-matcher, not a crystal ball.
 
 LL97 (ELI5):
-  New York City made a rule: every big building must stay under a pollution limit.
+  New York City made a rule: every big building must stay under a carbon pollution limit.
   If a building pollutes too much from heating, it pays a fine — $268 for every extra ton of CO₂.
-  Steam heat is a big source of that pollution. The worse a building's LL97 fine, the more desperate they are to switch to electric heat (and leave ConEd).
-  Think of it like a speeding ticket that gets more expensive every year — and the speed limit drops in 2030.
+  Steam heat contributes significantly to a building's carbon count under this law.
+  The fine rate ($268/ton) stays the same, but the allowed pollution LIMIT gets much stricter in 2030 —
+  so the same building that barely squeaks by in 2024 could owe 3× more in fines by 2030.
+  Think of it like a speed limit that drops from 60mph to 40mph — same fine per mph over, but now you're further over the limit.
 
 STEAM (ELI5):
   ConEd makes steam in giant boilers and pipes it underground to buildings all over Manhattan.
@@ -439,21 +442,23 @@ STEAM (ELI5):
 
 EUI (Energy Use Intensity, ELI5):
   EUI is how much energy a building uses per square foot per year.
-  A high EUI means the building is "thirsty" — it needs a lot of energy to keep running.
-  Think of it like miles per gallon for a car: lower is more efficient.
+  Think of it like how many gallons of gas a car burns per mile — NOT miles per gallon.
+  Lower EUI = more efficient building (uses less energy to heat the same space).
+  A building with very high EUI is "guzzling" energy compared to similar buildings.
 
 DOB PERMITS (ELI5):
-  When a building owner replaces their HVAC system or boiler, they need a permit from the city.
-  High permit count = the building is actively renovating its heating system.
-  That's a warning sign — they might be switching from steam to electric and planning to cancel ConEd.
+  When a building owner does HVAC or boiler work, they need a permit from the city.
+  High permit count suggests the building is actively doing heating system work.
+  This COULD mean they are switching from steam to electric — but it could also mean maintenance.
+  It is a warning signal worth watching, not a guarantee they are leaving.
 
 CLUSTERS / ARCHETYPES (ELI5):
-  The dashboard sorts all 1,210 buildings into 5 personality types — like sorting students into groups.
-  Group 1 (Pre-War Active): Old buildings filing lots of renovation permits. Most likely to leave.
+  The dashboard sorts all 1,210 buildings into 5 personality types — like sorting customers into groups.
+  Group 1 (Pre-War Active): Old buildings filing lots of renovation permits. Most likely to eventually leave.
   Group 2 (Mid-Size Post-War): Medium buildings, not very efficient, starting to show warning signs.
   Group 3 (Pre-War Stable): Old but efficient and quiet — no signs of leaving.
   Group 4 (Large Commercial): Big commercial buildings, stable but worth watching.
-  Group 5 (Low-Compliance Commercial): Big offices with huge LL97 fines coming. Motivated to switch by 2030.
+  Group 5 (Low-Compliance Commercial): Big offices facing huge LL97 fines after 2030. Strong financial reason to switch.
 
 YoY CHART (ELI5):
   The year-over-year chart compares how much each building's steam usage changed in two periods.
