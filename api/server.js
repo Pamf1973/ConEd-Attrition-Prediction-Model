@@ -508,7 +508,8 @@ so account managers can intervene before customers act. Think of it as a churn m
 
 === RISK SCORE ===
 Each building has a risk score from 0.0 to 1.0 produced by a Gradient Boosting Machine (GBM) classifier.
-Score ≥ 0.80 = Very high risk (4 buildings). Score ≥ 0.70 = High risk (52 buildings total). Score 0.40–0.70 = Medium (945 buildings). Score < 0.40 = Low (213 buildings).
+Score ≥ 0.90 = Extreme risk (54 buildings). Score 0.70–0.90 = High risk (4 buildings). Score 0.40–0.70 = Medium (5 buildings). Score 0.10–0.40 = Low-medium (71 buildings). Score < 0.10 = Low (1,076 buildings).
+NOTE: The model is strongly bimodal — most buildings are either extreme (≥0.90) or low (<0.10). The middle is almost empty. This is by design: the GBM was trained on confirmed big-drop vs stable labels, not on a gradient.
 The model is binary by design — it was trained on buildings with confirmed big steam drops vs. stable accounts.
 Buildings with "moderate" drops were excluded from training, which is why the distribution is strongly bimodal.
 The score is NOT a nuanced 0–100 rating; it's a signal that a building probably will or won't churn.
@@ -516,21 +517,27 @@ The score is NOT a nuanced 0–100 rating; it's a signal that a building probabl
 === ACTIONABILITY — WHAT TO DO WITH HIGH ATTRITION RISK ===
 The dashboard is designed to drive three types of action:
 
-Tier 1 — Very High Risk (score ≥ 0.80, 4 buildings): Immediate account manager outreach.
-  These combine the strongest churn signals: large LL97 fines + active HVAC permits + sustained steam drops.
+Tier 1 — Extreme Risk (score ≥ 0.90, 54 buildings): Immediate account manager outreach.
+  These are the clearest churn signals in the portfolio. The model fires at this level when multiple
+  alarm signals overlap: large LL97 fines, sustained steam drops, active HVAC permits, poor peer score.
   Action: Direct contact with building owner/manager within 1–2 weeks. Ask: "Are you considering switching
   off steam?" Understand their timeline, offer rate negotiation or LL97 compliance assistance if applicable.
 
-Tier 2 — High Risk (score 0.70–0.80, 48 buildings): Proactive monitoring + scheduled outreach.
-  Action: Add to watch list. Flag for quarterly account review. Look for new DOB permit filings as a
-  leading indicator that capital is being mobilized for electrification.
+Tier 2 — High Risk (score 0.70–0.90, 4 buildings): Scheduled proactive outreach.
+  Action: Add to watch list. Flag for quarterly account review. Monitor for new DOB permit filings.
 
-Tier 3 — Medium Risk (score 0.40–0.70, 945 buildings): Monitor passively.
+Tier 3 — Medium (score 0.40–0.70, 5 buildings): Thin band — treat like Tier 2.
+  Action: Watch list + monitor for two consecutive years of steam drops.
+
+Tier 4 — Low (score < 0.40, 1,147 buildings): Passive monitoring.
   Action: Watch for YoY steam drops ≥20% in two consecutive years — that's the primary early warning.
   The YoY scatter chart bottom-left quadrant surfaces these automatically.
 
-Tier 4 — Low Risk (score < 0.40, 213 buildings): No immediate action needed.
-  These buildings show stable steam usage and no major LL97 exposure.
+IMPORTANT: The model is bimodal. 54 buildings have ≥90% risk; 1,076 have <10%. The middle is sparse.
+The LL97 dollar exposure story is richer than the risk score story for investment purposes:
+  - 165 buildings are over the 2024 LL97 cap now ($81.9M total penalty)
+  - 830 buildings will be over the 2030 LL97 cap ($270.9M total penalty — a 231% jump)
+  - This is the investment signal Blackstone cares about most.
 
 Key signals that should ESCALATE a building's priority:
 - New HVAC or boiler DOB permit filed in the last 6 months (dob_jobs metric)
