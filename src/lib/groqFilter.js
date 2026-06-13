@@ -3,6 +3,29 @@
 // Strategy: be conservative — when ambiguous, default to FILTER.
 // Explain only when question clearly asks for meaning, calculation, or description.
 
+// Domain acronyms that contain no vowels but are still valid queries
+const DOMAIN_ACRONYMS = /\b(ll97|gbm|bbl|hvac|dob|ghg|hdd|yoy|iqr|kbtu|eui|nyc|api)\b/i;
+
+// Short conversational replies that mean nothing without context
+const CONVERSATIONAL_REPLY = /^(yes|no|ok|okay|sure|nope|yep|yeah|nah|thanks|thank\s+you|got\s+it|i\s+see|alright|cool|great|fine|maybe|correct|right|wrong|exactly|yup|uh\s*huh|mm+|hmm+)\.?!?$/i;
+
+// A valid query must have at least 3 meaningful chars and either:
+//   - contain at least one vowel (real words), OR
+//   - match a known domain acronym (LL97, GBM, BBL, etc.)
+// Returns false for gibberish and for conversational one-word replies.
+export function isValidQuery(q) {
+  const t = q.trim().replace(/^[?!.,;]+|[?!.,;]+$/g, "");
+  if (t.length < 3) return false;
+  if (CONVERSATIONAL_REPLY.test(t)) return false;
+  if (/[aeiou]/i.test(t)) return true;
+  return DOMAIN_ACRONYMS.test(t);
+}
+
+export function isConversationalReply(q) {
+  const t = q.trim().replace(/^[?!.,;]+|[?!.,;]+$/g, "");
+  return CONVERSATIONAL_REPLY.test(t);
+}
+
 // Phrases that are clearly filter intent — override even if explain pattern matches
 const FILTER_OVERRIDE = /^(what\s+buildings|which\s+buildings|how\s+many|how\s+much|find\s+|show\s+|list\s+|filter\s+|give\s+me\s+buildings|buildings\s+with|buildings\s+that|buildings\s+over|buildings\s+under)/i;
 

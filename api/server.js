@@ -466,6 +466,18 @@ YoY CHART (ELI5):
   A building in the bottom-left corner = steam going down both years. That's the biggest red flag.
   A building in the top-right = steam going UP both years. Totally stable customer.
 
+GBM / Risk Model (ELI5):
+  Imagine each building is a student taking a test. The model is the teacher who's graded 1,000 previous students and knows exactly which answers predict a failing grade. When a new building shows patterns like "steam going down + filed HVAC permits + near a fine limit," the teacher flags it. The risk score is how many alarm bells the teacher hears for that building — rang all of them (90%+), rang a few (40-70%), or none at all (under 30%).
+
+K-means Clustering (ELI5):
+  Think of sorting a pile of mixed LEGO bricks into 5 buckets. You sort by color, size, and shape all at once so each bucket ends up with bricks that look similar to each other. That's what K-means does — it looks at each building's year built, steam usage, permits filed, and energy score, then places it into one of 5 groups where every building in the group shares similar patterns.
+
+HDD Normalization (ELI5):
+  Heating Degree Days measure how cold each winter is. If 2023 was freezing cold and 2024 was warm, buildings naturally use less steam in 2024 — not because they left ConEd, just because it was warmer. HDD normalization adjusts for this: it's like correcting for the weather so we can see the REAL drop, not the weather-related one.
+
+Peer Score (Z-score) (ELI5):
+  If you're a 5'10" kid in a 4th-grade class, you're tall. But in a high school, you're short. Peer score compares each building's energy use against OTHER BUILDINGS OF THE SAME TYPE — so an office is only compared to offices, a hospital to hospitals. A negative peer score means "more efficient than similar buildings."
+
 === DASHBOARD PURPOSE ===
 This dashboard tracks 1,210 Manhattan buildings that buy district steam heat from ConEd.
 It identifies which buildings are most likely to disconnect from the steam grid ("attrition"),
@@ -505,13 +517,13 @@ Total 2024 portfolio exposure: $81,875,711. Total 2030 exposure: $270,916,416 (~
 === 5 CLUSTER ARCHETYPES (K-means, K=5) ===
 Buildings are grouped into 5 archetypes using steam, year built, DOB permits, Energy Star, peer score, and use type.
 0: "Pre-War Active — Permit-Driven Churn" (269 buildings) — HIGH risk
-   Older stock with heavy permit activity. Landlords actively renovating toward electrification.
+   Mixed-era stock with moderate permit activity. Includes diverse use types (residential, office, institutional). Landlords with active permits may be renovating toward electrification.
 1: "Mid-Size Post-War — Moderate Signal" (189 buildings) — MEDIUM risk
    Post-war construction, low Energy Star scores (~21), underperforming vs. peers.
 2: "Pre-War Stable — Low Signal" (242 buildings) — LOW risk
    Older but efficient (Energy Star ~72), stable consumption, no strong churn signal.
 3: "Large Commercial — Capital Mobilized" (263 buildings) — MEDIUM risk
-   Large pre-war commercial, low permit activity, stable base.
+   Primarily pre-war multifamily housing with low permit activity and mixed efficiency — stable base overall, but higher LL97 exposure for the residential portion.
 4: "Low-Compliance Commercial — Quiet Attrition" (247 buildings) — HIGH risk
    97% office/commercial. High DOB activity (avg 12.3 permits). Most exposed to LL97 2030 tightening.
 
@@ -534,7 +546,39 @@ Buildings are grouped into 5 archetypes using steam, year built, DOB permits, En
 - Floor area: NYC LL Benchmarking (self-reported)
 - DOB permits: NYC Open Data DOB NOW API, updated through June 2026
 - Building coordinates + owner: NYC PLUTO dataset
-- BBL (Borough-Block-Lot): used as the join key across all datasets`;
+- BBL (Borough-Block-Lot): used as the join key across all datasets
+
+=== DEEP DIVE — FOR ML SCIENTISTS AND EXPERTS ===
+When the user asks for "formula", "derivation", "SHAP", "model weights", "backprop", "mathematical", "deep technical", or shows expert-level language:
+
+Risk Model Architecture:
+- Algorithm: sklearn.ensemble.GradientBoostingClassifier with n_estimators=300, learning_rate=0.1, max_depth=4, subsample=0.8, min_samples_leaf=10.
+- Training data: 782 buildings with confirmed labels (big_drop=1: 391, stable=0: 391). Moderate-drop buildings excluded.
+- CV: 5-fold stratified, mean AUC = 0.645 (SD ±0.04). The low AUC reflects label noise from public LL84 data — production model with ConEd billing data would be stronger.
+- GBM loss function: deviance (cross-entropy). Tree splits use Friedman's MSE improvement criterion.
+- Feature engineering: log-transform for right-skewed features (steam_kbtu, ll97_penalty, ghg_emissions, dob_jobs). No interaction terms in current model.
+
+To view SHAP values or feature interactions, inspect `ll97_model.py` in the project root, or request a Jupyter notebook export.
+
+K-means (ARCHETYPES):
+- Algorithm: sklearn.cluster.KMeans with n_clusters=5, init='k-means++', random_state=42.
+- Features: [steam_kbtu, yr_built, dob_jobs, energy_star, peer_score, use_type_ordinal], all standardized via StandardScaler.
+- K-selected via silhouette score: s(5)=0.31 vs s(4)=0.28 and s(6)=0.30 — K=5 is the elbow.
+- Data path: `kmeans_model.py` in project root.
+
+LL97 Penalty Formula (exact):
+  GHG_steam = steam_kBtu × 4.493e-5  (MT CO₂e — NYC DOB Chapter 103 coefficient)
+  cap      = floor_sqft × intensity_limit[use_type][phase]
+  excess   = max(0, GHG_total − cap)
+  fine     = excess × $268/ton
+  Phase 1 (2024) intensity limits: see INTENSITY_LIMITS dict in ll97_model.py lines 34-56.
+  Phase 2 (2030) limits: 40-60% stricter by use type.
+
+Data Limitations:
+- LL84 benchmarking data is self-reported by building owners — estimated ±15% accuracy.
+- 2023→2024 YoY deltas flagged as "provisional" because 2024 HDD factor is estimated until final weather data is published (typically July 2025).
+- ~250 buildings have only one year of steam data (— in YoY column).
+- All 1,210 buildings are below 96th Street in Manhattan. No steam customers above 96th St are represented.`;
 
 app.post("/api/explain", requireAuth, async (req, res) => {
   const { question } = req.body ?? {};

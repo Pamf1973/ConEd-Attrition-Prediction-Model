@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { queryBuildings, applyFilterSpec, summarizeResults, isExplainQuery, explainDashboard } from "../lib/groqFilter";
+import { queryBuildings, applyFilterSpec, summarizeResults, isExplainQuery, explainDashboard, isValidQuery, isConversationalReply } from "../lib/groqFilter";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 const EXAMPLES_TECHNICAL = [
   { label: "How is the risk score calculated?",                           explain: true  },
   { label: "What is LL97 and how is the fine calculated?",               explain: true  },
+  { label: "What are the exact LL97 formulas?",                          explain: true  },
   { label: "Explain the 5 building archetypes",                          explain: true  },
   { label: "What does peer score mean?",                                  explain: true  },
   { label: "How does the YoY scatter chart work?",                       explain: true  },
@@ -34,14 +35,25 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [simpleMode,  setSimpleMode]  = useState(false);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
+  const [hint,        setHint]        = useState(null);
   const inputRef = useRef(null);
 
   async function handleSubmit(q) {
     const question = q ?? query;
     if (!question.trim()) return;
+    if (isConversationalReply(question)) {
+      setHint("Each question starts fresh — I don't remember what came before. Ask a full question like \"What is LL97?\" or \"Show high risk hotels\".");
+      return;
+    }
+    setHint(null);
+    if (!isValidQuery(question)) {
+      setError("That doesn't look like a valid question. Try asking about risk scores, LL97, steam usage, or a specific building type.");
+      return;
+    }
     // Always clear both modes before starting — prevents stale state bleed
     setLoading(true);
     setError(null);
+    setHint(null);
     setResults(null);
     setExplanation("");
     setInsight("");
@@ -82,6 +94,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     setInsight("");
     setExplainAnswer(null);
     setError(null);
+    setHint(null);
     setMode("filter");
     inputRef.current?.focus();
   }
@@ -124,7 +137,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
           <input
             ref={inputRef}
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => { setQuery(e.target.value); if (error) setError(null); if (hint) setHint(null); }}
             onKeyDown={e => e.key === "Enter" && handleSubmit()}
             placeholder={simpleMode ? "Ask anything — I'll explain it simply…" : "Ask about the portfolio or how the dashboard works…"}
             className="flex-1 px-4 py-2.5 text-sm rounded-lg bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#E87722]/60 transition-colors"
@@ -182,6 +195,12 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
           </div>
         )}
 
+        {hint && (
+          <div className="m-4 px-4 py-3 rounded-lg bg-amber-900/20 border border-amber-700/30 text-amber-400 text-sm">
+            {hint}
+          </div>
+        )}
+
         {error && (
           <div className="m-4 px-4 py-3 rounded-lg bg-red-900/20 border border-red-800/40 text-red-400 text-sm">
             {error}
@@ -220,6 +239,8 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
                 "How is the LL97 fine calculated?",
                 "What does EUI mean?",
                 "Explain the YoY scatter chart",
+                "Show me the SHAP values",
+                "Explain how the GBM works mathematically",
               ]).map(q => (
                 <button
                   key={q}
