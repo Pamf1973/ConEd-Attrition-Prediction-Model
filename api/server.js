@@ -218,7 +218,7 @@ AVAILABLE FIELDS on each building:
     "Mid-Size Post-War — Moderate Signal"
     "Pre-War Stable — Low Signal"
     "Large Commercial — Capital Mobilized"
-    "Low-Compliance Residential — Quiet Attrition"
+    "Low-Compliance Commercial — Quiet Attrition"
 - address (string): building address. Use for partial text search.
 - yr (integer): year built. "pre-war" = yr < 1940, "post-war" = yr >= 1940 && yr < 1980
 - peer_score (number 0–1): fraction of nearby buildings also showing attrition signals
@@ -389,6 +389,107 @@ Write ONE concise sentence (max 25 words) summarizing what was found. Be specifi
   } catch (err) {
     console.error("[/api/summarize]", err.message);
     res.status(502).json({ error: "summarize failed" });
+  }
+});
+
+// ── /api/explain — dashboard knowledge Q&A ───────────────────────────────────
+const EXPLAIN_PROMPT = `You are an expert assistant embedded inside the ConEd Manhattan Steam Attrition Dashboard.
+You have complete knowledge of how the dashboard works, its data, formulas, and ML models.
+Answer user questions clearly and concisely. Use plain language. When relevant, give specific numbers.
+Do NOT output JSON. Do NOT start with "I". Respond in 3–6 sentences unless a list is clearly better.
+
+=== DASHBOARD PURPOSE ===
+This dashboard tracks 1,210 Manhattan buildings that buy district steam heat from ConEd.
+It identifies which buildings are most likely to disconnect from the steam grid ("attrition"),
+so account managers can intervene before customers act. Think of it as a churn model for a utility.
+
+=== RISK SCORE ===
+Each building has a risk score from 0.0 to 1.0 produced by a Gradient Boosting Machine (GBM) classifier.
+Score ≥ 0.70 = High risk (58 buildings). Score 0.30–0.70 = Medium (11 buildings). Score < 0.30 = Low (1,141 buildings).
+The model is binary by design — it was trained on buildings with confirmed big steam drops vs. stable accounts.
+Buildings with "moderate" drops were excluded from training, which is why the distribution is strongly bimodal.
+The score is NOT a nuanced 0–100 rating; it's a signal that a building probably will or won't churn.
+
+=== GBM FEATURES (12 total, in order of importance) ===
+1. LL97 penalty 2024 (log) — ~22% importance. Biggest driver: financial pressure to switch.
+2. Steam consumption (log) — ~17%. Raw volume signal.
+3. LL97 over limit 2024 — ~13%. Binary: is building currently non-compliant?
+4. GHG emissions (log) — ~12%.
+5. Peer score — ~9%. EUI vs. same-use-type peers (negative = more efficient than peers).
+6. LL97 penalty 2030 (log) — ~7%. Forward-looking pressure.
+7. Cluster ID — ~6%. Which K-means archetype the building belongs to.
+8. Steam–GHG share — ~5%. Fraction of building GHG attributable to steam (vs. electricity).
+9. Energy Star score — ~4%.
+10. Year built — ~2%.
+11. DOB permit count (log) — ~2%. Recent HVAC/boiler permit activity.
+12. Use-type risk ordinal — ~1%. Office=4 (most likely to electrify), Hospital=1 (least likely).
+
+=== LL97 CALCULATION (Local Law 97, NYC 2019) ===
+LL97 caps carbon emissions per square foot for buildings over 25,000 sq ft.
+Step 1 — Convert steam to GHG: GHG (MT CO₂e/yr) = steam_kBtu × 0.00004493
+  (0.00004493 is the NYC-binding coefficient from NYC DOB Chapter 103 Rules, not the EPA eGRID value)
+Step 2 — Calculate allowed cap: cap = floor_sqft × intensity_limit (varies by use type and phase)
+  Examples: Office = 0.00846 MT/ft²/yr (Phase 1, 2024), 0.00453 (Phase 2, 2030)
+  Hotel = 0.01450 (2024), 0.00700 (2030). Hospital = 0.02381 (2024), 0.00840 (2030).
+Step 3 — Fine: excess = max(0, GHG − cap). Fine = excess × $268/ton.
+Total 2024 portfolio exposure: $81,875,711. Total 2030 exposure: $270,916,416 (~3.3× more).
+
+=== 5 CLUSTER ARCHETYPES (K-means, K=5) ===
+Buildings are grouped into 5 archetypes using steam, year built, DOB permits, Energy Star, peer score, and use type.
+0: "Pre-War Active — Permit-Driven Churn" (269 buildings) — HIGH risk
+   Older stock with heavy permit activity. Landlords actively renovating toward electrification.
+1: "Mid-Size Post-War — Moderate Signal" (189 buildings) — MEDIUM risk
+   Post-war construction, low Energy Star scores (~21), underperforming vs. peers.
+2: "Pre-War Stable — Low Signal" (242 buildings) — LOW risk
+   Older but efficient (Energy Star ~72), stable consumption, no strong churn signal.
+3: "Large Commercial — Capital Mobilized" (263 buildings) — MEDIUM risk
+   Large pre-war commercial, low permit activity, stable base.
+4: "Low-Compliance Commercial — Quiet Attrition" (247 buildings) — HIGH risk
+   97% office/commercial. High DOB activity (avg 12.3 permits). Most exposed to LL97 2030 tightening.
+
+=== KEY FIELDS ===
+- EUI (Energy Use Intensity): kBtu per sq ft per year. Lower = more efficient.
+- DOB jobs: permit filings in trailing 24 months. High count = active capital investment (could signal electrification prep).
+- Peer score: z-score of EUI vs. same-use-type buildings. Negative = more efficient than average peers.
+- YoY delta: year-over-year % change in steam consumption, HDD-normalized (adjusted for weather).
+- Steam–GHG share: fraction of building's total GHG that comes from steam (vs. electricity).
+- Signal: "big_drop" = ≥50% confirmed steam decline (highest churn signal), "mod_drop" = moderate, null = stable.
+
+=== DASHBOARD TABS ===
+- Attrition Rankings: Sortable risk table of all 1,210 buildings. Filter by risk tier, use type, cluster, LL97 status.
+- YoY Trends: Scatter showing 2022→2023 vs 2023→2024 steam change. Bottom-left = sustained decline (highest concern).
+- Watch List: Pin specific accounts for tracking across sessions.
+- AI Agent (this tab): Ask questions in plain English to filter buildings or get explanations.
+
+=== DATA SOURCES ===
+- Steam + GHG data: NYC LL Benchmarking (2021–2024)
+- Floor area: NYC LL Benchmarking (self-reported)
+- DOB permits: NYC Open Data DOB NOW API, updated through June 2026
+- Building coordinates + owner: NYC PLUTO dataset
+- BBL (Borough-Block-Lot): used as the join key across all datasets`;
+
+app.post("/api/explain", requireAuth, async (req, res) => {
+  const { question } = req.body ?? {};
+
+  if (typeof question !== "string" || !question.trim()) {
+    return res.status(400).json({ error: "question is required" });
+  }
+  if (question.length > 600) {
+    return res.status(400).json({ error: "question too long (max 600 chars)" });
+  }
+  if (!ANTHROPIC_KEY && !GROQ_KEY) {
+    return res.status(503).json({ error: "No LLM API key configured" });
+  }
+
+  const safe = sanitizeQuestion(question);
+  try {
+    const answer = ANTHROPIC_KEY
+      ? await callClaude(safe, EXPLAIN_PROMPT)
+      : await callGroq(safe, EXPLAIN_PROMPT);
+    res.json({ answer: answer.trim() });
+  } catch (err) {
+    console.error("[/api/explain]", err.message);
+    res.status(502).json({ error: "explain failed — try again" });
   }
 });
 

@@ -1,3 +1,29 @@
+// Detect if the question is asking for an explanation vs. a building filter.
+// Explain intent: starts with question words or contains explanation verbs.
+const EXPLAIN_STARTS = /^(what|how|why|explain|tell|describe|define|can you|what's|who|help|what does|what is|what are|show me how)/i;
+const EXPLAIN_CONTAINS = /\b(mean|means|meaning|calculate|calculated|calculation|explain|explains|work|works|function|functions|what is|what are|how does|how do|how is|describe|definition|understand|difference between|tell me about|about the|guide|overview|purpose|interpret|interpreting)\b/i;
+
+export function isExplainQuery(question) {
+  const q = question.trim();
+  return EXPLAIN_STARTS.test(q) || EXPLAIN_CONTAINS.test(q);
+}
+
+export async function explainDashboard(question, token) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch("/api/explain", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ question }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new Error(err.error ?? `Explain failed (${res.status})`);
+  }
+  const { answer } = await res.json();
+  return answer;
+}
+
 export async function summarizeResults(question, results, token) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;

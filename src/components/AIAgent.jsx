@@ -1,13 +1,16 @@
 import { useState, useRef } from "react";
-import { queryBuildings, applyFilterSpec, summarizeResults } from "../lib/groqFilter";
+import { queryBuildings, applyFilterSpec, summarizeResults, isExplainQuery, explainDashboard } from "../lib/groqFilter";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 const EXAMPLES = [
-  "High risk hotels with HVAC permits filed",
-  "Office buildings over their LL97 limit with big steam drops",
-  "Pre-war multifamily buildings with peer score above 50%",
-  "Buildings facing more than $100k LL97 penalty in 2024",
-  "Large commercial buildings sorted by LL97 penalty",
+  { label: "How is the risk score calculated?",          explain: true  },
+  { label: "What is LL97 and how is the fine calculated?", explain: true },
+  { label: "Explain the 5 building archetypes",           explain: true  },
+  { label: "What does EUI mean?",                         explain: true  },
+  { label: "High risk hotels with HVAC permits filed",    explain: false },
+  { label: "Office buildings over their LL97 limit with big steam drops", explain: false },
+  { label: "Buildings facing more than $100k LL97 penalty in 2024",      explain: false },
+  { label: "Large commercial buildings sorted by LL97 penalty",           explain: false },
 ];
 
 export default function AIAgent({ buildings, onSelect, selectedAddress, token }) {
@@ -15,6 +18,8 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [results,     setResults]     = useState(null);
   const [explanation, setExplanation] = useState("");
   const [insight,     setInsight]     = useState("");
+  const [explainAnswer, setExplainAnswer] = useState(null);
+  const [mode,        setMode]        = useState("filter"); // "filter" | "explain"
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const inputRef = useRef(null);
@@ -27,14 +32,22 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     setResults(null);
     setExplanation("");
     setInsight("");
+    setExplainAnswer(null);
+
+    const explaining = isExplainQuery(question);
+    setMode(explaining ? "explain" : "filter");
 
     try {
-      const spec    = await queryBuildings(question, token);
-      const matched = applyFilterSpec(buildings, spec);
-      setResults(matched);
-      setExplanation(spec.explanation ?? "");
-      // Fire NL summary in background — doesn't block table render
-      summarizeResults(question, matched, token).then(s => s && setInsight(s));
+      if (explaining) {
+        const answer = await explainDashboard(question, token);
+        setExplainAnswer(answer);
+      } else {
+        const spec    = await queryBuildings(question, token);
+        const matched = applyFilterSpec(buildings, spec);
+        setResults(matched);
+        setExplanation(spec.explanation ?? "");
+        summarizeResults(question, matched, token).then(s => s && setInsight(s));
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,7 +65,9 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     setResults(null);
     setExplanation("");
     setInsight("");
+    setExplainAnswer(null);
     setError(null);
+    setMode("filter");
     inputRef.current?.focus();
   }
 
@@ -87,17 +102,24 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         </div>
 
         {/* Example queries */}
-        {results === null && !loading && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {EXAMPLES.map(ex => (
-              <button
-                key={ex}
-                onClick={() => handleExample(ex)}
-                className="px-2.5 py-1 text-xs rounded-full border border-[#0F3B7E] text-slate-400 hover:border-[#E87722]/40 hover:text-[#F09040] transition-colors"
-              >
-                {ex}
-              </button>
-            ))}
+        {results === null && !explainAnswer && !loading && (
+          <div className="mt-3">
+            <div className="text-[10px] text-slate-600 mb-1.5 uppercase tracking-wider">Ask a question · or filter the portfolio</div>
+            <div className="flex flex-wrap gap-2">
+              {EXAMPLES.map(ex => (
+                <button
+                  key={ex.label}
+                  onClick={() => handleExample(ex.label)}
+                  className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                    ex.explain
+                      ? "border-[#0F3B7E] text-[#7AAAD0] hover:border-[#E87722]/40 hover:text-[#F09040]"
+                      : "border-[#082244] text-slate-500 hover:border-[#0F3B7E] hover:text-slate-300"
+                  }`}
+                >
+                  {ex.explain ? "💡 " : "🔍 "}{ex.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -114,6 +136,45 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         {error && (
           <div className="m-4 px-4 py-3 rounded-lg bg-red-900/20 border border-red-800/40 text-red-400 text-sm">
             {error}
+          </div>
+        )}
+
+        {/* Explain answer — prose response */}
+        {explainAnswer && !loading && (
+          <div className="m-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[#E87722] font-bold text-xs tracking-widest uppercase">⚡ Dashboard Intelligence</span>
+              <div className="flex-1 h-px bg-[#082244]" />
+              <button
+                onClick={handleClear}
+                className="text-xs text-slate-600 hover:text-slate-400 transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="bg-[#001748] border border-[#0F3B7E] rounded-xl p-5">
+              <div className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                {explainAnswer}
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="text-[10px] text-slate-600">Follow-up questions:</span>
+              {[
+                "How is the risk score calculated?",
+                "What are the 5 archetypes?",
+                "How is the LL97 fine calculated?",
+                "What does EUI mean?",
+                "Explain the YoY scatter chart",
+              ].map(q => (
+                <button
+                  key={q}
+                  onClick={() => { setQuery(q); handleSubmit(q); }}
+                  className="px-2 py-0.5 text-[10px] rounded-full border border-[#082244] text-slate-600 hover:border-[#0F3B7E] hover:text-slate-400 transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -213,11 +274,11 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         )}
 
         {/* Empty state */}
-        {results === null && !loading && !error && (
+        {results === null && !explainAnswer && !loading && !error && (
           <div className="flex flex-col items-center justify-center h-full text-center px-8 pb-16">
             <div className="text-4xl mb-4 opacity-20">⚡</div>
-            <p className="text-slate-400 text-sm mb-1">Ask anything about the steam portfolio</p>
-            <p className="text-slate-600 text-xs">Powered by Claude Haiku · backend proxy</p>
+            <p className="text-slate-400 text-sm mb-1">Ask anything — filter buildings or ask how the dashboard works</p>
+            <p className="text-slate-600 text-xs">💡 Explain mode · 🔍 Filter mode · powered by Groq / Claude Haiku</p>
           </div>
         )}
       </div>
