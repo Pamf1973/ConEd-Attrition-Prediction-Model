@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useBuildings } from "./data/useBuildings";
+import { useKeyboard } from "./hooks/useKeyboard";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
 import AIAgent from "./components/AIAgent";
@@ -19,6 +20,7 @@ export default function App() {
   const [clusterFilter, setClusterFilter] = useState("All");
   const [riskMin, setRiskMin] = useState(null);
   const [riskMax, setRiskMax] = useState(null);
+  const searchInputRef = useRef(null);
 
   const handleLogout = useCallback(() => {
     if (token) {
@@ -56,6 +58,19 @@ export default function App() {
     }
     setSelected(prev => prev?.address === b.address ? null : b);
   }
+
+  useKeyboard({
+    "Escape":  () => setSelected(null),
+    "1":       () => setActiveTab("rankings"),
+    "2":       () => setActiveTab("trends"),
+    "3":       () => setActiveTab("targets"),
+    "4":       () => setActiveTab("watchlist"),
+    "5":       () => setActiveTab("agent"),
+    "ctrl+f":  () => {
+      setActiveTab("rankings");
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    },
+  }, [setSelected, setActiveTab]);
 
   function handleScatterFilterCluster(clusterName) {
     setClusterFilter(clusterName);
@@ -158,6 +173,9 @@ export default function App() {
           <span className="text-xs text-slate-600">
             {buildings.length.toLocaleString()} active steam customers
           </span>
+          <span className="text-xs text-slate-500/70">
+            Data: Jun 2026 · Steam: 2024 · LL84: May 2025
+          </span>
           <button
             onClick={handleLogout}
             className="px-2.5 py-1 rounded border border-[#0F3B7E] hover:border-red-500/40 text-[11px] font-bold text-slate-400 hover:text-red-400 bg-[#002469]/40 transition-colors"
@@ -220,6 +238,7 @@ export default function App() {
                 clusterFilter={clusterFilter}
                 riskMin={riskMin}
                 riskMax={riskMax}
+                searchInputRef={searchInputRef}
               />
             </div>
             {selected && (
@@ -227,6 +246,7 @@ export default function App() {
                 <BuildingPanel
                   building={selected}
                   onClose={() => setSelected(null)}
+                  allBuildings={buildings}
                 />
               </div>
             )}
@@ -251,7 +271,7 @@ export default function App() {
             </div>
             {selected && (
               <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel building={selected} onClose={() => setSelected(null)} />
+                <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
               </div>
             )}
           </>
@@ -271,7 +291,7 @@ export default function App() {
             </div>
             {selected && (
               <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel building={selected} onClose={() => setSelected(null)} />
+                <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
               </div>
             )}
           </>
@@ -292,6 +312,7 @@ export default function App() {
                 <BuildingPanel
                   building={selected}
                   onClose={() => setSelected(null)}
+                  allBuildings={buildings}
                 />
               </div>
             )}

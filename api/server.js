@@ -208,6 +208,58 @@ app.get("/api/data/enrichment",  requireAuth, (_req, res) => res.type("json").se
 app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
 app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
 
+// GET /api/buildings — server-side filtered + paginated building query
+app.get("/api/buildings", requireAuth, (req, res) => {
+  const {
+    risk_min, risk_max, use, signal, ll97_over,
+    cluster_name, sort_by = "risk", sort_dir = "desc",
+    page = "1", per_page = "50", search,
+  } = req.query;
+
+  // Merge buildings with enrichment (same logic as client useBuildings)
+  let rows = DATA_PARSED.buildings.map(b => {
+    const key = b.address?.toUpperCase();
+    const e = DATA_PARSED.enrichment?.[key] ?? {};
+    return { ...b, ...e, risk: e.ml_risk ?? b.risk };
+  });
+
+  // Filters
+  if (risk_min) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk >= parseFloat(risk_min));
+  if (risk_max) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk <= parseFloat(risk_max));
+  if (use)      rows = rows.filter(b => b.use === use);
+  if (signal)   rows = rows.filter(b => b.signal === signal);
+  if (ll97_over === "1" || ll97_over === "true")  rows = rows.filter(b => b.ll97_over_2024 === 1);
+  if (ll97_over === "0" || ll97_over === "false") rows = rows.filter(b => b.ll97_over_2024 === 0);
+  if (cluster_name) rows = rows.filter(b => b.cluster_name === cluster_name);
+  if (search) {
+    const q = search.toLowerCase();
+    rows = rows.filter(b =>
+      [b.address, b.use, b.cluster_name, b.sc_class].some(f => (f ?? "").toLowerCase().includes(q))
+    );
+  }
+
+  // Sort
+  const SORTABLE = ["risk", "ll97_penalty_2024", "ll97_penalty_2030", "steam", "yr", "energy_star", "peer_score"];
+  const sortKey = SORTABLE.includes(sort_by) ? sort_by : "risk";
+  const sortAsc = sort_dir === "asc";
+  rows.sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    return sortAsc ? (av < bv ? -1 : av > bv ? 1 : 0) : (av > bv ? -1 : av < bv ? 1 : 0);
+  });
+
+  // Pagination
+  const total     = rows.length;
+  const pageNum   = Math.max(1, parseInt(page, 10) || 1);
+  const perPage   = Math.min(200, Math.max(1, parseInt(per_page, 10) || 50));
+  const paged     = rows.slice((pageNum - 1) * perPage, pageNum * perPage);
+  const totalPages = Math.ceil(total / perPage);
+
+  res.json({ buildings: paged, total, page: pageNum, per_page: perPage, total_pages: totalPages });
+});
+
 // Protect public JSON files from direct exposure in production build folder
 app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json", "/yoy_summary.json"], (req, res) => {
   res.status(403).json({ error: "Access Forbidden — Data is protected" });

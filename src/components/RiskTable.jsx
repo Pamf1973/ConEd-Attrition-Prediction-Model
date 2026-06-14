@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 function buildCols(penaltyYear) {
@@ -21,22 +21,31 @@ const USE_TYPES = [
   "Other", "Retail Store",
 ];
 
-export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token, clusterFilter: initialClusterFilter, riskMin: initialRiskMin, riskMax: initialRiskMax }) {
-  const [sortKey,       setSortKey]       = useState("risk");
-  const [sortDir,       setSortDir]       = useState("desc");
-  const [penaltyYear,   setPenaltyYear]   = useState(2024);
-  const [tierFilter,    setTierFilter]    = useState("All");
-  const [typeFilter,    setTypeFilter]    = useState("All");
-  const [clusterFilter, setClusterFilter] = useState("All");
-  const [signalFilter,  setSignalFilter]  = useState("All");
-  const [ll97Filter,    setLl97Filter]    = useState("All");
-  const [scFilter,      setScFilter]      = useState("All");
-  const [outlierFilter, setOutlierFilter] = useState("All");
-  const [demandMin,     setDemandMin]     = useState("");
-  const [demandMax,     setDemandMax]     = useState("");
-  const [search,        setSearch]        = useState("");
-  const [chartRiskMin,  setChartRiskMin]  = useState(null);
-  const [chartRiskMax,  setChartRiskMax]  = useState(null);
+export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token, clusterFilter: initialClusterFilter, riskMin: initialRiskMin, riskMax: initialRiskMax, searchInputRef }) {
+  const [sortStack,      setSortStack]     = useState([{ key: "risk", dir: "desc" }]);
+  const [penaltyYear,    setPenaltyYear]   = useState(2024);
+  const [tierFilter,     setTierFilter]    = useState("All");
+  const [typeFilter,     setTypeFilter]    = useState("All");
+  const [clusterFilter,  setClusterFilter] = useState("All");
+  const [signalFilter,   setSignalFilter]  = useState("All");
+  const [ll97Filter,     setLl97Filter]    = useState("All");
+  const [scFilter,       setScFilter]      = useState("All");
+  const [outlierFilter,  setOutlierFilter] = useState("All");
+  const [demandMin,      setDemandMin]     = useState("");
+  const [demandMax,      setDemandMax]     = useState("");
+  const [search,         setSearch]        = useState("");
+  const [chartRiskMin,   setChartRiskMin]  = useState(null);
+  const [chartRiskMax,   setChartRiskMax]  = useState(null);
+  const [csvLoading,     setCsvLoading]    = useState(false);
+  const [csvError,       setCsvError]      = useState(null);
+  const [page,           setPage]          = useState(1);
+  const [pageSize,       setPageSize]      = useState(50);
+  const [selectedSet,    setSelectedSet]   = useState(new Set());
+
+  const resetFilters = useCallback(() => {
+    setPage(1);
+    setSelectedSet(new Set());
+  }, []);
 
   // Sync cluster filter driven by YoY Scatter chart click
   useEffect(() => {
@@ -50,11 +59,35 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   }, [initialRiskMin, initialRiskMax]);
 
   function handleSort(key) {
-    if (sortKey === key) {
-      setSortDir(d => d === "asc" ? "desc" : "asc");
+    setSortStack(prev => {
+      const existing = prev.find(s => s.key === key);
+      if (existing) {
+        if (existing.dir === "desc") {
+          return prev.map(s => s.key === key ? { ...s, dir: "asc" } : s);
+        } else {
+          return prev.filter(s => s.key !== key);
+        }
+      } else {
+        return [...prev, { key, dir: "desc" }];
+      }
+    });
+    resetFilters();
+  }
+
+  function toggleSelect(address) {
+    setSelectedSet(prev => {
+      const next = new Set(prev);
+      if (next.has(address)) next.delete(address);
+      else next.add(address);
+      return next;
+    });
+  }
+
+  function toggleSelectAll(filteredRows) {
+    if (selectedSet.size === filteredRows.length && filteredRows.length > 0) {
+      setSelectedSet(new Set());
     } else {
-      setSortKey(key);
-      setSortDir("desc");
+      setSelectedSet(new Set(filteredRows.map(b => b.address)));
     }
   }
 
@@ -63,7 +96,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
 
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      rows = rows.filter(b => (b.address?.toLowerCase() ?? "").includes(q));
+      rows = rows.filter(b => {
+        const fields = [b.address, b.use, b.cluster_name, b.sc_class, b.bbl];
+        return fields.some(f => (f ?? "").toLowerCase().includes(q));
+      });
     }
 
     if (tierFilter !== "All") {
@@ -111,47 +147,64 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
     if (!isNaN(min)) rows = rows.filter(b => b.steam >= min * 1e6);
     if (!isNaN(max)) rows = rows.filter(b => b.steam <= max * 1e6);
 
+    // Multi-column sort
     return [...rows].sort((a, b) => {
-      const rawA = a[sortKey]; const rawB = b[sortKey];
-      // Push nulls/undefined to the end regardless of sort direction
-      if (rawA == null && rawB == null) return 0;
-      if (rawA == null) return 1;
-      if (rawB == null) return -1;
-      let av = typeof rawA === "string" ? rawA.toLowerCase() : rawA;
-      let bv = typeof rawB === "string" ? rawB.toLowerCase() : rawB;
-      if (av < bv) return sortDir === "asc" ? -1 :  1;
-      if (av > bv) return sortDir === "asc" ?  1 : -1;
+      for (const { key, dir } of sortStack) {
+        const rawA = a[key]; const rawB = b[key];
+        if (rawA == null && rawB == null) continue;
+        if (rawA == null) return 1;
+        if (rawB == null) return -1;
+        let av = typeof rawA === "string" ? rawA.toLowerCase() : rawA;
+        let bv = typeof rawB === "string" ? rawB.toLowerCase() : rawB;
+        if (av < bv) return dir === "asc" ? -1 : 1;
+        if (av > bv) return dir === "asc" ? 1 : -1;
+      }
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, chartRiskMin, chartRiskMax, sortKey, sortDir, penaltyYear]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, chartRiskMin, chartRiskMax, sortStack, penaltyYear]);
 
-  function exportCSV() {
-    // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
-    const cell = v => {
-      const s = String(v ?? "").replace(/"/g, '""');
-      return /^[\s]*[=+\-@\t\r\n]/.test(s) ? `"'${s}"` : `"${s}"`;
-    };
-    const header = ["Address","Type","SC Class","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","YoY Delta 23-24 (norm)","YoY Delta 22-23 (norm)","Outlier","Signal","DOB HVAC Jobs","Last Sale"].join(",");
-    const rows = filtered.map(b => [
-      cell(b.address),
-      cell(b.use),
-      cell(b.sc_class),
-      Number.isFinite(b.risk) ? (b.risk * 100).toFixed(1) + "%" : "",
-      b.ll97_penalty_2024 ?? "",
-      b.ll97_penalty_2030 ?? "",
-      b.steam != null ? (b.steam / 1e6).toFixed(1) : "",
-      b.norm_delta_23_24 != null ? b.norm_delta_23_24.toFixed(1) + "%" : "",
-      b.norm_delta_22_23 != null ? b.norm_delta_22_23.toFixed(1) + "%" : "",
-      (b.outlier_23_24 || b.outlier_22_23) ? "YES" : "",
-      cell(b.signal),
-      b.dob_jobs ?? 0,
-      cell(b.deed_date),
-    ].join(","));
-    const blob = new Blob([header + "\n" + rows.join("\n")], { type: "text/csv" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href = url; a.download = "coned-attrition-risk.csv"; a.click();
-    URL.revokeObjectURL(url);
+  // Paginate
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const startIdx = (safePage - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, filtered.length);
+  const pageRows = filtered.slice(startIdx, endIdx);
+
+  function exportCSV(rows) {
+    setCsvLoading(true);
+    setCsvError(null);
+    try {
+      const cell = v => {
+        const s = String(v ?? "").replace(/"/g, '""');
+        return /^[\s]*[=+\-@\t\r\n]/.test(s) ? `"'${s}"` : `"${s}"`;
+      };
+      const header = ["Address","Type","SC Class","Attrition Score","LL97 Penalty 2024","LL97 Penalty 2030","Steam (M kBtu)","YoY Delta 23-24 (norm)","YoY Delta 22-23 (norm)","Outlier","Signal","DOB HVAC Jobs","Last Sale"].join(",");
+      const csvRows = rows.map(b => [
+        cell(b.address),
+        cell(b.use),
+        cell(b.sc_class),
+        Number.isFinite(b.risk) ? (b.risk * 100).toFixed(1) + "%" : "",
+        b.ll97_penalty_2024 ?? "",
+        b.ll97_penalty_2030 ?? "",
+        b.steam != null ? (b.steam / 1e6).toFixed(1) : "",
+        b.norm_delta_23_24 != null ? b.norm_delta_23_24.toFixed(1) + "%" : "",
+        b.norm_delta_22_23 != null ? b.norm_delta_22_23.toFixed(1) + "%" : "",
+        (b.outlier_23_24 || b.outlier_22_23) ? "YES" : "",
+        cell(b.signal),
+        b.dob_jobs ?? 0,
+        cell(b.deed_date),
+      ].join(","));
+      const blob = new Blob([header + "\n" + csvRows.join("\n")], { type: "text/csv" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href = url; a.download = `coned-attrition-risk-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setCsvError(`Export failed — ${err.message}`);
+      setTimeout(() => setCsvError(null), 5000);
+    } finally {
+      setCsvLoading(false);
+    }
   }
 
   const COLS = buildCols(penaltyYear);
@@ -165,6 +218,8 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
 
   async function downloadPortfolioCSV() {
     if (!token) return;
+    setCsvLoading(true);
+    setCsvError(null);
     try {
       const res = await fetch("/api/export/csv", { headers: { Authorization: `Bearer ${token}` } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -176,9 +231,23 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("[CSV export]", err.message);
-      alert(`Export failed — ${err.message}`);
+      setCsvError(`Portfolio export failed — ${err.message}`);
+      setTimeout(() => setCsvError(null), 5000);
+    } finally {
+      setCsvLoading(false);
     }
+  }
+
+  function handleAddSelectedToWatchlist() {
+    if (!onWatch) return;
+    selectedSet.forEach(addr => onWatch(addr));
+    setSelectedSet(new Set());
+  }
+
+  function handleExportSelectedCSV() {
+    const selected = filtered.filter(b => selectedSet.has(b.address));
+    if (selected.length === 0) return;
+    exportCSV(selected);
   }
 
   return (
@@ -216,34 +285,78 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          {csvError && (
+            <span className="text-xs text-red-400">{csvError}</span>
+          )}
           <button
-            onClick={exportCSV}
-            className="px-3 py-1.5 text-xs rounded border border-[#0F3B7E] text-slate-300 hover:bg-[#002469] transition-colors"
+            onClick={() => exportCSV(filtered)}
+            disabled={csvLoading}
+            className={`px-3 py-1.5 text-xs rounded border border-[#0F3B7E] text-slate-300 transition-colors ${csvLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-[#002469]"}`}
           >
-            Export CSV
+            {csvLoading ? (
+              <span className="flex items-center gap-1">
+                <span className="inline-block w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                Exporting…
+              </span>
+            ) : "Export CSV"}
           </button>
           {token && (
             <button
               onClick={downloadPortfolioCSV}
-              className="px-3 py-1.5 text-xs rounded border border-[#0F3B7E] text-slate-300 hover:bg-[#002469] transition-colors"
+              disabled={csvLoading}
+              className={`px-3 py-1.5 text-xs rounded border border-[#0F3B7E] text-slate-300 transition-colors ${csvLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-[#002469]"}`}
             >
-              ⬇ CSV
+              {csvLoading ? (
+                <span className="flex items-center gap-1">
+                  <span className="inline-block w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                  Exporting…
+                </span>
+              ) : "⬇ CSV"}
             </button>
           )}
         </div>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedSet.size > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2 bg-[#0041A8]/20 border-b border-[#0F3B7E]">
+          <span className="text-sm text-slate-300 font-semibold">{selectedSet.size} selected</span>
+          <div className="w-px h-5 bg-[#0F3B7E]" />
+          {onWatch && (
+            <button
+              onClick={handleAddSelectedToWatchlist}
+              className="px-2.5 py-1 text-xs rounded bg-[#002469] border border-[#0F3B7E] text-slate-300 hover:bg-[#0041A8] transition-colors"
+            >
+              + Add to Watchlist
+            </button>
+          )}
+          <button
+            onClick={handleExportSelectedCSV}
+            className="px-2.5 py-1 text-xs rounded bg-[#002469] border border-[#0F3B7E] text-slate-300 hover:bg-[#0041A8] transition-colors"
+          >
+            Export Selected CSV
+          </button>
+          <button
+            onClick={() => setSelectedSet(new Set())}
+            className="px-2.5 py-1 text-xs rounded bg-[#002469] border border-[#0F3B7E] text-slate-400 hover:text-red-400 transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex flex-wrap gap-2 p-3 border-b border-[#082244] bg-[#001748]/50">
         <input
+          ref={searchInputRef}
           value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search address…"
+          onChange={e => { setSearch(e.target.value); resetFilters(); }}
+          placeholder="Search address, use, BBL…"
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#2A6FBF] w-48"
         />
         <select
           value={tierFilter}
-          onChange={e => setTierFilter(e.target.value)}
+          onChange={e => { setTierFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option>All</option>
@@ -253,7 +366,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={typeFilter}
-          onChange={e => setTypeFilter(e.target.value)}
+          onChange={e => { setTypeFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option>All</option>
@@ -261,7 +374,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={clusterFilter}
-          onChange={e => setClusterFilter(e.target.value)}
+          onChange={e => { setClusterFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none max-w-[220px]"
         >
           <option value="All">All Archetypes</option>
@@ -273,7 +386,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={signalFilter}
-          onChange={e => setSignalFilter(e.target.value)}
+          onChange={e => { setSignalFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All Signals</option>
@@ -283,7 +396,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={ll97Filter}
-          onChange={e => setLl97Filter(e.target.value)}
+          onChange={e => { setLl97Filter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All LL97</option>
@@ -292,7 +405,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={scFilter}
-          onChange={e => setScFilter(e.target.value)}
+          onChange={e => { setScFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All SC Classes</option>
@@ -304,7 +417,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <select
           value={outlierFilter}
-          onChange={e => setOutlierFilter(e.target.value)}
+          onChange={e => { setOutlierFilter(e.target.value); resetFilters(); }}
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
         >
           <option value="All">All YoY</option>
@@ -313,14 +426,14 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         </select>
         <input
           value={demandMin}
-          onChange={e => setDemandMin(e.target.value)}
+          onChange={e => { setDemandMin(e.target.value); resetFilters(); }}
           placeholder="Min M kBtu"
           type="number"
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none w-28"
         />
         <input
           value={demandMax}
-          onChange={e => setDemandMax(e.target.value)}
+          onChange={e => { setDemandMax(e.target.value); resetFilters(); }}
           placeholder="Max M kBtu"
           type="number"
           className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 placeholder-slate-500 focus:outline-none w-28"
@@ -335,8 +448,21 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
         <table className="w-full text-sm border-collapse">
           <thead className="sticky top-0 bg-[#001748] z-10">
             <tr>
+              {/* Checkbox column */}
+              {(onWatch) && (
+                <th className="px-1 py-3 text-center border-b border-[#082244] w-8">
+                  <input
+                    type="checkbox"
+                    checked={selectedSet.size === filtered.length && filtered.length > 0}
+                    onChange={() => toggleSelectAll(filtered)}
+                    className="accent-[#0041A8] cursor-pointer"
+                  />
+                </th>
+              )}
               {COLS.map(col => {
                 const isPenaltyCol = col.key === "ll97_penalty_2024" || col.key === "ll97_penalty_2030";
+                const sortEntry = sortStack.find(s => s.key === col.key);
+                const sortIdx = sortEntry ? sortStack.indexOf(sortEntry) + 1 : null;
                 return (
                   <th
                     key={col.key}
@@ -346,8 +472,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                     <span className="flex items-center gap-2">
                       <span>
                         {col.label}
-                        {col.sortable && sortKey === col.key && (
-                          <span className="ml-1 opacity-60">{sortDir === "asc" ? "↑" : "↓"}</span>
+                        {sortEntry && (
+                          <span className="ml-1 text-[11px] opacity-80">
+                            {sortIdx}{sortEntry.dir === "asc" ? "▲" : "▼"}
+                          </span>
                         )}
                       </span>
                       {isPenaltyCol && (
@@ -356,11 +484,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                           onClick={e => e.stopPropagation()}
                         >
                           <span
-                            onClick={() => { setPenaltyYear(2024); setSortKey("ll97_penalty_2024"); }}
+                            onClick={() => { setPenaltyYear(2024); handleSort("ll97_penalty_2024"); }}
                             className={`px-1.5 py-0.5 cursor-pointer transition-colors ${penaltyYear === 2024 ? "bg-[#0041A8] text-white" : "text-slate-500 hover:text-slate-300"}`}
                           >2024</span>
                           <span
-                            onClick={() => { setPenaltyYear(2030); setSortKey("ll97_penalty_2030"); }}
+                            onClick={() => { setPenaltyYear(2030); handleSort("ll97_penalty_2030"); }}
                             className={`px-1.5 py-0.5 cursor-pointer transition-colors ${penaltyYear === 2030 ? "bg-[#0041A8] text-white" : "text-slate-500 hover:text-slate-300"}`}
                           >2030</span>
                         </span>
@@ -375,10 +503,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
             </tr>
           </thead>
           <tbody>
-            {filtered.map((b, i) => {
+            {pageRows.map((b, i) => {
               const tier   = riskTier(b.risk);
               const sig    = signalMeta(b.signal);
               const active = b.address === selectedAddress;
+              const checked = selectedSet.has(b.address);
               return (
                 <tr
                   key={`${b.address}_${b.bbl}_${i}`}
@@ -391,6 +520,17 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                         : "hover:bg-[#002469]/50"
                   }`}
                 >
+                  {/* Checkbox */}
+                  {onWatch && (
+                    <td className="px-1 py-2.5 text-center" onClick={e => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleSelect(b.address)}
+                        className="accent-[#0041A8] cursor-pointer"
+                      />
+                    </td>
+                  )}
                   <td className="px-4 py-2.5 font-medium text-slate-200 max-w-xs truncate">{b.address}</td>
                   <td className="px-4 py-2.5 max-w-[200px]">
                     {b.cluster_name ? (
@@ -497,6 +637,36 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           <div className="text-center text-slate-500 py-16">No buildings match filters</div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-2 border-t border-[#082244] bg-[#001748]/60 shrink-0">
+          <span className="text-xs text-slate-500">
+            Showing {startIdx + 1}–{endIdx} of {filtered.length}
+          </span>
+          <div className="flex items-center gap-2">
+            {safePage > 1 && (
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                className="px-2.5 py-1 text-xs rounded border border-[#0F3B7E] text-slate-300 hover:bg-[#002469] transition-colors"
+              >
+                ← Prev
+              </button>
+            )}
+            <span className="text-xs text-slate-500">
+              Page {safePage} of {totalPages}
+            </span>
+            {safePage < totalPages && (
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                className="px-2.5 py-1 text-xs rounded border border-[#0F3B7E] text-slate-300 hover:bg-[#002469] transition-colors"
+              >
+                Next →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

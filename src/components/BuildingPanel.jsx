@@ -1,4 +1,5 @@
 import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
+import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 function SteamTrend({ building }) {
   const pts = [
@@ -52,6 +53,52 @@ function SteamTrend({ building }) {
   );
 }
 
+function TrendChart({ building, allBuildings }) {
+  const years = [2022, 2023, 2024];
+  const steamKeys = { 2022: "steam_2022", 2023: "steam_2023", 2024: "steam_2024" };
+
+  // Peer median: same use type AND cluster
+  const peers = (allBuildings ?? []).filter(
+    b => b.use === building.use && b.cluster_name === building.cluster_name && b.address !== building.address
+  );
+
+  const peerMedian = (year) => {
+    const vals = peers.map(b => b[steamKeys[year]]).filter(v => v != null).sort((a, b) => a - b);
+    if (!vals.length) return null;
+    const mid = Math.floor(vals.length / 2);
+    return vals.length % 2 ? vals[mid] : (vals[mid - 1] + vals[mid]) / 2;
+  };
+
+  const data = years.map(yr => ({
+    year: yr,
+    building:    building[steamKeys[yr]] ?? null,
+    peerMedian:  peerMedian(yr),
+  })).filter(d => d.building != null);
+
+  if (data.length < 2) return null;
+
+  const fmt = v => v >= 1e9 ? `${(v/1e9).toFixed(1)}B` : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${(v/1e3).toFixed(0)}k` : String(v);
+
+  return (
+    <div className="mt-3">
+      <ResponsiveContainer width="100%" height={160}>
+        <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
+          <XAxis dataKey="year" tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={36} tickFormatter={fmt} />
+          <Tooltip
+            contentStyle={{ background: "#001748", border: "1px solid #0F3B7E", borderRadius: 6, fontSize: 11 }}
+            labelStyle={{ color: "#94a3b8" }}
+            formatter={(v, name) => [fmt(v) + " kBtu", name]}
+          />
+          <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }} />
+          <Line type="monotone" dataKey="building" name="This building" stroke="#ffffff" strokeWidth={2} dot={{ r: 3, fill: "#ffffff" }} />
+          <Line type="monotone" dataKey="peerMedian" name="Peer median" stroke="#E87722" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 const EUI_MEDIANS = {
   Office:                              27.5,
   "Multifamily Housing":               46.4,
@@ -83,7 +130,7 @@ function Section({ title, children }) {
   );
 }
 
-export default function BuildingPanel({ building, onClose }) {
+export default function BuildingPanel({ building, onClose, allBuildings }) {
   if (!building) return null;
 
   const b      = building;
@@ -234,7 +281,7 @@ export default function BuildingPanel({ building, onClose }) {
         <Section title="Energy & Demand">
           <Row label="SC Class"      value={b.sc_class || null} />
           <Row label="Steam Demand"  value={b.steam != null ? `${(b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 })} M kBtu` : null} />
-          <SteamTrend building={b} />
+          <TrendChart building={b} allBuildings={allBuildings} />
           <Row
             label="Steam EUI"
             value={b.eui != null ? `${b.eui} kBtu/ft²` : null}

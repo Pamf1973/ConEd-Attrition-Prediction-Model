@@ -92,9 +92,14 @@ export default function RiskHistogram({ buildings, onFilterByRisk }) {
           <Tooltip content={<CustomTooltip />} cursor={{ fill: "#1e293b" }} />
           <ReferenceLine x="40–50%" stroke="#f97316" strokeDasharray="3 3" strokeOpacity={0.5} />
           <ReferenceLine x="70–80%" stroke="#ef4444" strokeDasharray="3 3" strokeOpacity={0.5} />
-          <Bar dataKey="count" radius={[3, 3, 0, 0]}>
+          <Bar dataKey="count" radius={[3, 3, 0, 0]} cursor={onFilterByRisk ? "pointer" : "default"}>
             {bins.map((bin, i) => (
-              <Cell key={i} fill={binColor(bin)} opacity={0.8} />
+              <Cell
+                key={i}
+                fill={binColor(bin)}
+                opacity={0.8}
+                onClick={onFilterByRisk ? () => onFilterByRisk(bin.min, bin.max) : undefined}
+              />
             ))}
           </Bar>
         </BarChart>

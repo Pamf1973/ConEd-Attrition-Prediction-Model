@@ -33,6 +33,38 @@ export function useWatchlist() {
 export default function Watchlist({ buildings, watchlist, onToggle, onClear, onSelect, selectedAddress }) {
   const watched = buildings.filter(b => watchlist.includes(b.address));
 
+  function exportWatchlist() {
+    const blob = new Blob(
+      [JSON.stringify(watched.map(b => b.address), null, 2)],
+      { type: "application/json" }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "coned-watchlist.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importWatchlist(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const addresses = JSON.parse(evt.target.result);
+        if (!Array.isArray(addresses)) return;
+        addresses.forEach(addr => {
+          const b = buildings.find(bld => bld.address === addr);
+          if (b && !watched.find(w => w.address === addr)) onToggle(b.address);
+        });
+      } catch { /* ignore invalid JSON */ }
+    };
+    reader.readAsText(file);
+    // Reset input so the same file can be re-imported
+    e.target.value = "";
+  }
+
   if (watchlist.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-8 pb-16">
@@ -47,12 +79,24 @@ export default function Watchlist({ buildings, watchlist, onToggle, onClear, onS
     <div className="flex flex-col h-full">
       <div className="px-5 py-3 border-b border-[#082244] bg-[#001748]/60 flex items-center justify-between">
         <span className="text-sm text-slate-300 font-semibold">{watched.length} saved buildings</span>
-        <button
-          onClick={onClear ?? (() => {})}
-          className="text-xs text-slate-500 hover:text-red-400 transition-colors"
-        >
-          Clear all
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportWatchlist}
+            className="px-2 py-1 text-xs rounded border border-[#0F3B7E] text-slate-400 hover:text-slate-200 hover:bg-[#002469] transition-colors"
+          >
+            Export
+          </button>
+          <label className="px-2 py-1 text-xs rounded border border-[#0F3B7E] text-slate-400 hover:text-slate-200 hover:bg-[#002469] transition-colors cursor-pointer">
+            Import
+            <input type="file" accept=".json" className="hidden" onChange={importWatchlist} />
+          </label>
+          <button
+            onClick={onClear ?? (() => {})}
+            className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+          >
+            Clear all
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto">
