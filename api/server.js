@@ -41,7 +41,21 @@ if (isPlaceholder(process.env.GROQ_API_KEY)) {
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:  ["'self'"],
+      scriptSrc:   ["'self'"],
+      styleSrc:    ["'self'", "'unsafe-inline'"],
+      imgSrc:      ["'self'", "data:"],
+      connectSrc:  ["'self'"],
+      frameSrc:    ["'none'"],
+      objectSrc:   ["'none'"],
+    },
+  },
+  frameguard: { action: "deny" },
+  hsts: { maxAge: 31536000, includeSubDomains: true },
+}));
 
 // trust proxy only when behind a real reverse proxy (nginx in prod)
 // Do NOT set "trust proxy" in dev — X-Forwarded-For would be client-controlled
@@ -65,6 +79,14 @@ const limiter = rateLimit({
   message: { error: "Too many requests — try again in a minute" },
 });
 app.use("/api", limiter);
+
+const aiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "AI query rate limit — max 20 per minute" },
+});
 
 // ── Authentication & Sessions ──────────────────────────────────────────────────
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
@@ -187,7 +209,7 @@ app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").se
 app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
 
 // Protect public JSON files from direct exposure in production build folder
-app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json"], (req, res) => {
+app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json", "/yoy_summary.json"], (req, res) => {
   res.status(403).json({ error: "Access Forbidden — Data is protected" });
 });
 
@@ -318,7 +340,7 @@ function validateSpec(raw) {
     if (!Number.isFinite(n)) return null;
     return Math.min(max, Math.max(min, n));
   };
-  const oneOf = (v, allowed) => allowed.includes(v) ? v : allowed[allowed.length - 1];
+  const oneOf = (v, allowed) => allowed.includes(v) ? v : null;
 
   return {
     risk_min:         numOrNull(raw.risk_min, 0, 1),
@@ -326,7 +348,7 @@ function validateSpec(raw) {
     use:              oneOf(raw.use, ALLOWED_USES),
     dob_jobs_min:     numOrNull(raw.dob_jobs_min, 0, 1000),
     signal:           oneOf(raw.signal, ALLOWED_SIGNALS),
-    ll97_over_2024:   raw.ll97_over_2024 === true || raw.ll97_over_2024 === false ? raw.ll97_over_2024 : null,
+    ll97_over_2024:   (raw.ll97_over_2024 === true || raw.ll97_over_2024 === 1) ? true : (raw.ll97_over_2024 === false || raw.ll97_over_2024 === 0) ? false : null,
     ll97_penalty_min: numOrNull(raw.ll97_penalty_min, 0, 1e9),
     steam_min:        numOrNull(raw.steam_min, 0, 1e12),
     steam_max:        numOrNull(raw.steam_max, 0, 1e12),
@@ -341,7 +363,7 @@ function validateSpec(raw) {
 }
 
 // ── /api/query ────────────────────────────────────────────────────────────────
-app.post("/api/query", requireAuth, async (req, res) => {
+app.post("/api/query", requireAuth, aiLimiter, async (req, res) => {
   const question = req.body?.question;
 
   if (typeof question !== "string" || !question.trim()) {
@@ -368,22 +390,30 @@ app.post("/api/query", requireAuth, async (req, res) => {
 });
 
 // ── /api/summarize ────────────────────────────────────────────────────────────
-app.post("/api/summarize", requireAuth, async (req, res) => {
+app.post("/api/summarize", requireAuth, aiLimiter, async (req, res) => {
   const { question, count, sample } = req.body ?? {};
 
   if (typeof question !== "string" || !question.trim()) {
     return res.status(400).json({ error: "question is required" });
   }
+  if (question.length > 600) {
+    return res.status(400).json({ error: "question too long (max 600 chars)" });
+  }
   if (!ANTHROPIC_KEY && !GROQ_KEY) {
     return res.status(503).json({ error: "No LLM API key configured" });
   }
 
-  const top = (Array.isArray(sample) ? sample.slice(0, 5) : []).map(b =>
-    `${b.address} (risk ${Math.round((b.risk ?? 0) * 100)}%, LL97 $${(b.ll97_penalty_2024 ?? 0).toLocaleString()}, ${b.use ?? "unknown use"})`
-  ).join("; ");
+  const safeCount = Math.max(0, Math.min(99999, parseInt(count, 10) || 0));
+  const top = (Array.isArray(sample) ? sample.slice(0, 5) : []).map(b => {
+    const addr    = String(b.address ?? "").replace(/[\r\n]/g, " ").slice(0, 100);
+    const use     = String(b.use     ?? "unknown use").replace(/[\r\n]/g, " ").slice(0, 50);
+    const risk    = Math.round((Number.isFinite(b.risk) ? b.risk : 0) * 100);
+    const penalty = Number.isFinite(b.ll97_penalty_2024) ? b.ll97_penalty_2024 : 0;
+    return `${addr} (risk ${risk}%, LL97 $${penalty.toLocaleString()}, ${use})`;
+  }).join("; ");
 
   const summaryPrompt = `The user asked: "${sanitizeQuestion(question).slice(0, 220)}"
-Results: ${count} buildings matched.
+Results: ${safeCount} buildings matched.
 Top matches: ${top || "none"}.
 Write ONE concise sentence (max 25 words) summarizing what was found. Be specific with numbers. No preamble.`;
 
@@ -648,7 +678,7 @@ Data Limitations:
 - ~250 buildings have only one year of steam data (— in YoY column).
 - All 1,210 buildings are below 96th Street in Manhattan. No steam customers above 96th St are represented.`;
 
-app.post("/api/explain", requireAuth, async (req, res) => {
+app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   const { question } = req.body ?? {};
 
   if (typeof question !== "string" || !question.trim()) {
@@ -713,7 +743,7 @@ app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
   res.send([header, ...rows].join("\n"));
 });
 
-app.get("/api/health", (_req, res) => {
+app.get("/api/health", requireAuth, (_req, res) => {
   res.json({
     ok:       true,
     provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : "none",

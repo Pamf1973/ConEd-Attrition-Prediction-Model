@@ -59,8 +59,8 @@ export default function Watchlist({ buildings, watchlist, onToggle, onClear, onS
         <table className="w-full text-sm border-collapse">
           <thead className="sticky top-0 bg-[#001748] z-10">
             <tr>
-              {["Address", "Attrition Score", "LL97 Penalty", "Steam (M kBtu)", "Signal", ""].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap">
+              {["Address", "Attrition Score", "LL97 Penalty", "Steam (M kBtu)", "Signal", ""].map((h, i) => (
+                <th key={i} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap">
                   {h}
                 </th>
               ))}

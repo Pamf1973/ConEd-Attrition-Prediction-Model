@@ -36,6 +36,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);
   const [hint,        setHint]        = useState(null);
+  const genRef = useRef(0);
   const inputRef = useRef(null);
 
   async function handleSubmit(q) {
@@ -63,6 +64,8 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     const explaining = isExplainQuery(question);
     setMode(explaining ? "explain" : "filter");
 
+    const gen = ++genRef.current;
+
     try {
       if (explaining) {
         const prefixed = simpleMode ? `[SIMPLE MODE] ${question}` : question;
@@ -73,7 +76,9 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
         const matched = applyFilterSpec(buildings, spec);
         setResults(matched);
         setExplanation(spec.explanation ?? "");
-        summarizeResults(question, matched, token).then(s => s && setInsight(s));
+        summarizeResults(question, matched, token).then(s => {
+          if (s && genRef.current === gen) setInsight(s);
+        });
       }
     } catch (err) {
       setError(err.message);

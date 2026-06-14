@@ -148,11 +148,20 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
 
   async function downloadPortfolioCSV() {
     if (!token) return;
-    const res = await fetch("/api/export/csv", { headers: { Authorization: `Bearer ${token}` } });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "coned-steam-portfolio.csv"; a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const res = await fetch("/api/export/csv", { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `coned-portfolio-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("[CSV export]", err.message);
+      alert(`Export failed — ${err.message}`);
+    }
   }
 
   return (

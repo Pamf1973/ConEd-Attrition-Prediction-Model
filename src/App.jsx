@@ -25,6 +25,7 @@ export default function App() {
       }).catch(() => {});
     }
     sessionStorage.removeItem("coned_token");
+    localStorage.removeItem("coned_watchlist");
     setToken(null);
     setSelected(null);
   }, [token]);

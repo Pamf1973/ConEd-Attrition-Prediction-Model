@@ -49,7 +49,7 @@ export default function TopTargets({ buildings, onSelect, token: _token }) {
               return (
                 <tr
                   key={`${b.address}_${i}`}
-                  onClick={() => onSelect(b.address)}
+                  onClick={() => onSelect(b)}
                   className={`border-b border-[#082244]/60 cursor-pointer transition-colors ${
                     i % 2 === 0
                       ? "bg-[#001748]/30 hover:bg-[#002469]/50"
