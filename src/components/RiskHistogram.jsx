@@ -46,7 +46,7 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function RiskHistogram({ buildings }) {
+export default function RiskHistogram({ buildings, onFilterByRisk }) {
   const scored = buildings.filter(b => Number.isFinite(b.risk) && b.risk != null);
   const bins   = buildBins(scored);
 
@@ -69,7 +69,15 @@ export default function RiskHistogram({ buildings }) {
       </div>
 
       <ResponsiveContainer width="100%" height={220}>
-        <BarChart data={bins} margin={{ top: 4, right: 8, bottom: 4, left: 0 }}>
+        <BarChart
+          data={bins}
+          margin={{ top: 4, right: 8, bottom: 4, left: 0 }}
+          style={onFilterByRisk ? { cursor: "pointer" } : undefined}
+          onClick={onFilterByRisk ? (data) => {
+            const bin = data?.activePayload?.[0]?.payload;
+            if (bin) onFilterByRisk(bin.min, bin.max);
+          } : undefined}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
           <XAxis
             dataKey="label"

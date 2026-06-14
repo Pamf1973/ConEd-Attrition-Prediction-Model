@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useBuildings } from "./data/useBuildings";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
@@ -16,6 +16,9 @@ export default function App() {
   const [selected,    setSelected]    = useState(null);
   const [activeTab,   setActiveTab]   = useState("rankings");
   const { watchlist, toggle: toggleWatch, clear: clearWatch } = useWatchlist();
+  const [clusterFilter, setClusterFilter] = useState("All");
+  const [riskMin, setRiskMin] = useState(null);
+  const [riskMax, setRiskMax] = useState(null);
 
   const handleLogout = useCallback(() => {
     if (token) {
@@ -52,6 +55,22 @@ export default function App() {
       return;
     }
     setSelected(prev => prev?.address === b.address ? null : b);
+  }
+
+  function handleScatterFilterCluster(clusterName) {
+    setClusterFilter(clusterName);
+    setActiveTab("rankings");
+  }
+
+  function handleScatterSelect(building) {
+    handleSelect(building);
+    setActiveTab("rankings");
+  }
+
+  function handleHistogramFilter(min, max) {
+    setRiskMin(min);
+    setRiskMax(max);
+    setActiveTab("rankings");
   }
 
   const bannerStats = useMemo(() => {
@@ -198,6 +217,9 @@ export default function App() {
                 watchlist={watchlist}
                 onWatch={toggleWatch}
                 token={token}
+                clusterFilter={clusterFilter}
+                riskMin={riskMin}
+                riskMax={riskMax}
               />
             </div>
             {selected && (
@@ -213,8 +235,8 @@ export default function App() {
 
         {activeTab === "trends" && (
           <div className="flex-1 min-w-0 overflow-y-auto p-5 grid gap-5">
-            <RiskHistogram buildings={buildings} />
-            <YoYScatter buildings={buildings} />
+            <RiskHistogram buildings={buildings} onFilterByRisk={handleHistogramFilter} />
+            <YoYScatter buildings={buildings} onFilterCluster={handleScatterFilterCluster} onSelectBuilding={handleScatterSelect} />
           </div>
         )}
 

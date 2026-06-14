@@ -60,7 +60,7 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
-export default function YoYScatter({ buildings }) {
+export default function YoYScatter({ buildings, onFilterCluster, onSelectBuilding }) {
   // Include both real both-delta buildings AND projected ones (cluster-median imputed)
   const bothPeriods = buildings.filter(
     b => b.norm_delta_22_23 != null && b.norm_delta_23_24 != null
@@ -123,7 +123,18 @@ export default function YoYScatter({ buildings }) {
           <Tooltip content={<CustomTooltip />} />
           <Legend
             wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-            formatter={v => <span style={{ color: CLUSTER_COLORS[v] ?? "#94a3b8" }}>{v}</span>}
+            formatter={(v) => {
+              const color = CLUSTER_COLORS[v] ?? "#94a3b8";
+              return (
+                <span
+                  style={{ color, cursor: onFilterCluster ? "pointer" : "default" }}
+                  onClick={() => onFilterCluster?.(v)}
+                  title={onFilterCluster ? `Filter by ${v}` : v}
+                >
+                  {v}
+                </span>
+              );
+            }}
           />
           {Object.entries(byCluster).map(([clusterName, pts]) => (
             <Scatter
@@ -132,6 +143,11 @@ export default function YoYScatter({ buildings }) {
               data={pts}
               shape={<CustomDot />}
               fill={CLUSTER_COLORS[clusterName] ?? CLUSTER_COLORS.Unknown}
+              onClick={(pointData) => {
+                if (pointData?.payload) {
+                  onSelectBuilding?.(pointData.payload);
+                }
+              }}
             />
           ))}
         </ScatterChart>

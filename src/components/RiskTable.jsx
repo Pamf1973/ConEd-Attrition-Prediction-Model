@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 function buildCols(penaltyYear) {
@@ -21,7 +21,7 @@ const USE_TYPES = [
   "Other", "Retail Store",
 ];
 
-export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token }) {
+export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token, clusterFilter: initialClusterFilter, riskMin: initialRiskMin, riskMax: initialRiskMax }) {
   const [sortKey,       setSortKey]       = useState("risk");
   const [sortDir,       setSortDir]       = useState("desc");
   const [penaltyYear,   setPenaltyYear]   = useState(2024);
@@ -35,6 +35,19 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const [demandMin,     setDemandMin]     = useState("");
   const [demandMax,     setDemandMax]     = useState("");
   const [search,        setSearch]        = useState("");
+  const [chartRiskMin,  setChartRiskMin]  = useState(null);
+  const [chartRiskMax,  setChartRiskMax]  = useState(null);
+
+  // Sync cluster filter driven by YoY Scatter chart click
+  useEffect(() => {
+    if (initialClusterFilter != null) setClusterFilter(initialClusterFilter);
+  }, [initialClusterFilter]);
+
+  // Sync risk range driven by Risk Histogram bar click
+  useEffect(() => {
+    setChartRiskMin(initialRiskMin ?? null);
+    setChartRiskMax(initialRiskMax ?? null);
+  }, [initialRiskMin, initialRiskMax]);
 
   function handleSort(key) {
     if (sortKey === key) {
@@ -89,6 +102,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       rows = rows.filter(b => !b.outlier_23_24 && !b.outlier_22_23);
     }
 
+    // Chart-driven risk range (from histogram bar click)
+    if (chartRiskMin != null) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk >= chartRiskMin);
+    if (chartRiskMax != null) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk <  chartRiskMax);
+
     const min = parseFloat(demandMin);
     const max = parseFloat(demandMax);
     if (!isNaN(min)) rows = rows.filter(b => b.steam >= min * 1e6);
@@ -106,7 +123,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       if (av > bv) return sortDir === "asc" ?  1 : -1;
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, sortKey, sortDir, penaltyYear]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, chartRiskMin, chartRiskMax, sortKey, sortDir, penaltyYear]);
 
   function exportCSV() {
     // Wrap in quotes and neutralise CSV formula injection (=, +, -, @, tab, CR at start)
