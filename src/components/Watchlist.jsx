@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { riskTier, signalMeta } from "../data/useBuildings";
 
 const STORAGE_KEY = "coned_watchlist";
 
-export function useWatchlist() {
+export function useWatchlist(token) {
   const [watchlist, setWatchlist] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
@@ -12,18 +12,53 @@ export function useWatchlist() {
     }
   });
 
+  // Load from server on mount (localStorage fallback)
+  useEffect(() => {
+    if (!token) return;
+    fetch("/api/watchlist/load", {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(3000),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        // Skip overwrite if server returns empty and localStorage already has entries
+        if (data && Array.isArray(data.addresses) && data.addresses.length > 0) {
+          setWatchlist(data.addresses);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data.addresses));
+        }
+      })
+      .catch(() => {
+        // Server unavailable — keep localStorage data
+      });
+  }, [token]);
+
+  // Persist to both localStorage and server — useCallback keeps token current
+  const persist = useCallback((addresses) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(addresses));
+    if (token) {
+      fetch("/api/watchlist/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ addresses }),
+      }).catch(err => console.warn("[watchlist] server save failed:", err.message));
+    }
+  }, [token]);
+
   function toggle(address) {
     setWatchlist(prev => {
       const next = prev.includes(address)
         ? prev.filter(a => a !== address)
         : [...prev, address];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      persist(next);
       return next;
     });
   }
 
   function clear() {
-    localStorage.removeItem(STORAGE_KEY);
+    persist([]);
     setWatchlist([]);
   }
 

@@ -1,58 +1,6 @@
 import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-function SteamTrend({ building }) {
-  const pts = [
-    { yr: "2022", v: building.steam_2022 },
-    { yr: "2023", v: building.steam_2023 },
-    { yr: "2024", v: building.steam_2024 },
-  ].filter(p => p.v != null);
-
-  if (pts.length < 2) return null;
-
-  const first = pts[0].v;
-  const last  = pts[pts.length - 1].v;
-  const pct   = first ? Math.round(((last - first) / first) * 100) : 0;
-  const color = pct <= -20 ? "#ef4444" : pct <= -5 ? "#f97316" : pct >= 5 ? "#22c55e" : "#94a3b8";
-  const maxV  = Math.max(...pts.map(p => p.v));
-
-  const label = pct <= -20 ? "Sharp drop — possible disconnect underway"
-              : pct <= -5  ? "Moderate decline in steam demand"
-              : pct >= 5   ? "Demand increasing"
-              :               "Stable demand";
-
-  return (
-    <div className="rounded-lg p-3 mt-1 mb-2" style={{ background: "#1e293b" }}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-slate-500">STEAM USAGE — YEAR OVER YEAR</span>
-        <span className="text-sm font-bold" style={{ color }}>
-          {pct > 0 ? "+" : ""}{pct}%
-        </span>
-      </div>
-      <div className="space-y-1.5">
-        {pts.map(p => (
-          <div key={p.yr} className="flex items-center gap-2">
-            <span className="text-xs text-slate-500 w-10">{p.yr}</span>
-            <div className="flex-1 h-3 bg-[#002469] rounded overflow-hidden">
-              <div
-                className="h-full rounded"
-                style={{
-                  width: `${maxV ? (p.v / maxV) * 100 : 0}%`,
-                  background: p.yr === String(pts[pts.length - 1].yr) ? color : "#475569",
-                }}
-              />
-            </div>
-            <span className="text-xs text-slate-300 w-16 text-right">
-              {(p.v / 1e6).toFixed(1)}M
-            </span>
-          </div>
-        ))}
-      </div>
-      <p className="text-xs text-slate-600 mt-2">{label}</p>
-    </div>
-  );
-}
-
 function TrendChart({ building, allBuildings }) {
   const years = [2022, 2023, 2024];
   const steamKeys = { 2022: "steam_2022", 2023: "steam_2023", 2024: "steam_2024" };
@@ -69,18 +17,29 @@ function TrendChart({ building, allBuildings }) {
     return vals.length % 2 ? vals[mid] : (vals[mid - 1] + vals[mid]) / 2;
   };
 
+  // LL97 cap in MT CO₂e → convert to steam kBtu using GHG = steam_kBtu × 4.493e-5
+  const ll97CapSteam = (year) => {
+    const capKey = year === 2024 || year === 2025 ? "ll97_cap_2024" : "ll97_cap_2030";
+    const capMt = building[capKey];
+    if (capMt == null) return null;
+    return capMt / 4.493e-5;
+  };
+
   const data = years.map(yr => ({
     year: yr,
     building:    building[steamKeys[yr]] ?? null,
     peerMedian:  peerMedian(yr),
+    ll97Cap:     ll97CapSteam(yr),
   })).filter(d => d.building != null);
 
   if (data.length < 2) return null;
 
+  const hasCapData = data.some(d => d.ll97Cap != null);
   const fmt = v => v >= 1e9 ? `${(v/1e9).toFixed(1)}B` : v >= 1e6 ? `${(v/1e6).toFixed(1)}M` : v >= 1e3 ? `${(v/1e3).toFixed(0)}k` : String(v);
 
   return (
     <div className="mt-3">
+      <div className="text-xs text-slate-500 mb-1">Steam Trend (kBtu) — Peer Benchmark{hasCapData ? " & LL97 Cap" : ""}</div>
       <ResponsiveContainer width="100%" height={160}>
         <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
           <XAxis dataKey="year" tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -93,6 +52,7 @@ function TrendChart({ building, allBuildings }) {
           <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }} />
           <Line type="monotone" dataKey="building" name="This building" stroke="#ffffff" strokeWidth={2} dot={{ r: 3, fill: "#ffffff" }} />
           <Line type="monotone" dataKey="peerMedian" name="Peer median" stroke="#E87722" strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
+          {hasCapData && <Line type="monotone" dataKey="ll97Cap" name="LL97 cap" stroke="#ef4444" strokeWidth={1.5} strokeDasharray="2 2" dot={false} />}
         </LineChart>
       </ResponsiveContainer>
     </div>

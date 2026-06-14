@@ -260,6 +260,33 @@ app.get("/api/buildings", requireAuth, (req, res) => {
   res.json({ buildings: paged, total, page: pageNum, per_page: perPage, total_pages: totalPages });
 });
 
+// ── Watchlist — per-session persistence (Map, localStorage fallback on client) ──
+const watchlistStore = new Map(); // token → string[]
+
+app.post("/api/watchlist/save", requireAuth, (req, res) => {
+  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
+  const { addresses } = req.body ?? {};
+  if (!Array.isArray(addresses)) {
+    return res.status(400).json({ error: "addresses must be an array of strings" });
+  }
+  if (addresses.length > 10_000) {
+    return res.status(400).json({ error: "addresses array too large (max 10,000)" });
+  }
+  if (!addresses.every(a => typeof a === "string" && a.length <= 500)) {
+    return res.status(400).json({ error: "each address must be a non-empty string ≤ 500 chars" });
+  }
+  // Evict oldest entry when store reaches 500 sessions to bound memory use
+  if (watchlistStore.size >= 500) watchlistStore.delete(watchlistStore.keys().next().value);
+  watchlistStore.set(req.sessionToken, addresses);
+  res.json({ ok: true, count: addresses.length });
+});
+
+app.get("/api/watchlist/load", requireAuth, (req, res) => {
+  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
+  const addresses = watchlistStore.get(req.sessionToken) ?? [];
+  res.json({ addresses });
+});
+
 // Protect public JSON files from direct exposure in production build folder
 app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json", "/yoy_summary.json"], (req, res) => {
   res.status(403).json({ error: "Access Forbidden — Data is protected" });

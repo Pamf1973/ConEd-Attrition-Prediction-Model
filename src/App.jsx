@@ -16,7 +16,7 @@ export default function App() {
   const { buildings, loading, error } = useBuildings(token);
   const [selected,    setSelected]    = useState(null);
   const [activeTab,   setActiveTab]   = useState("rankings");
-  const { watchlist, toggle: toggleWatch, clear: clearWatch } = useWatchlist();
+  const { watchlist, toggle: toggleWatch, clear: clearWatch } = useWatchlist(token);
   const [clusterFilter, setClusterFilter] = useState("All");
   const [riskMin, setRiskMin] = useState(null);
   const [riskMax, setRiskMax] = useState(null);
