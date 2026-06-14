@@ -126,6 +126,7 @@ function requireAuth(req, res, next) {
     activeSessions.delete(token); // clean up if expired
     return res.status(401).json({ error: "Unauthorized — invalid or expired session" });
   }
+  req.sessionToken = token;
   next();
 }
 
