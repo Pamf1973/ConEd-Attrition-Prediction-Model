@@ -10,6 +10,9 @@ import RiskHistogram from "./components/RiskHistogram";
 import Watchlist, { useWatchlist } from "./components/Watchlist";
 import ErrorBoundary from "./components/ErrorBoundary";
 import TopTargets from "./components/TopTargets";
+import AlertBanner from "./components/AlertBanner";
+import AlertsPanel from "./components/AlertsPanel";
+import ProactiveAlertSummary from "./components/ProactiveAlertSummary";
 
 export default function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
@@ -21,6 +24,55 @@ export default function App() {
   const [riskMin, setRiskMin] = useState(null);
   const [riskMax, setRiskMax] = useState(null);
   const searchInputRef = useRef(null);
+
+  // ── Alert state ──────────────────────────────────────────────────────────────
+  const [alerts, setAlerts] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [showAlertsPanel, setShowAlertsPanel] = useState(false);
+
+  const fetchAlerts = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch("/api/alerts/proactive", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAlerts(data.alerts ?? []);
+        if (data.summary) setSummary(data.summary);
+      }
+    } catch {
+      // silently ignore — polling will retry
+    }
+  }, [token]);
+
+  // Initial fetch when token available, then poll every 60s
+  useEffect(() => {
+    if (!token) return;
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 60_000);
+    return () => clearInterval(interval);
+  }, [token, fetchAlerts]);
+
+  const dismissAlert = useCallback(async (alertId) => {
+    if (!token) return;
+    try {
+      await fetch("/api/alerts/proactive/dismiss", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ alert_id: alertId }),
+      });
+      // Optimistic removal from local state
+      setAlerts(prev => prev.map(a => a.id === alertId ? { ...a, dismissed: true } : a));
+    } catch {
+      // re-fetch on next poll
+    }
+  }, [token]);
+
+  const activeAlertCount = useMemo(() => alerts.filter(a => !a.dismissed).length, [alerts]);
 
   const handleLogout = useCallback(() => {
     if (token) {
@@ -176,6 +228,24 @@ export default function App() {
           <span className="text-xs text-slate-500/70">
             Data: Jun 2026 · Steam: 2024 · LL84: May 2025
           </span>
+          {/* Alert bell badge */}
+          <button
+            onClick={() => setShowAlertsPanel(true)}
+            className={`relative px-2.5 py-1.5 rounded text-xs font-medium transition-colors ${
+              activeAlertCount > 0
+                ? "text-orange-400 bg-[#002469]/60 border border-orange-700/40 hover:bg-[#003080]"
+                : "text-slate-500 bg-[#002469]/30 border border-[#0F3B7E]/30 hover:bg-[#002469]/60"
+            }`}
+            title={activeAlertCount > 0 ? `${activeAlertCount} active alert(s)` : "No active alerts"}
+          >
+            🔔
+            {activeAlertCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[9px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none shadow-lg shadow-red-900/50">
+                {activeAlertCount > 99 ? "99+" : activeAlertCount}
+              </span>
+            )}
+          </button>
+
           <button
             onClick={handleLogout}
             className="px-2.5 py-1 rounded border border-[#0F3B7E] hover:border-red-500/40 text-[11px] font-bold text-slate-400 hover:text-red-400 bg-[#002469]/40 transition-colors"
@@ -184,6 +254,11 @@ export default function App() {
           </button>
         </div>
       </header>
+
+      {/* Alert Banner — shows most critical active alert */}
+      {activeAlertCount > 0 && (
+        <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
+      )}
 
       {/* Portfolio Dollar Exposure Banner */}
       <div className="grid grid-cols-4 gap-px border-b border-[#082244] bg-[#082244] shrink-0">
@@ -222,6 +297,15 @@ export default function App() {
           </div>
         ))}
       </div>
+
+      {/* Proactive Alert Summary */}
+      {summary && (
+        <div className="border-b border-[#082244] shrink-0">
+          <div className="px-5 py-2">
+            <ProactiveAlertSummary summary={summary} />
+          </div>
+        </div>
+      )}
 
       {/* Body */}
       <div className="flex flex-1 min-h-0">
@@ -319,6 +403,31 @@ export default function App() {
           </>
         )}
       </div>
+
+      {/* Alerts Panel Overlay */}
+      {showAlertsPanel && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 z-40"
+            onClick={() => setShowAlertsPanel(false)}
+          />
+          {/* Panel */}
+          <div className="fixed right-0 top-0 bottom-0 w-[420px] z-50 shadow-2xl shadow-black/50 overflow-y-auto bg-[#030D1A] border-l border-[#0F3B7E]/50">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-[#082244] bg-[#001748] sticky top-0 z-10">
+              <h2 className="text-sm font-bold text-slate-100">🔔 Active Alerts</h2>
+              <button
+                onClick={() => setShowAlertsPanel(false)}
+                className="text-slate-500 hover:text-slate-300 text-lg leading-none px-1"
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <AlertsPanel alerts={alerts} onDismiss={dismissAlert} />
+          </div>
+        </>
+      )}
     </div>
     </ErrorBoundary>
   );

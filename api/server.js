@@ -113,6 +113,10 @@ setInterval(() => {
       if (++evicted >= overflow) break;
     }
   }
+  // Clean up alert dismissals for expired sessions
+  for (const token of proactiveDismissed.keys()) {
+    if (!activeSessions.has(token)) proactiveDismissed.delete(token);
+  }
 }, 60 * 60 * 1000).unref();
 
 function requireAuth(req, res, next) {
@@ -201,6 +205,8 @@ const DATA_CACHE = {
 const DATA_PARSED = {
   buildings:  JSON.parse(DATA_CACHE.buildings),
   enrichment: JSON.parse(DATA_CACHE.enrichment),
+  yearly:     JSON.parse(DATA_CACHE.yearly),
+  yoyDeltas:  JSON.parse(DATA_CACHE.yoyDeltas),
 };
 
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
@@ -263,6 +269,198 @@ app.get("/api/buildings", requireAuth, (req, res) => {
 
 // ── Watchlist — per-session persistence (Map, localStorage fallback on client) ──
 const watchlistStore = new Map(); // token → string[]
+
+// ── Proactive Alert Engine ────────────────────────────────────────────────────
+// Per-session dismissed alert IDs (lightweight — just tracks which were dismissed)
+const proactiveDismissed = new Map(); // sessionToken → Set<alertId>
+
+// Cache for computed proactive alerts (refreshed every 5 min)
+let proactiveAlertsCache = [];
+let proactiveSummaryCache = { critical: 0, high: 0, medium: 0, low: 0 };
+let proactiveCacheTimestamp = 0;
+
+// Severity thresholds
+const SEV_CRITICAL = 0.8;
+const SEV_HIGH = 0.5;
+const SEV_MEDIUM = 0.2;
+
+function severityScore(b, e) {
+  const risk = e.ml_risk ?? b.risk ?? 0;
+  const ll97Over = e.ll97_over_2024 ? 0.3 : 0;
+  const penaltyContrib = Math.min((e.ll97_penalty_2024 ?? 0) / 1_000_000, 0.1);
+  return risk * 0.6 + ll97Over + penaltyContrib;
+}
+
+function severityBand(score) {
+  if (score >= SEV_CRITICAL) return "critical";
+  if (score >= SEV_HIGH) return "high";
+  if (score >= SEV_MEDIUM) return "medium";
+  return "low";
+}
+
+function getSeverityOrder(sev) {
+  const order = { critical: 3, high: 2, medium: 1, low: 0 };
+  return order[sev] ?? 0;
+}
+
+async function computeProactiveAlerts() {
+  const now = new Date();
+  const bldgs = DATA_PARSED.buildings;
+  const enr = DATA_PARSED.enrichment;
+
+  // Score all buildings
+  const scored = [];
+  for (const b of bldgs) {
+    const addrUp = b.address?.toUpperCase();
+    const e = enr[addrUp] ?? {};
+    const score = severityScore(b, e);
+    const band = severityBand(score);
+    const pen2024 = e.ll97_penalty_2024 ?? 0;
+
+    if (score >= SEV_MEDIUM) {
+      scored.push({
+        id: `proactive_${b.address}`.replace(/[^a-zA-Z0-9_]/g, "_"),
+        address: b.address,
+        type: "proactive_risk",
+        severity: band,
+        severity_score: score,
+        ll97_penalty_2024: pen2024,
+        ll97_over_2024: e.ll97_over_2024 ?? 0,
+        message: `${b.address} — ${band === "critical" ? "Critical" : band === "high" ? "High" : "Medium"} Severity (${(score * 100).toFixed(0)}%)`,
+        detail: `Risk: ${((e.ml_risk ?? b.risk ?? 0) * 100).toFixed(0)}% · LL97: $${(pen2024 / 1000).toFixed(0)}k${e.ll97_over_2024 ? " (over cap)" : ""} · ${e.cluster_name ?? ""} · ${b.use ?? ""}`,
+        description: "", // filled async by LLM
+        recommendation: "", // filled async by LLM
+        timestamp: now.toISOString(),
+      });
+    }
+  }
+
+  // Summary across ALL buildings (not just top N)
+  const summary = { critical: 0, high: 0, medium: 0, low: 0 };
+  for (const b of bldgs) {
+    const addrUp = b.address?.toUpperCase();
+    const e = enr[addrUp] ?? {};
+    const band = severityBand(severityScore(b, e));
+    summary[band]++;
+  }
+
+  // Sort — severity desc then score desc
+  scored.sort((a, b) => {
+    const sa = getSeverityOrder(b.severity) - getSeverityOrder(a.severity);
+    if (sa !== 0) return sa;
+    return b.severity_score - a.severity_score;
+  });
+
+  // Top 50 for detailed view
+  const top50 = scored.slice(0, 50);
+
+  // Update cache immediately (before LLM enrichment)
+  proactiveAlertsCache = top50;
+  proactiveSummaryCache = summary;
+  proactiveCacheTimestamp = now.getTime();
+
+  // Kick off async LLM enrichment for top items (fire-and-forget)
+  enrichAlertDescriptions(top50).catch(() => {});
+}
+
+async function enrichAlertDescriptions(alerts) {
+  if (!ANTHROPIC_KEY && !GROQ_KEY) return;
+  const BATCH_SIZE = 5;
+  const DELAY_MS = 300;
+
+  for (let i = 0; i < alerts.length; i += BATCH_SIZE) {
+    const batch = alerts.slice(i, i + BATCH_SIZE);
+    const promises = batch.map(async (alert) => {
+      const prompt = `You are a ConEd steam operations advisor. For this building alert, respond with raw JSON only — no markdown, no code fences:
+
+Building: ${alert.address}
+Severity: ${alert.severity}
+Score: ${(alert.severity_score * 100).toFixed(0)}%
+LL97 Penalty: $${(alert.ll97_penalty_2024 / 1000).toFixed(0)}k
+Over Cap: ${alert.ll97_over_2024 ? "Yes" : "No"}
+
+Respond with valid JSON only:
+{"description":"One-sentence alert description (under 80 chars)","recommendation":"One-sentence recommended action (under 120 chars)"}`;
+      try {
+        const raw = ANTHROPIC_KEY
+          ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.")
+          : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
+        // Strip markdown fences if LLM wraps output anyway
+        const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+        const parsed = JSON.parse(cleaned);
+        if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
+        if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
+      } catch {
+        // leave empty — acceptable
+      }
+    });
+    await Promise.all(promises);
+    if (i + BATCH_SIZE < alerts.length) {
+      await new Promise(r => setTimeout(r, DELAY_MS));
+    }
+  }
+}
+
+// Compute at startup (module-level init)
+computeProactiveAlerts();
+
+// Refresh every 5 minutes
+setInterval(() => {
+  computeProactiveAlerts();
+}, 5 * 60 * 1000).unref();
+
+// ── Proactive Alert API ──────────────────────────────────────────────────────
+app.get("/api/alerts/proactive", requireAuth, (req, res) => {
+  const token = req.sessionToken;
+  const since = req.query.since;
+
+  // Filter out dismissed alerts for this session
+  const dismissed = proactiveDismissed.get(token);
+  let alerts = dismissed && dismissed.size > 0
+    ? proactiveAlertsCache.filter(a => !dismissed.has(a.id))
+    : [...proactiveAlertsCache];
+
+  // Filter by ?since= ISO timestamp
+  if (since) {
+    const sinceTime = new Date(since).getTime();
+    if (!isNaN(sinceTime)) {
+      alerts = alerts.filter(a => new Date(a.timestamp).getTime() > sinceTime);
+    }
+  }
+
+  res.json({ alerts, count: alerts.length, summary: proactiveSummaryCache });
+});
+
+app.get("/api/alerts/proactive/summary", requireAuth, (_req, res) => {
+  res.json(proactiveSummaryCache ?? { critical: 0, high: 0, medium: 0, low: 0 });
+});
+
+app.post("/api/alerts/proactive/dismiss", requireAuth, (req, res) => {
+  const token = req.sessionToken;
+  const { alert_id } = req.body ?? {};
+
+  if (!alert_id || typeof alert_id !== "string") {
+    return res.status(400).json({ error: "alert_id is required (string)" });
+  }
+
+  if (!proactiveDismissed.has(token)) {
+    proactiveDismissed.set(token, new Set());
+  }
+  const set = proactiveDismissed.get(token);
+  set.add(alert_id);
+
+  // Cap at 10k per session to bound memory
+  if (set.size > 10_000) {
+    const iter = set.values();
+    for (let i = 0; i < 1000; i++) {
+      const first = iter.next();
+      if (first.done) break;
+      set.delete(first.value);
+    }
+  }
+
+  res.json({ ok: true, alert_id });
+});
 
 app.post("/api/watchlist/save", requireAuth, (req, res) => {
   if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
