@@ -38,6 +38,10 @@ if (isPlaceholder(process.env.GROQ_API_KEY)) {
   }
 }
 
+// ── LLM provider detection (hoisted — used by Proactive Alert Engine and /api/query) ──
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
+const GROQ_KEY      = process.env.GROQ_API_KEY;
+
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
 
@@ -365,9 +369,12 @@ async function computeProactiveAlerts() {
 
 async function enrichAlertDescriptions(alerts) {
   if (!ANTHROPIC_KEY && !GROQ_KEY) return;
-  const BATCH_SIZE = 5;
-  const DELAY_MS = 300;
+  const BATCH_SIZE = 5;     // 5 parallel ~30 req/min — safe for Anthropic 40 req/min tier
+  const DELAY_MS = 300;     // 300ms between batches
+  const MAX_RETRIES = 2;
+  const ENRICH_TIMEOUT = 25_000;  // longer timeout — alert prompts are verbose (25s)
 
+  console.log(`[enrich] Starting enrichment of ${alerts.length} alerts (batch=${BATCH_SIZE}, delay=${DELAY_MS}ms, timeout=${ENRICH_TIMEOUT}ms)`);
   for (let i = 0; i < alerts.length; i += BATCH_SIZE) {
     const batch = alerts.slice(i, i + BATCH_SIZE);
     const promises = batch.map(async (alert) => {
@@ -383,18 +390,36 @@ Respond with valid JSON only:
 {"description":"One-sentence alert description (under 80 chars)","recommendation":"One-sentence recommended action (under 120 chars)"}`;
       try {
         const raw = ANTHROPIC_KEY
-          ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.")
+          ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024)
           : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
         // Strip markdown fences if LLM wraps output anyway
         const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
         const parsed = JSON.parse(cleaned);
         if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
         if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
-      } catch {
-        // leave empty — acceptable
+      } catch (err) {
+        // Retry with exponential backoff on rate-limit / transient errors
+        for (let retry = 1; retry <= MAX_RETRIES; retry++) {
+          await new Promise(r => setTimeout(r, retry * 2000));
+          try {
+            const raw = ANTHROPIC_KEY
+              ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT)
+              : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
+            const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+            const parsed = JSON.parse(cleaned);
+            if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
+            if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
+            break; // success — exit retry loop
+          } catch {
+            // still failed — will retry or fall through
+          }
+        }
+        // leave empty if all retries exhausted — acceptable
       }
     });
     await Promise.all(promises);
+    const done = Math.min(i + BATCH_SIZE, alerts.length);
+    console.log(`[enrich] ${done}/${alerts.length} alerts processed`);
     if (i + BATCH_SIZE < alerts.length) {
       await new Promise(r => setTimeout(r, DELAY_MS));
     }
@@ -494,10 +519,6 @@ app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_de
 // Serve built frontend assets in production (if built)
 app.use(express.static(resolve(process.cwd(), "dist")));
 
-// ── LLM provider detection ────────────────────────────────────────────────────
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-const GROQ_KEY      = process.env.GROQ_API_KEY;
-
 // Wrap user input in XML tags to structurally isolate it from the system prompt,
 // and strip the most common injection patterns. This is defense-in-depth —
 // validateSpec() still enforces the schema on output regardless.
@@ -549,10 +570,10 @@ FILTER SPEC (return ONLY valid JSON, no explanation text, no markdown):
   "explanation": ""
 }`;
 
-async function callClaude(question, systemOverride) {
+async function callClaude(question, systemOverride, timeoutMs = 10_000, maxTokens = 512) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       "content-type":      "application/json",
       "x-api-key":         ANTHROPIC_KEY,
@@ -560,7 +581,7 @@ async function callClaude(question, systemOverride) {
     },
     body: JSON.stringify({
       model:      "claude-haiku-4-5-20251001",
-      max_tokens: 512,
+      max_tokens: maxTokens,
       system:     systemOverride ?? SYSTEM_PROMPT,
       messages:   [{ role: "user", content: question }],
     }),
