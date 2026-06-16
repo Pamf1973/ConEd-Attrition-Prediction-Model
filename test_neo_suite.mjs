@@ -63,7 +63,7 @@ const TESTS = [
   {
     id: 6, section: "Investor / Blackstone Analyst",
     question: "321 missing 2024 buildings — worry?",
-    expected: ["321", "attention", "warrant", "compliance", "missing",],
+    expected: ["321", "monitoring", "2022", "2023", "data",],
   },
   {
     id: 7, section: "Investor / Blackstone Analyst",
