@@ -22,7 +22,9 @@ export default function Login({ onLogin }) {
         body: JSON.stringify({ password }),
       });
 
-      const data = await res.json();
+      const bodyText = await res.text();
+      if (!bodyText) throw new Error("Server unavailable — try again in a moment");
+      const data = JSON.parse(bodyText);
       if (!res.ok) {
         // Check for rate limit (429) and parse Retry-After header
         if (res.status === 429) {

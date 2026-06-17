@@ -58,7 +58,9 @@ export function useBuildings(token) {
         const bldgRes = await fetch("/api/data/buildings", { headers });
         if (bldgRes.status === 401) throw new Error("UNAUTHORIZED");
         if (!bldgRes.ok) throw new Error(`buildings data: HTTP ${bldgRes.status}`);
-        const bldgs = await bldgRes.json();
+        const bldgText = await bldgRes.text();
+        if (!bldgText) throw new Error("buildings data: empty response — server may be restarting");
+        const bldgs = JSON.parse(bldgText);
 
         // Enrichment is optional — degrade gracefully if it fails
         let enrich = {};
