@@ -39,8 +39,9 @@ if (isPlaceholder(process.env.GROQ_API_KEY)) {
 }
 
 // ── LLM provider detection (hoisted — used by Proactive Alert Engine and /api/query) ──
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-const GROQ_KEY      = process.env.GROQ_API_KEY;
+const ANTHROPIC_KEY   = process.env.ANTHROPIC_API_KEY;
+const GROQ_KEY        = process.env.GROQ_API_KEY;
+const OPENROUTER_KEY  = process.env.OPENROUTER_API_KEY;
 
 const app  = express();
 const PORT = process.env.API_PORT ?? 3001;
@@ -368,7 +369,7 @@ async function computeProactiveAlerts() {
 }
 
 async function enrichAlertDescriptions(alerts) {
-  if (!ANTHROPIC_KEY && !GROQ_KEY) return;
+  if (!ANTHROPIC_KEY && !GROQ_KEY && !OPENROUTER_KEY) return;
   const BATCH_SIZE = 5;     // 5 parallel ~30 req/min — safe for Anthropic 40 req/min tier
   const DELAY_MS = 300;     // 300ms between batches
   const MAX_RETRIES = 2;
@@ -389,9 +390,7 @@ Over Cap: ${alert.ll97_over_2024 ? "Yes" : "No"}
 Respond with valid JSON only:
 {"description":"One-sentence alert description (under 80 chars)","recommendation":"One-sentence recommended action (under 120 chars)"}`;
       try {
-        const raw = ANTHROPIC_KEY
-          ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024)
-          : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
+        const raw = await callLLM(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024);
         // Strip markdown fences if LLM wraps output anyway
         const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
         const parsed = JSON.parse(cleaned);
@@ -402,9 +401,7 @@ Respond with valid JSON only:
         for (let retry = 1; retry <= MAX_RETRIES; retry++) {
           await new Promise(r => setTimeout(r, retry * 2000));
           try {
-            const raw = ANTHROPIC_KEY
-              ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024)
-              : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
+            const raw = await callLLM(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024);
             const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
             const parsed = JSON.parse(cleaned);
             if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
@@ -586,15 +583,18 @@ async function callClaude(question, systemOverride, timeoutMs = 10_000, maxToken
       messages:   [{ role: "user", content: question }],
     }),
   });
-  if (!res.ok) throw new Error(`Claude API ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Claude API ${res.status}: ${body.slice(0, 300)}`);
+  }
   const data = await res.json();
   return data.content?.[0]?.text ?? "";
 }
 
-async function callGroq(question, systemOverride) {
+async function callGroq(question, systemOverride, timeoutMs = 10_000) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       "content-type":  "application/json",
       "Authorization": `Bearer ${GROQ_KEY}`,
@@ -609,9 +609,78 @@ async function callGroq(question, systemOverride) {
       ],
     }),
   });
-  if (!res.ok) throw new Error(`Groq API ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Groq API ${res.status}: ${body.slice(0, 300)}`);
+  }
   const data = await res.json();
   return data.choices?.[0]?.message?.content ?? "";
+}
+
+async function callOpenRouter(question, systemOverride, timeoutMs = 10_000, maxTokens = 512) {
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    signal: AbortSignal.timeout(timeoutMs),
+    headers: {
+      "content-type":  "application/json",
+      "Authorization": `Bearer ${OPENROUTER_KEY}`,
+      "HTTP-Referer":  "coned-dashboard",
+      "X-Title":       "ConEd Steam Dashboard",
+    },
+    body: JSON.stringify({
+      model:       "meta-llama/llama-3.3-70b-instruct:free",
+      temperature: 0,
+      max_tokens:  maxTokens,
+      messages: [
+        { role: "system", content: systemOverride ?? SYSTEM_PROMPT },
+        { role: "user",   content: question },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`OpenRouter API ${res.status}: ${body.slice(0, 300)}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content ?? "";
+}
+
+// Returns true for transient/quota errors that warrant trying the next provider.
+// Auth errors (401) and validation errors (400 without credit language) are NOT retryable.
+function _isRetryable(msg) {
+  return msg.includes("402") || msg.includes("429") || msg.includes("credit balance") ||
+         /\b5\d{2}\b/.test(msg);
+}
+
+// ── Unified LLM caller: Claude → Groq → OpenRouter ────────────────────────────
+async function callLLM(question, systemOverride, timeoutMs = 10_000, maxTokens = 512) {
+  if (ANTHROPIC_KEY) {
+    try {
+      return await callClaude(question, systemOverride, timeoutMs, maxTokens);
+    } catch (e) {
+      if (!_isRetryable(String(e.message))) throw e;
+      console.warn("[callLLM] Claude unavailable — falling back:", e.message.slice(0, 80));
+    }
+  }
+
+  if (GROQ_KEY) {
+    try {
+      return await callGroq(question, systemOverride, timeoutMs);
+    } catch (e) {
+      if (!_isRetryable(String(e.message))) throw e;
+      console.warn("[callLLM] Groq unavailable — falling back:", e.message.slice(0, 80));
+    }
+  }
+
+  if (OPENROUTER_KEY) {
+    try {
+      return await callOpenRouter(question, systemOverride, timeoutMs, maxTokens);
+    } catch (e) {
+      console.error("[callLLM] OpenRouter fallback failed:", e.message.slice(0, 80));
+    }
+  }
+
+  throw new Error("All LLM providers unavailable — try again later");
 }
 
 // ── Spec schema validation ────────────────────────────────────────────────────
@@ -671,17 +740,17 @@ app.post("/api/query", requireAuth, aiLimiter, async (req, res) => {
   if (question.length > 500) {
     return res.status(400).json({ error: "question too long (max 500 chars)" });
   }
-  if (!ANTHROPIC_KEY && !GROQ_KEY) {
-    return res.status(503).json({ error: "No LLM API key configured — set ANTHROPIC_API_KEY or GROQ_API_KEY" });
+  if (!ANTHROPIC_KEY && !GROQ_KEY && !OPENROUTER_KEY) {
+    return res.status(503).json({ error: "No LLM API key configured" });
   }
 
   try {
     const safe    = sanitizeQuestion(question);
-    const raw     = ANTHROPIC_KEY ? await callClaude(safe) : await callGroq(safe);
+    const raw     = await callLLM(safe);
     const cleaned = raw.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
     const parsed  = JSON.parse(cleaned);
     const spec    = validateSpec(parsed);
-    res.json({ spec, provider: ANTHROPIC_KEY ? "claude-haiku" : "groq-llama3.3" });
+    res.json({ spec, provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : "openrouter-llama3.3" });
   } catch (err) {
     console.error("[/api/query]", err.message);
     res.status(502).json({ error: "LLM query failed — try again" });
@@ -698,7 +767,7 @@ app.post("/api/summarize", requireAuth, aiLimiter, async (req, res) => {
   if (question.length > 600) {
     return res.status(400).json({ error: "question too long (max 600 chars)" });
   }
-  if (!ANTHROPIC_KEY && !GROQ_KEY) {
+  if (!ANTHROPIC_KEY && !GROQ_KEY && !OPENROUTER_KEY) {
     return res.status(503).json({ error: "No LLM API key configured" });
   }
 
@@ -717,9 +786,7 @@ Top matches: ${top || "none"}.
 Write ONE concise sentence (max 25 words) summarizing what was found. Be specific with numbers. No preamble.`;
 
   try {
-    const raw = ANTHROPIC_KEY
-      ? await callClaude(summaryPrompt, "You are a data analyst summarizing building search results. Reply with one sentence only.", 15_000)
-      : await callGroq(summaryPrompt,   "You are a data analyst summarizing building search results. Reply with one sentence only.");
+    const raw = await callLLM(summaryPrompt, "You are a data analyst summarizing building search results. Reply with one sentence only.", 15_000);
     res.json({ summary: raw.trim().replace(/^["']|["']$/g, "") });
   } catch (err) {
     console.error("[/api/summarize]", err.message);
@@ -996,7 +1063,7 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   if (question.length > 600) {
     return res.status(400).json({ error: "question too long (max 600 chars)" });
   }
-  if (!ANTHROPIC_KEY && !GROQ_KEY) {
+  if (!ANTHROPIC_KEY && !GROQ_KEY && !OPENROUTER_KEY) {
     return res.status(503).json({ error: "No LLM API key configured" });
   }
 
@@ -1009,9 +1076,7 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   }
 
   try {
-    const answer = ANTHROPIC_KEY
-      ? await callClaude(safe, EXPLAIN_PROMPT, 25_000)
-      : await callGroq(safe, EXPLAIN_PROMPT);
+    const answer = await callLLM(safe, EXPLAIN_PROMPT, 25_000);
     const trimmed = answer.trim();
     // Store in cache on success
     explainCache.set(safe, { answer: trimmed, timestamp: Date.now() });
@@ -1065,12 +1130,12 @@ app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
 app.get("/api/health", requireAuth, (_req, res) => {
   res.json({
     ok:       true,
-    provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : "none",
+    provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : OPENROUTER_KEY ? "openrouter-llama3.3" : "none",
   });
 });
 
 const server = app.listen(PORT, () => {
-  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : "NO KEY SET";
+  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
   console.log(`[api] listening on :${PORT} | provider: ${provider}`);
 });
 

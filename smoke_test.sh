@@ -55,19 +55,19 @@ echo "  ✅ /api/data/enrichment → $ENRICHMENT entries"
 
 # ── Step 5: AI Q&A ──
 echo "[5/9] Testing AI Q&A..."
-ANSWER=$(curl -s -X POST $BASE_URL/api/ai/ask \
+ANSWER=$(curl -s -X POST $BASE_URL/api/explain \
   -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' \
-  -d '{"question":"What is the total LL97 exposure for 2024?"}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('answer','')[:100])" 2>/dev/null)
-echo "  ✅ /api/ai/ask → \"${ANSWER}...\""
+  -d '{"question":"What is the total LL97 exposure for 2024?"}' | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('answer',d.get('error',''))[:100])" 2>/dev/null)
+echo "  ✅ /api/explain → \"${ANSWER}...\""
 
 # ── Step 6: AI Summarize ──
 echo "[6/9] Testing AI summarize..."
-SUMMARY=$(curl -s -X POST $BASE_URL/api/ai/summarize \
+SUMMARY=$(curl -s -X POST $BASE_URL/api/summarize \
   -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' \
-  -d '{"type":"portfolio"}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('summary','')[:80])" 2>/dev/null)
-echo "  ✅ /api/ai/summarize → \"${SUMMARY}...\""
+  -d '{"question":"Summarize the portfolio risk","count":1210,"sample":[]}' | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('summary',d.get('error',''))[:80])" 2>/dev/null)
+echo "  ✅ /api/summarize → \"${SUMMARY}...\""
 
 # ── Step 7: Watchlist ──
 echo "[7/9] Testing watchlist..."
