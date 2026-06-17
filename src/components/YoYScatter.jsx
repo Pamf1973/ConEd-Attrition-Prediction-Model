@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ScatterChart, Scatter, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer, Legend,
@@ -12,17 +13,30 @@ const CLUSTER_COLORS = {
   "Unknown": "#64748b",
 };
 
+const DIAG_COLORS = {
+  High: "#ef4444", Medium: "#f59e0b", Low: "#22c55e", Uncertain: "#9ca3af",
+};
+const TREND_COLORS = {
+  accelerating: "#ef4444", decelerating: "#22c55e", stable: "#64748b",
+};
+
+function dotColor(payload, colorMode) {
+  if (colorMode === "diagnostic") return DIAG_COLORS[payload.diagnostic_risk] ?? "#64748b";
+  if (colorMode === "trend")      return TREND_COLORS[payload.decline_trend_label] ?? TREND_COLORS.stable;
+  return CLUSTER_COLORS[payload.cluster_name] ?? CLUSTER_COLORS.Unknown;
+}
+
 function CustomDot(props) {
-  const { cx, cy, payload } = props;
+  const { cx, cy, payload, colorMode } = props;
   const isOutlier = payload.outlier_22_23 || payload.outlier_23_24;
-  const color = CLUSTER_COLORS[payload.cluster_name] ?? CLUSTER_COLORS.Unknown;
+  const color = dotColor(payload, colorMode);
   return (
     <circle
       cx={cx} cy={cy}
       r={isOutlier ? 6 : 3}
-      fill={isOutlier ? "#fbbf24" : color}
-      stroke={isOutlier ? "#d97706" : color}
-      strokeWidth={isOutlier ? 1.5 : 0}
+      fill={isOutlier && colorMode === "cluster" ? "#fbbf24" : color}
+      stroke={isOutlier && colorMode === "cluster" ? "#d97706" : color}
+      strokeWidth={isOutlier && colorMode === "cluster" ? 1.5 : 0}
       opacity={isOutlier ? 1 : 0.6}
     />
   );
@@ -60,7 +74,15 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
+const COLOR_MODES = [
+  { id: "cluster",    label: "ML Cluster" },
+  { id: "diagnostic", label: "Diagnostic Tier" },
+  { id: "trend",      label: "Decline Trend" },
+];
+
 export default function YoYScatter({ buildings, onFilterCluster, onSelectBuilding }) {
+  const [colorMode, setColorMode] = useState("cluster");
+
   // Include both real both-delta buildings AND projected ones (cluster-median imputed)
   const bothPeriods = buildings.filter(
     b => b.norm_delta_22_23 != null && b.norm_delta_23_24 != null
@@ -86,7 +108,7 @@ export default function YoYScatter({ buildings, onFilterCluster, onSelectBuildin
 
   return (
     <div className="bg-[#001748] border border-[#082244] rounded-xl p-5">
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-4 gap-4">
         <div>
           <h3 className="text-slate-100 font-semibold text-sm">
             Steam Consumption Δ — Year over Year
@@ -96,8 +118,27 @@ export default function YoYScatter({ buildings, onFilterCluster, onSelectBuildin
             <span className="text-yellow-400">{outlierCount} outliers (IQR 1.5×)</span>
           </p>
         </div>
-        <div className="text-[10px] text-yellow-600 bg-yellow-950 border border-yellow-900 rounded px-2 py-1">
-          2024 HDD provisional
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Color-by toggle */}
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] text-slate-600 mr-1">Color by:</span>
+            {COLOR_MODES.map(m => (
+              <button
+                key={m.id}
+                onClick={() => setColorMode(m.id)}
+                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${
+                  colorMode === m.id
+                    ? "border-[#E87722] text-[#E87722] bg-[#002469]"
+                    : "border-[#0F3B7E] text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <div className="text-[10px] text-yellow-600 bg-yellow-950 border border-yellow-900 rounded px-2 py-1">
+            2024 HDD provisional
+          </div>
         </div>
       </div>
 
@@ -121,27 +162,29 @@ export default function YoYScatter({ buildings, onFilterCluster, onSelectBuildin
           <ReferenceLine x={0} stroke="#0F3B7E" strokeWidth={1} />
           <ReferenceLine y={0} stroke="#0F3B7E" strokeWidth={1} />
           <Tooltip content={<CustomTooltip />} />
-          <Legend
-            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-            formatter={(v) => {
-              const color = CLUSTER_COLORS[v] ?? "#94a3b8";
-              return (
-                <span
-                  style={{ color, cursor: onFilterCluster ? "pointer" : "default" }}
-                  onClick={() => onFilterCluster?.(v)}
-                  title={onFilterCluster ? `Filter by ${v}` : v}
-                >
-                  {v}
-                </span>
-              );
-            }}
-          />
+          {colorMode === "cluster" && (
+            <Legend
+              wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
+              formatter={(v) => {
+                const color = CLUSTER_COLORS[v] ?? "#94a3b8";
+                return (
+                  <span
+                    style={{ color, cursor: onFilterCluster ? "pointer" : "default" }}
+                    onClick={() => onFilterCluster?.(v)}
+                    title={onFilterCluster ? `Filter by ${v}` : v}
+                  >
+                    {v}
+                  </span>
+                );
+              }}
+            />
+          )}
           {Object.entries(byCluster).map(([clusterName, pts]) => (
             <Scatter
               key={clusterName}
               name={clusterName}
               data={pts}
-              shape={<CustomDot />}
+              shape={<CustomDot colorMode={colorMode} />}
               fill={CLUSTER_COLORS[clusterName] ?? CLUSTER_COLORS.Unknown}
               onClick={(pointData) => {
                 if (pointData?.payload) {
@@ -153,9 +196,31 @@ export default function YoYScatter({ buildings, onFilterCluster, onSelectBuildin
         </ScatterChart>
       </ResponsiveContainer>
 
+      {/* Static legend for non-cluster color modes */}
+      {colorMode === "diagnostic" && (
+        <div className="flex gap-3 mt-2 flex-wrap">
+          {Object.entries(DIAG_COLORS).map(([label, color]) => (
+            <div key={label} className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+              <span className="text-[10px] text-slate-500">{label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {colorMode === "trend" && (
+        <div className="flex gap-3 mt-2 flex-wrap">
+          {Object.entries(TREND_COLORS).map(([label, color]) => (
+            <div key={label} className="flex items-center gap-1">
+              <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+              <span className="text-[10px] text-slate-500">{label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <p className="text-slate-600 text-[10px] mt-2">
         Bottom-left quadrant = sustained decline both periods (highest attrition signal).
-        Yellow dots = IQR outliers. Display capped at ±{CAP}%.
+        {colorMode === "cluster" && " Yellow dots = IQR outliers."} Display capped at ±{CAP}%.
       </p>
     </div>
   );

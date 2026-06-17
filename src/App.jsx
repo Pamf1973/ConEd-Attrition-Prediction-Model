@@ -154,6 +154,15 @@ export default function App() {
     })).sort((a, b) => b.count - a.count);
   }, [buildings]);
 
+  const diagnosticStats = useMemo(() => {
+    const counts = { High: 0, Medium: 0, Low: 0, Uncertain: 0 };
+    for (const b of buildings) {
+      const dr = b.diagnostic_risk;
+      if (dr && dr in counts) counts[dr]++;
+    }
+    return counts;
+  }, [buildings]);
+
   // Render Login if no token
   if (!token) {
     return <ErrorBoundary><Login onLogin={handleLogin} /></ErrorBoundary>;
@@ -287,6 +296,18 @@ export default function App() {
           );
         })}
       </div>
+
+      {/* Diagnostic Tier Summary Bar */}
+      {diagnosticStats.High + diagnosticStats.Medium + diagnosticStats.Low + diagnosticStats.Uncertain > 0 && (
+        <div className="flex items-center gap-4 px-5 py-1.5 border-b border-[#082244] bg-[#001748]/60 shrink-0 text-[11px]">
+          <span className="text-slate-600 font-semibold uppercase tracking-widest text-[9px]">Diagnostic</span>
+          <span style={{ color: "#ef4444" }}>High: <b>{diagnosticStats.High}</b></span>
+          <span style={{ color: "#f59e0b" }}>Med: <b>{diagnosticStats.Medium}</b></span>
+          <span style={{ color: "#22c55e" }}>Low: <b>{diagnosticStats.Low}</b></span>
+          <span style={{ color: "#9ca3af" }}>Uncertain: <b>{diagnosticStats.Uncertain}</b></span>
+          <span className="text-slate-600 ml-auto">weather-normalized rule-based tier</span>
+        </div>
+      )}
 
       {/* Proactive Alert Summary */}
       {summary && (

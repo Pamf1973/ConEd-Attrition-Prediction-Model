@@ -1,6 +1,87 @@
 import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+const DIAG_COLORS = {
+  High:      { color: "#ef4444", bg: "#450a0a" },
+  Medium:    { color: "#f59e0b", bg: "#451a03" },
+  Low:       { color: "#22c55e", bg: "#052e16" },
+  Uncertain: { color: "#9ca3af", bg: "#1e293b" },
+};
+
+function DiagnosticSection({ building }) {
+  const { diagnostic_risk, decline_trend_label, decline_acceleration, n_years_data, uncertain_reason, risk } = building;
+  if (!diagnostic_risk) return null;
+
+  const dc = DIAG_COLORS[diagnostic_risk] ?? DIAG_COLORS.Uncertain;
+
+  // Derive ML tier label using same thresholds as riskTier()
+  const mlLabel = Number.isFinite(risk)
+    ? (risk > 0.7 ? "High" : risk > 0.4 ? "Medium" : "Low")
+    : null;
+  const conflict = mlLabel && mlLabel !== diagnostic_risk && diagnostic_risk !== "Uncertain";
+
+  const accelFmt = decline_acceleration != null
+    ? `${decline_acceleration > 0 ? "+" : ""}${decline_acceleration.toFixed(1)}%/yr²`
+    : null;
+
+  return (
+    <div className="mt-5">
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-widest mb-1">
+        Diagnostic Tier
+      </div>
+      <div className="rounded-lg p-3 mt-1" style={{ background: "#1e293b" }}>
+        {/* Tier badge + optional conflict indicator */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span
+            className="text-xs font-bold px-2 py-0.5 rounded"
+            style={{ color: dc.color, background: dc.bg, border: `1px solid ${dc.color}40` }}
+          >
+            {diagnostic_risk === "Uncertain" ? "? Uncertain" : diagnostic_risk}
+          </span>
+          {conflict && (
+            <span className="text-[10px] text-slate-500">
+              ML: {mlLabel} · Diagnostic: {diagnostic_risk}
+            </span>
+          )}
+        </div>
+
+        {/* Data years */}
+        <div className="mt-2 text-xs text-slate-500">
+          {n_years_data} yr{n_years_data !== 1 ? "s" : ""} of steam data
+          {n_years_data < 3 && " · limited history"}
+        </div>
+
+        {/* Decline trend */}
+        {decline_trend_label && decline_trend_label !== "stable" && (
+          <div
+            className="mt-1.5 text-xs font-semibold"
+            style={{ color: decline_trend_label === "accelerating" ? "#ef4444" : "#22c55e" }}
+          >
+            {decline_trend_label === "accelerating" ? "↓ Accelerating decline" : "↑ Decelerating (improving)"}
+            {accelFmt && <span className="font-normal text-slate-500 ml-1">({accelFmt})</span>}
+          </div>
+        )}
+
+        {/* Uncertain reason */}
+        {diagnostic_risk === "Uncertain" && uncertain_reason && (
+          <div className="mt-1.5 text-[11px] text-slate-500 leading-snug">{uncertain_reason}</div>
+        )}
+
+        {/* Conflict explanation */}
+        {conflict && (
+          <div className="mt-2 text-[10px] text-slate-500 leading-snug border-t border-[#082244] pt-2">
+            {mlLabel === "Low" && diagnostic_risk === "High"
+              ? "Usage anomalies not captured by ML external signals — watch manually."
+              : mlLabel === "High" && diagnostic_risk === "Low"
+              ? "External pressure (LL97/permits) without usage anomaly yet — early-warning case."
+              : "Conflicting signals — review both ML score and diagnostic modifiers."}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TrendChart({ building, allBuildings }) {
   const years = [2022, 2023, 2024];
   const steamKeys = { 2022: "steam_2022", 2023: "steam_2023", 2024: "steam_2024" };
@@ -187,6 +268,8 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
             Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
           </p>
         </Section>
+
+        <DiagnosticSection building={b} />
 
         {/* Cluster archetype */}
         {b.cluster_name && (

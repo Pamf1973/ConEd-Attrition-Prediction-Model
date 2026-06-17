@@ -1,0 +1,149 @@
+{
+  "model": "OLS: steam ~ HDD + CDD",
+  "n_developments": 17,
+  "citywide_averages": {
+    "avg_beta_hdd": 4.714868,
+    "avg_beta_cdd": 13.998998,
+    "avg_intercept": 114.1169,
+    "n_developments": 17,
+    "note": "Use for buildings without monthly data (1,186 buildings)"
+  },
+  "developments": {
+    "AMSTERDAM ADDITION": {
+      "beta_hdd": 1.647695,
+      "beta_cdd": -1.105628,
+      "intercept": 502.1645,
+      "r2": 0.8515,
+      "n_observations": 45,
+      "mean_consumption": 1095.76
+    },
+    "CAMPOS PLAZA II": {
+      "beta_hdd": 0.442234,
+      "beta_cdd": -1.247965,
+      "intercept": 395.7615,
+      "r2": 0.34,
+      "n_observations": 20,
+      "mean_consumption": 456.08
+    },
+    "DE HOSTOS APARTMENTS": {
+      "beta_hdd": 2.303577,
+      "beta_cdd": 1.284188,
+      "intercept": 300.9405,
+      "r2": 0.6394,
+      "n_observations": 45,
+      "mean_consumption": 1363.19
+    },
+    "FULTON": {
+      "beta_hdd": 10.52475,
+      "beta_cdd": -3.549453,
+      "intercept": 3516.3264,
+      "r2": 0.8993,
+      "n_observations": 45,
+      "mean_consumption": 7596.39
+    },
+    "GOMPERS": {
+      "beta_hdd": 3.147054,
+      "beta_cdd": -1.585925,
+      "intercept": 1565.001,
+      "r2": 0.6446,
+      "n_observations": 45,
+      "mean_consumption": 2741.93
+    },
+    "ROBBINS PLAZA": {
+      "beta_hdd": 0.837698,
+      "beta_cdd": -0.718689,
+      "intercept": 409.9024,
+      "r2": 0.5396,
+      "n_observations": 44,
+      "mean_consumption": 700.04
+    },
+    "SEWARD PARK EXTENSION": {
+      "beta_hdd": 4.616198,
+      "beta_cdd": 3.204131,
+      "intercept": -477.5433,
+      "r2": 0.2186,
+      "n_observations": 45,
+      "mean_consumption": 1702.92
+    },
+    "STRAUS": {
+      "beta_hdd": 2.616285,
+      "beta_cdd": 0.10633,
+      "intercept": 534.6638,
+      "r2": 0.8816,
+      "n_observations": 45,
+      "mean_consumption": 1630.08
+    },
+    "THOMAS APARTMENTS": {
+      "beta_hdd": 1.132528,
+      "beta_cdd": 0.736982,
+      "intercept": 12.6963,
+      "r2": 0.2118,
+      "n_observations": 45,
+      "mean_consumption": 543.61
+    },
+    "WEST SIDE URBAN RENEWAL (BROWNSTONES)": {
+      "beta_hdd": 1.183678,
+      "beta_cdd": -0.082957,
+      "intercept": 329.3143,
+      "r2": 0.5787,
+      "n_observations": 40,
+      "mean_consumption": 782.85
+    },
+    "CAMPOS PLAZA I": {
+      "beta_hdd": 2.447181,
+      "beta_cdd": 1.818845,
+      "intercept": 588.3895,
+      "r2": 0.3391,
+      "n_observations": 45,
+      "mean_consumption": 1754.19
+    },
+    "WSUR (BROWNSTONES)": {
+      "beta_hdd": -0.692691,
+      "beta_cdd": -27.684934,
+      "intercept": 2273.7297,
+      "r2": 0.0733,
+      "n_observations": 5,
+      "mean_consumption": 1499.58
+    },
+    "WSUR (SITE A) 120 WEST 94TH STREET": {
+      "beta_hdd": 32.422608,
+      "beta_cdd": 280.368068,
+      "intercept": -16649.8267,
+      "r2": 0.5972,
+      "n_observations": 5,
+      "mean_consumption": 6993.6
+    },
+    "WEST SIDE URBAN RENEWAL (SITE A)": {
+      "beta_hdd": 0.603021,
+      "beta_cdd": -0.271414,
+      "intercept": 229.2838,
+      "r2": 0.8409,
+      "n_observations": 36,
+      "mean_consumption": 467.95
+    },
+    "WEST SIDE URBAN RENEWAL (SITE B)": {
+      "beta_hdd": 1.378766,
+      "beta_cdd": -0.350068,
+      "intercept": 334.5689,
+      "r2": 0.6301,
+      "n_observations": 40,
+      "mean_consumption": 839.84
+    },
+    "WEST SIDE URBAN RENEWAL (SITE C)": {
+      "beta_hdd": 1.092385,
+      "beta_cdd": -0.558246,
+      "intercept": 371.8183,
+      "r2": 0.8172,
+      "n_observations": 36,
+      "mean_consumption": 798.99
+    },
+    "BARUCH": {
+      "beta_hdd": 14.449793,
+      "beta_cdd": -12.380302,
+      "intercept": 7702.7963,
+      "r2": 0.3491,
+      "n_observations": 13,
+      "mean_consumption": 11505.23
+    }
+  }
+}

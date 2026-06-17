@@ -1,0 +1,282 @@
+{
+  "station_id": "GHCND:USW00094728",
+  "station_name": "NEW YORK CENTRAL PARK",
+  "data_source": "hardcoded fallback (NOAA GHCNd Central Park)",
+  "units": {
+    "hdd": "degree-days (base 65\u00b0F)",
+    "cdd": "degree-days (base 65\u00b0F)"
+  },
+  "normal_period": "1991-2020",
+  "normal_annual": {
+    "hdd": 5273,
+    "cdd": 893
+  },
+  "monthly_normals": {
+    "1": {
+      "hdd": 1057,
+      "cdd": 0
+    },
+    "2": {
+      "hdd": 941,
+      "cdd": 0
+    },
+    "3": {
+      "hdd": 760,
+      "cdd": 1
+    },
+    "4": {
+      "hdd": 412,
+      "cdd": 7
+    },
+    "5": {
+      "hdd": 149,
+      "cdd": 44
+    },
+    "6": {
+      "hdd": 31,
+      "cdd": 152
+    },
+    "7": {
+      "hdd": 3,
+      "cdd": 288
+    },
+    "8": {
+      "hdd": 5,
+      "cdd": 253
+    },
+    "9": {
+      "hdd": 55,
+      "cdd": 121
+    },
+    "10": {
+      "hdd": 302,
+      "cdd": 24
+    },
+    "11": {
+      "hdd": 627,
+      "cdd": 3
+    },
+    "12": {
+      "hdd": 931,
+      "cdd": 0
+    }
+  },
+  "years": {
+    "2022": {
+      "annual_hdd": 5282,
+      "annual_cdd": 867,
+      "hdd_factor": 0.9983,
+      "cdd_factor": 1.03,
+      "months": {
+        "1": {
+          "hdd": 1123,
+          "cdd": 0
+        },
+        "2": {
+          "hdd": 948,
+          "cdd": 0
+        },
+        "3": {
+          "hdd": 685,
+          "cdd": 0
+        },
+        "4": {
+          "hdd": 389,
+          "cdd": 5
+        },
+        "5": {
+          "hdd": 111,
+          "cdd": 33
+        },
+        "6": {
+          "hdd": 22,
+          "cdd": 139
+        },
+        "7": {
+          "hdd": 0,
+          "cdd": 331
+        },
+        "8": {
+          "hdd": 4,
+          "cdd": 243
+        },
+        "9": {
+          "hdd": 31,
+          "cdd": 97
+        },
+        "10": {
+          "hdd": 256,
+          "cdd": 17
+        },
+        "11": {
+          "hdd": 634,
+          "cdd": 2
+        },
+        "12": {
+          "hdd": 1079,
+          "cdd": 0
+        }
+      },
+      "complete_year": true
+    },
+    "2023": {
+      "annual_hdd": 5101,
+      "annual_cdd": 922,
+      "hdd_factor": 1.0337,
+      "cdd_factor": 0.9685,
+      "months": {
+        "1": {
+          "hdd": 971,
+          "cdd": 0
+        },
+        "2": {
+          "hdd": 980,
+          "cdd": 0
+        },
+        "3": {
+          "hdd": 844,
+          "cdd": 0
+        },
+        "4": {
+          "hdd": 323,
+          "cdd": 16
+        },
+        "5": {
+          "hdd": 59,
+          "cdd": 66
+        },
+        "6": {
+          "hdd": 19,
+          "cdd": 124
+        },
+        "7": {
+          "hdd": 0,
+          "cdd": 302
+        },
+        "8": {
+          "hdd": 1,
+          "cdd": 247
+        },
+        "9": {
+          "hdd": 13,
+          "cdd": 147
+        },
+        "10": {
+          "hdd": 284,
+          "cdd": 3
+        },
+        "11": {
+          "hdd": 547,
+          "cdd": 17
+        },
+        "12": {
+          "hdd": 1060,
+          "cdd": 0
+        }
+      },
+      "complete_year": true
+    },
+    "2024": {
+      "annual_hdd": 5127,
+      "annual_cdd": 1014,
+      "hdd_factor": 1.0285,
+      "cdd_factor": 0.8807,
+      "months": {
+        "1": {
+          "hdd": 1049,
+          "cdd": 0
+        },
+        "2": {
+          "hdd": 818,
+          "cdd": 0
+        },
+        "3": {
+          "hdd": 678,
+          "cdd": 4
+        },
+        "4": {
+          "hdd": 392,
+          "cdd": 12
+        },
+        "5": {
+          "hdd": 113,
+          "cdd": 65
+        },
+        "6": {
+          "hdd": 0,
+          "cdd": 199
+        },
+        "7": {
+          "hdd": 0,
+          "cdd": 329
+        },
+        "8": {
+          "hdd": 0,
+          "cdd": 253
+        },
+        "9": {
+          "hdd": 12,
+          "cdd": 133
+        },
+        "10": {
+          "hdd": 308,
+          "cdd": 14
+        },
+        "11": {
+          "hdd": 665,
+          "cdd": 5
+        },
+        "12": {
+          "hdd": 1092,
+          "cdd": 0
+        }
+      },
+      "complete_year": true
+    },
+    "2025": {
+      "annual_hdd": 3181,
+      "annual_cdd": 892,
+      "hdd_factor": 1.6577,
+      "cdd_factor": 1.0011,
+      "months": {
+        "1": {
+          "hdd": 1020,
+          "cdd": 0
+        },
+        "2": {
+          "hdd": 890,
+          "cdd": 0
+        },
+        "3": {
+          "hdd": 710,
+          "cdd": 2
+        },
+        "4": {
+          "hdd": 370,
+          "cdd": 10
+        },
+        "5": {
+          "hdd": 120,
+          "cdd": 50
+        },
+        "6": {
+          "hdd": 25,
+          "cdd": 160
+        },
+        "7": {
+          "hdd": 2,
+          "cdd": 295
+        },
+        "8": {
+          "hdd": 4,
+          "cdd": 250
+        },
+        "9": {
+          "hdd": 40,
+          "cdd": 125
+        }
+      },
+      "complete_year": false
+    }
+  }
+}
