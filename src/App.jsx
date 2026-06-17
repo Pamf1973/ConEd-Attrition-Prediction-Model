@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useBuildings } from "./data/useBuildings";
+import { useBuildings, riskTier } from "./data/useBuildings";
 import { useKeyboard } from "./hooks/useKeyboard";
 import RiskTable from "./components/RiskTable";
 import BuildingPanel from "./components/BuildingPanel";
@@ -9,7 +9,7 @@ import YoYScatter from "./components/YoYScatter";
 import RiskHistogram from "./components/RiskHistogram";
 import Watchlist, { useWatchlist } from "./components/Watchlist";
 import ErrorBoundary from "./components/ErrorBoundary";
-import TopTargets from "./components/TopTargets";
+import ClusterExplorer from "./components/ClusterExplorer";
 import AlertBanner from "./components/AlertBanner";
 import AlertsPanel from "./components/AlertsPanel";
 import ProactiveAlertSummary from "./components/ProactiveAlertSummary";
@@ -102,7 +102,7 @@ export default function App() {
   }
 
   function handleSelect(b) {
-    // Accept either a building object or an address string (from TopTargets)
+    // Accept either a building object or an address string (from ClusterExplorer)
     if (typeof b === "string") {
       const found = buildings.find(bld => bld.address === b);
       if (found) setSelected(prev => prev?.address === found.address ? null : found);
@@ -140,15 +140,18 @@ export default function App() {
     setActiveTab("rankings");
   }
 
-  const bannerStats = useMemo(() => {
-    const total2024   = buildings.reduce((s, b) => s + (b.ll97_penalty_2024 || 0), 0);
-    const total2030   = buildings.reduce((s, b) => s + (b.ll97_penalty_2030 || 0), 0);
-    const over2024    = buildings.filter(b => (b.ll97_penalty_2024 ?? 0) > 0).length;
-    const over2030    = buildings.filter(b => (b.ll97_penalty_2030 ?? 0) > 0).length;
-    const extremeRisk = buildings.filter(b => (b.risk ?? 0) >= 0.90).length;
-    const pctIncrease = total2024 > 0 ? Math.round(((total2030 - total2024) / total2024) * 100) : 0;
-    const fmt = v => v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(1)}M` : v > 0 ? `$${Math.round(v / 1000)}k` : "$0";
-    return { total2024, total2030, over2024, over2030, extremeRisk, pctIncrease, fmt };
+  const clusterStats = useMemo(() => {
+    const clusters = {};
+    for (const b of buildings) {
+      const name = b.cluster_name ?? "Unlabeled";
+      if (!clusters[name]) clusters[name] = { name, count: 0, riskSum: 0, riskCount: 0 };
+      clusters[name].count++;
+      if (Number.isFinite(b.risk)) { clusters[name].riskSum += b.risk; clusters[name].riskCount++; }
+    }
+    return Object.values(clusters).map(c => ({
+      ...c,
+      avgRisk: c.riskCount > 0 ? c.riskSum / c.riskCount : 0,
+    })).sort((a, b) => b.count - a.count);
   }, [buildings]);
 
   // Render Login if no token
@@ -198,7 +201,7 @@ export default function App() {
           {[
             { id: "rankings",    label: "Attrition Rankings", enabled: true },
             { id: "trends",      label: "YoY Trends",          enabled: true },
-            { id: "targets",     label: "🎯 Top Targets",      enabled: true },
+            { id: "targets",     label: "📊 Clusters",          enabled: true },
             { id: "watchlist",   label: `Watch List${watchlist.length ? ` (${watchlist.length})` : ""}`, enabled: true },
             { id: "agent",       label: "AI Agent",            enabled: true },
           ].map(tab => (
@@ -260,42 +263,29 @@ export default function App() {
         <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
       )}
 
-      {/* Portfolio Dollar Exposure Banner */}
-      <div className="grid grid-cols-4 gap-px border-b border-[#082244] bg-[#082244] shrink-0">
-        {[
-          {
-            value: bannerStats.fmt(bannerStats.total2024),
-            label: "2024 LL97 Exposure",
-            sub:   `${bannerStats.over2024.toLocaleString()} buildings over cap`,
-            orange: false,
-          },
-          {
-            value: bannerStats.fmt(bannerStats.total2030),
-            label: "2030 LL97 Exposure",
-            sub:   `${bannerStats.over2030.toLocaleString()} buildings over cap`,
-            orange: true,
-          },
-          {
-            value: `${bannerStats.pctIncrease}%`,
-            label: "Penalty Increase →2030",
-            sub:   "cap tightens significantly",
-            orange: false,
-          },
-          {
-            value: bannerStats.extremeRisk.toLocaleString(),
-            label: "Extreme Risk Accounts",
-            sub:   "score ≥ 90%",
-            orange: false,
-          },
-        ].map((card, i) => (
-          <div key={i} className="bg-[#001748] px-4 py-2.5 flex flex-col gap-0.5">
-            <div className={`text-xl font-bold leading-tight ${card.orange ? "text-[#E87722]" : "text-slate-100"}`}>
-              {card.value}
+      {/* Cluster Stats Banner */}
+      <div className="grid grid-cols-5 gap-px border-b border-[#082244] bg-[#082244] shrink-0">
+        {clusterStats.map((c, i) => {
+          const tier = riskTier(c.avgRisk);
+          return (
+            <div key={i} className="bg-[#001748] px-4 py-2.5 flex flex-col gap-0.5">
+              <div className="text-sm font-bold text-slate-100 leading-tight truncate">{c.name}</div>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-lg font-bold" style={{ color: tier.color }}>{c.count}</span>
+                <span className="text-[11px] text-slate-500">buildings</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="text-xs font-semibold px-1.5 py-0.5 rounded"
+                  style={{ color: tier.color, background: tier.bg }}
+                >
+                  {Math.round(c.avgRisk * 100)}%
+                </span>
+                <span className="text-[11px] text-slate-500">{tier.label}</span>
+              </div>
             </div>
-            <div className="text-xs font-medium text-slate-300">{card.label}</div>
-            <div className={`text-[11px] ${card.orange ? "text-[#E87722]/70" : "text-slate-500"}`}>{card.sub}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Proactive Alert Summary */}
@@ -347,7 +337,7 @@ export default function App() {
         {activeTab === "targets" && (
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
-              <TopTargets
+              <ClusterExplorer
                 buildings={buildings}
                 onSelect={handleSelect}
                 token={token}

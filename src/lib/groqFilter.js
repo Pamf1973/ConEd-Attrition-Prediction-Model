@@ -41,13 +41,14 @@ export function isExplainQuery(question) {
   return EXPLAIN_STARTS.test(q) || EXPLAIN_CONTAINS.test(q);
 }
 
-export async function explainDashboard(question, token) {
+export async function explainDashboard(question, token, signal) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch("/api/explain", {
     method: "POST",
     headers,
     body: JSON.stringify({ question }),
+    signal,
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -57,7 +58,7 @@ export async function explainDashboard(question, token) {
   return answer;
 }
 
-export async function summarizeResults(question, results, token) {
+export async function summarizeResults(question, results, token, signal) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   try {
@@ -74,6 +75,7 @@ export async function summarizeResults(question, results, token) {
           use: b.use,
         })),
       }),
+      signal,
     });
     if (!res.ok) return null;
     const { summary } = await res.json();
@@ -84,7 +86,7 @@ export async function summarizeResults(question, results, token) {
 }
 
 // Calls the backend proxy at /api/query — no API keys in frontend code
-export async function queryBuildings(question, token) {
+export async function queryBuildings(question, token, signal) {
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -93,6 +95,7 @@ export async function queryBuildings(question, token) {
     method:  "POST",
     headers,
     body:    JSON.stringify({ question }),
+    signal,
   });
 
   if (!res.ok) {

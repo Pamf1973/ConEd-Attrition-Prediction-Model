@@ -38,6 +38,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [hint,        setHint]        = useState(null);
   const genRef = useRef(0);
   const inputRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
   async function handleSubmit(q) {
     const question = q ?? query;
@@ -48,10 +49,16 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     }
     setHint(null);
     if (!isValidQuery(question)) {
-      setError("That doesn't look like a valid question. Try asking about risk scores, LL97, steam usage, or a specific building type.");
+      setError("That doesn't look like a valid question. Try asking about risk scores, steam usage, or a specific building type.");
       return;
     }
-    // Always clear both modes before starting — prevents stale state bleed
+    // Cancel any previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     setError(null);
     setHint(null);
@@ -69,18 +76,23 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
     try {
       if (explaining) {
         const prefixed = simpleMode ? `[SIMPLE MODE] ${question}` : question;
-        const answer = await explainDashboard(prefixed, token);
-        setExplainAnswer(answer);
+        const answer = await explainDashboard(prefixed, token, controller.signal);
+        if (genRef.current === gen) {
+          setExplainAnswer(answer);
+        }
       } else {
-        const spec    = await queryBuildings(question, token);
+        const spec    = await queryBuildings(question, token, controller.signal);
         const matched = applyFilterSpec(buildings, spec);
-        setResults(matched);
-        setExplanation(spec.explanation ?? "");
-        summarizeResults(question, matched, token).then(s => {
-          if (s && genRef.current === gen) setInsight(s);
-        });
+        if (genRef.current === gen) {
+          setResults(matched);
+          setExplanation(spec.explanation ?? "");
+          summarizeResults(question, matched, token, controller.signal).then(s => {
+            if (s && genRef.current === gen) setInsight(s);
+          });
+        }
       }
     } catch (err) {
+      if (err.name === "AbortError") return;
       setError(err.message);
     } finally {
       setLoading(false);
@@ -93,6 +105,11 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   }
 
   function handleClear() {
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
     setQuery("");
     setResults(null);
     setExplanation("");
@@ -291,7 +308,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
               <table className="w-full text-sm border-collapse">
                 <thead className="sticky top-0 bg-[#001748] z-10">
                   <tr>
-                    {["Address", "Attrition Score", "LL97 Penalty", "Steam (M kBtu)", "Signal", "DOB Jobs"].map(h => (
+                    {["Address", "Attrition Score", "Steam (M kBtu)", "Cluster", "Signal"].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-[#082244] whitespace-nowrap">
                         {h}
                       </th>
@@ -323,27 +340,18 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-2.5 whitespace-nowrap">
-                          {b.ll97_penalty_2024 != null ? (
-                            b.ll97_penalty_2024 > 0 ? (
-                              <span className="text-xs font-semibold" style={{ color: b.ll97_penalty_2024 > 100_000 ? "#ef4444" : "#f97316" }}>
-                                ${b.ll97_penalty_2024 >= 1_000_000
-                                  ? (b.ll97_penalty_2024 / 1_000_000).toFixed(1) + "M"
-                                  : Math.round(b.ll97_penalty_2024 / 1_000) + "k"}
-                              </span>
-                            ) : <span className="text-xs text-green-600">✓</span>
-                          ) : "—"}
-                        </td>
                         <td className="px-4 py-2.5 text-slate-300">
                           {b.steam != null ? (b.steam / 1e6).toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—"}
+                        </td>
+                        <td className="px-4 py-2.5">
+                          {b.cluster_name
+                            ? <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-[#002469] border border-[#0F3B7E] text-slate-300">{b.cluster_name}</span>
+                            : <span className="text-slate-600">—</span>}
                         </td>
                         <td className="px-4 py-2.5">
                           {b.signal
                             ? <span className="text-xs font-semibold" style={{ color: sig.color }}>{sig.label}</span>
                             : <span className="text-slate-600">—</span>}
-                        </td>
-                        <td className="px-4 py-2.5 text-slate-400 text-center">
-                          {b.dob_jobs ? <span className="px-2 py-0.5 rounded bg-[#0041A8] text-xs">{b.dob_jobs}</span> : "—"}
                         </td>
                       </tr>
                     );

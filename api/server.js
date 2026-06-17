@@ -397,13 +397,13 @@ Respond with valid JSON only:
         const parsed = JSON.parse(cleaned);
         if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
         if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
-      } catch (err) {
+        } catch (err) {
         // Retry with exponential backoff on rate-limit / transient errors
         for (let retry = 1; retry <= MAX_RETRIES; retry++) {
           await new Promise(r => setTimeout(r, retry * 2000));
           try {
             const raw = ANTHROPIC_KEY
-              ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT)
+              ? await callClaude(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.", ENRICH_TIMEOUT, 1024)
               : await callGroq(prompt, "You are a ConEd steam operations advisor. Respond with raw JSON only — no markdown, no code fences.");
             const cleaned = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
             const parsed = JSON.parse(cleaned);
@@ -411,7 +411,7 @@ Respond with valid JSON only:
             if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
             break; // success — exit retry loop
           } catch {
-            // still failed — will retry or fall through
+            // still failed — retry or fall through
           }
         }
         // leave empty if all retries exhausted — acceptable
@@ -718,7 +718,7 @@ Write ONE concise sentence (max 25 words) summarizing what was found. Be specifi
 
   try {
     const raw = ANTHROPIC_KEY
-      ? await callClaude(summaryPrompt, "You are a data analyst summarizing building search results. Reply with one sentence only.")
+      ? await callClaude(summaryPrompt, "You are a data analyst summarizing building search results. Reply with one sentence only.", 15_000)
       : await callGroq(summaryPrompt,   "You are a data analyst summarizing building search results. Reply with one sentence only.");
     res.json({ summary: raw.trim().replace(/^["']|["']$/g, "") });
   } catch (err) {
@@ -728,6 +728,16 @@ Write ONE concise sentence (max 25 words) summarizing what was found. Be specifi
 });
 
 // ── /api/explain — dashboard knowledge Q&A ───────────────────────────────────
+// In-memory answer cache: sanitized question → { answer, timestamp }
+const explainCache = new Map();
+// Periodic cleanup every 5 minutes: evict entries older than 15 min
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of explainCache) {
+    if (now - entry.timestamp > 15 * 60 * 1000) explainCache.delete(key);
+  }
+}, 5 * 60 * 1000).unref();
+
 const EXPLAIN_PROMPT = `You are an expert assistant embedded inside the ConEd Manhattan Steam Attrition Dashboard.
 You have complete knowledge of how the dashboard works, its data, formulas, and ML models.
 Do NOT output JSON. Do NOT start with "I".
@@ -991,11 +1001,21 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   }
 
   const safe = sanitizeQuestion(question);
+
+  // In-memory cache: same exact question within 15 minutes
+  const cached = explainCache.get(safe);
+  if (cached && (Date.now() - cached.timestamp) < 15 * 60 * 1000) {
+    return res.json({ answer: cached.answer });
+  }
+
   try {
     const answer = ANTHROPIC_KEY
-      ? await callClaude(safe, EXPLAIN_PROMPT)
+      ? await callClaude(safe, EXPLAIN_PROMPT, 25_000)
       : await callGroq(safe, EXPLAIN_PROMPT);
-    res.json({ answer: answer.trim() });
+    const trimmed = answer.trim();
+    // Store in cache on success
+    explainCache.set(safe, { answer: trimmed, timestamp: Date.now() });
+    res.json({ answer: trimmed });
   } catch (err) {
     console.error("[/api/explain]", err.message);
     res.status(502).json({ error: "explain failed — try again" });

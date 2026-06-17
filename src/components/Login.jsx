@@ -24,6 +24,17 @@ export default function Login({ onLogin }) {
 
       const data = await res.json();
       if (!res.ok) {
+        // Check for rate limit (429) and parse Retry-After header
+        if (res.status === 429) {
+          const retryAfter = res.headers.get("retry-after");
+          if (retryAfter) {
+            const seconds = parseInt(retryAfter, 10);
+            if (!isNaN(seconds) && seconds > 0) {
+              const minutes = Math.ceil(seconds / 60);
+              throw new Error(`Too many attempts — try again in ~${minutes} minute${minutes > 1 ? "s" : ""}`);
+            }
+          }
+        }
         throw new Error(data.error || "Authentication failed");
       }
 

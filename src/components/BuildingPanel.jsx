@@ -101,6 +101,9 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
   const euiMedian = EUI_MEDIANS[b.use] ?? EUI_MEDIANS["Office"];
   const euiDelta  = b.eui != null ? Math.round(((b.eui - euiMedian) / euiMedian) * 100) : null;
 
+  // Compute cluster size from allBuildings
+  const clusterSize = allBuildings ? allBuildings.filter(x => x.cluster_id === b.cluster_id).length : null;
+
   return (
     <div className="flex flex-col h-full bg-[#001748] border-l border-[#082244] overflow-y-auto">
       {/* Header */}
@@ -193,47 +196,22 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
               <div className="text-xs text-slate-500 mt-1">
                 Cluster {b.cluster_id} · K-means unsupervised model (K=5)
               </div>
-            </div>
-          </Section>
-        )}
-
-        {/* LL97 Compliance */}
-        {(b.ll97_penalty_2024 != null || b.ll97_penalty_2030 != null) && (
-          <Section title="LL97 Carbon Compliance">
-            <div className="rounded-lg p-3 mt-1 space-y-2" style={{ background: "#1e293b" }}>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-slate-500">2024–2029 Annual Penalty</span>
-                <span className="text-sm font-bold"
-                  style={{ color: b.ll97_penalty_2024 > 100_000 ? "#ef4444" : b.ll97_penalty_2024 > 0 ? "#f97316" : "#22c55e" }}>
-                  {b.ll97_penalty_2024 > 0
-                    ? `$${b.ll97_penalty_2024.toLocaleString()}`
-                    : "✓ Compliant"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-slate-500">2030–2034 Annual Penalty</span>
-                <span className="text-sm font-bold"
-                  style={{ color: b.ll97_penalty_2030 > 100_000 ? "#ef4444" : b.ll97_penalty_2030 > 0 ? "#f97316" : "#22c55e" }}>
-                  {b.ll97_penalty_2030 > 0
-                    ? `$${b.ll97_penalty_2030.toLocaleString()}`
-                    : "✓ Compliant"}
-                </span>
-              </div>
-              {b.ll97_penalty_2024 > 0 && (
-                <p className="text-xs text-slate-600 pt-1">
-                  Based on {b.floor_sqft?.toLocaleString()} ft² · $268/MT CO₂e over limit · LL97 of 2019
-                </p>
+              {b.cluster_risk != null && (
+                <div className="text-xs text-slate-400 mt-1">
+                  Risk level: {b.cluster_risk}
+                </div>
+              )}
+              {clusterSize != null && (
+                <div className="text-xs text-slate-400 mt-1">
+                  {clusterSize.toLocaleString()} buildings in this cluster · {
+                    clusterSize >= 300 ? "largest cluster by population" :
+                    clusterSize >= 200 ? "major cluster segment" :
+                    clusterSize >= 100 ? "mid-size cluster" :
+                    "smallest cluster"
+                  }
+                </div>
               )}
             </div>
-            {b.ml_risk != null && (
-              <div className="flex justify-between items-center mt-2 text-sm">
-                <span className="text-slate-500">ML Attrition Score</span>
-                <span className="font-semibold"
-                  style={{ color: b.ml_risk > 0.7 ? "#ef4444" : b.ml_risk > 0.4 ? "#f97316" : "#94a3b8" }}>
-                  {Math.round(b.ml_risk * 100)}%
-                </span>
-              </div>
-            )}
           </Section>
         )}
 
@@ -253,18 +231,6 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
           <Row label="LL33 Grade"    value={b.ll33 || null}
                color={b.ll33 === "A" || b.ll33 === "B" ? "#22c55e" : b.ll33 === "C" ? "#eab308" : "#ef4444"} />
           <Row label="Boiler Fuel"   value={b.boiler_fuel || null} />
-        </Section>
-
-        {/* DOB activity */}
-        <Section title="DOB Activity">
-          <Row
-            label="HVAC / Boiler Jobs"
-            value={b.dob_jobs ? `${b.dob_jobs} filing${b.dob_jobs > 1 ? "s" : ""}` : null}
-            color={b.dob_jobs >= 3 ? "#f87171" : b.dob_jobs >= 1 ? "#fb923c" : null}
-          />
-          {(!b.dob_jobs) && (
-            <p className="text-sm text-slate-600 py-2">No recent HVAC filings on record</p>
-          )}
         </Section>
 
         {/* Ownership */}
