@@ -41,9 +41,13 @@ def restart_server():
     subprocess.run(
         f"lsof -ti :3001 | xargs kill -9 2>/dev/null; sleep 1",
         shell=True, capture_output=True)
+    env = os.environ.copy()
+    env["SKIP_ENRICHMENT"] = "true"
+    env.pop("ANTHROPIC_API_KEY", None)  # CC key causes 400s; .env key is exhausted
     subprocess.Popen(
         ["node", "api/server.js"], cwd=PROJECT_DIR,
-        stdout=open("/tmp/server.log", "w"), stderr=subprocess.STDOUT)
+        stdout=open("/tmp/server.log", "w"), stderr=subprocess.STDOUT,
+        env=env)
     # wait up to 10s for server
     for _ in range(20):
         time.sleep(0.5)
@@ -90,7 +94,7 @@ def robust_explain(token, question, results, generation=1):
       CONNREFUSED → restart server + retry
     Returns (ok, len, preview, generation)
     """
-    max_attempts = 5
+    max_attempts = 3
     t0 = time.time()
     for attempt in range(1, max_attempts + 1):
         ok, data, err = call_endpoint(token, "/api/explain", {"question": question})
@@ -98,14 +102,18 @@ def robust_explain(token, question, results, generation=1):
             ans = data.get("answer", "")
             return True, len(ans), ans[:150], generation, time.time() - t0
 
-        # Parse error
-        code, detail = err if isinstance(err, tuple) else ("UNKNOWN", str(err))
-        detail_lower = detail.lower()
+        # Parse error — err is either (code, detail) tuple or a plain string
+        if isinstance(err, tuple):
+            code, detail = err
+        else:
+            code = detail = str(err)
+        detail_lower = str(detail).lower()
+        code_str = str(code).upper()
 
-        # 502 / 429 → rate limit; backoff and retry
+        # 502 / 429 → rate limit; backoff enough to clear Groq's 60s TPM window
         if code in (429, 502) and "try again" in detail_lower:
-            wait = 2 ** (attempt + 2)  # 8, 16, 32, 64
-            print(f"        ⏳ attempt {attempt}/{max_attempts}: HTTP {code} — waiting {wait}s")
+            wait = [5, 65, 90][attempt - 1] if attempt <= 3 else 90
+            print(f"        ⏳ attempt {attempt}/{max_attempts}: HTTP {code} — waiting {wait}s (TPM window)")
             time.sleep(wait)
             continue
 
@@ -117,7 +125,7 @@ def robust_explain(token, question, results, generation=1):
             continue
 
         # Connection refused → server died; restart
-        if code == "CONNREFUSED":
+        if "CONNREFUSED" in code_str or "REFUSED" in detail_lower:
             print(f"        💀 attempt {attempt}/{max_attempts}: server down — restarting")
             if not restart_server():
                 return False, 0, f"FAILED restart server", generation, time.time() - t0
@@ -126,13 +134,13 @@ def robust_explain(token, question, results, generation=1):
             continue
 
         # Other error (fallback exhausted, internal error)
-        return False, 0, f"HTTP {code}: {detail[:200]}", generation, time.time() - t0
+        return False, 0, f"HTTP {code}: {str(detail)[:200]}", generation, time.time() - t0
 
     return False, 0, f"Exhausted {max_attempts} attempts", generation, time.time() - t0
 
 def robust_query(token, question, results, generation=1):
     """Robust call to /api/query with same self-healing pattern."""
-    max_attempts = 5
+    max_attempts = 3
     t0 = time.time()
     for attempt in range(1, max_attempts + 1):
         ok, data, err = call_endpoint(token, "/api/query", {"question": question})
@@ -141,12 +149,16 @@ def robust_query(token, question, results, generation=1):
             risk_min = spec.get("risk_min", "?")
             return True, f"risk_min={risk_min}", json.dumps(spec)[:200], generation, time.time() - t0
 
-        code, detail = err if isinstance(err, tuple) else ("UNKNOWN", str(err))
-        detail_lower = detail.lower()
+        if isinstance(err, tuple):
+            code, detail = err
+        else:
+            code = detail = str(err)
+        detail_lower = str(detail).lower()
+        code_str = str(code).upper()
 
         if code in (429, 502) and "try again" in detail_lower:
-            wait = 2 ** (attempt + 2)
-            print(f"        ⏳ attempt {attempt}/{max_attempts}: HTTP {code} — waiting {wait}s")
+            wait = [5, 65, 90][attempt - 1] if attempt <= 3 else 90
+            print(f"        ⏳ attempt {attempt}/{max_attempts}: HTTP {code} — waiting {wait}s (TPM window)")
             time.sleep(wait)
             continue
 
@@ -156,7 +168,7 @@ def robust_query(token, question, results, generation=1):
             results.append(("RELOGIN", token[:8], "", ""))
             continue
 
-        if code == "CONNREFUSED":
+        if "CONNREFUSED" in code_str or "REFUSED" in detail_lower:
             print(f"        💀 attempt {attempt}/{max_attempts}: server down — restarting")
             if not restart_server():
                 return False, "RESTART_FAILED", f"Could not restart server", generation, time.time() - t0
@@ -164,7 +176,7 @@ def robust_query(token, question, results, generation=1):
             results.append(("RESTART", token[:8], "", ""))
             continue
 
-        return False, f"HTTP {code}", detail[:200], generation, time.time() - t0
+        return False, f"HTTP {code}", str(detail)[:200], generation, time.time() - t0
 
     return False, "EXHAUSTED", f"Exhausted {max_attempts} attempts", generation, time.time() - t0
 
@@ -176,7 +188,7 @@ def main():
 
     print("=" * 68)
     print("  SMOKE TEST — ConEd Dashboard AI Endpoints")
-    print("  Pacing: ~20s between calls (Groq free tier-aware)")
+    print("  Pacing: ~35s between calls (Groq 6k TPM-safe)")
     print("=" * 68)
 
     # Login
@@ -215,15 +227,15 @@ def main():
 
         # Pace between questions
         if i < len(questions_explain):
-            print(f"         ⏱  waiting 20s...", end=" ", flush=True)
-            time.sleep(20)
+            print(f"         ⏱  waiting 35s...", end=" ", flush=True)
+            time.sleep(35)
             print("done")
 
     # ── /api/query ──
     print(f"\n  ── /api/query ({len(questions_query)} queries) ──\n")
     for i, q in enumerate(questions_query, 1):
-        print(f"       ⏱  waiting 20s...", end=" ", flush=True)
-        time.sleep(20)
+        print(f"       ⏱  waiting 35s...", end=" ", flush=True)
+        time.sleep(35)
         print("done")
         label = q[:70]
         print(f"  [{i + len(questions_explain):02d}/{total:02d}] {label}")
