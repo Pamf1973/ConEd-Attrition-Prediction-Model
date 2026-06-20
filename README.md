@@ -69,12 +69,39 @@ Run: `python3 ll97_model.py`
 ### The K-Shaped Distribution
 The model finds very little middle ground: **59 High risk / 6 Medium / 1,145 Low**. This reflects the real customer landscape — buildings either have converging signals (LL97 pressure + neighbors leaving + HVAC permits filed) and are heading out, or they have none of those and are staying. The retention strategy should focus on the high-risk cohort. All 1,210 buildings are ML-scored (100% coverage — no buildings fall back to legacy heuristic).
 
-### Weather Normalization — Known Limitation
+### Weather Normalization + Diagnostic Risk Fields
 
-ConEd's internal early-warning model performs **per-customer linear regression** to weather-normalize usage:
-`normalized = actual + (NHDD − AHDD) × β_HDD + (NCDD − ACDD) × β_CDD + billing_day_adj`
+The dashboard now aligns with ConEd's early-warning methodology using **NOAA-degree-day normalization** and **rule-based diagnostic risk tiering**:
 
-This Phase 1 model uses a **city-wide annual HDD ratio** (2023: 1.227×, 2022: 1.031×) applied uniformly to all buildings. This means the 57 "big drop" training labels carry some weather contamination — a warm year (2023 had ~18% fewer heating degree days than average) inflates apparent demand drops. Phase 2 should implement per-building regression once ConEd billing data is available under the data sharing agreement.
+#### Weather Normalization
+NOAA Central Park (USW00094728) heating and cooling degree days drive normalization:
+- `noaa_degree_days.py` fetches monthly HDD/CDD via NOAA CDO API (or uses hardcoded historical fallback)
+- Per-building OLS regression for 24 NYCHA developments with monthly steam data: `steam ~ HDD + CDD` (17/24 have sufficient data, median R² = 0.597)
+- Citywide HDD/CDD factors for the remaining 1,186 buildings derived from NOAA 30-year normal
+
+#### Diagnostic Risk Fields
+Each building now carries five new diagnostic fields in `buildingEnrichment.json`:
+
+| Field | Description | Values |
+|---|---|---|
+| `diagnostic_risk` | Rule-based risk tier combining ML attrition risk, decline acceleration, and data sufficiency | Low / Medium / High / Uncertain |
+| `decline_trend_label` | Direction of year-over-year steam demand change | accelerating / decelerating / stable |
+| `decline_acceleration` | Second-difference of normalized steam deltas (23_24 − 22_23) | Float or null |
+| `n_years_data` | Number of years with available steam data | 1, 2, or 3 |
+| `uncertain_reason` | Explanation when diagnostic_risk is Uncertain | String or null |
+
+**Tiering rules:**
+- `n_years_data < 2` → **Uncertain** (254 buildings)
+- Norm delta 23_24 < –30% → **High** (242)
+- Norm delta 23_24 –30% to –10% → **Medium** (475)
+- Norm delta 23_24 ≥ –10% → **Low** (239)
+
+#### NOAA_TOKEN Environment Variable
+Set `NOAA_TOKEN` in your `.env` file to enable live NOAA API data fetching (optional):
+```
+NOAA_TOKEN=your_token_here
+```
+Get a free token at https://www.ncdc.noaa.gov/cdo-web/token. If unset, the pipeline falls back to hardcoded Central Park historical degree-day data.
 
 ---
 

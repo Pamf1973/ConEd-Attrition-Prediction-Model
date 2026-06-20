@@ -3,6 +3,7 @@ import { riskTier, signalMeta } from "../data/useBuildings";
 
 const STORAGE_KEY = "coned_watchlist";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useWatchlist(token) {
   const [watchlist, setWatchlist] = useState(() => {
     try {

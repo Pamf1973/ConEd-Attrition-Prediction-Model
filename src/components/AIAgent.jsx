@@ -31,7 +31,7 @@ export default function AIAgent({ buildings, onSelect, selectedAddress, token })
   const [explanation, setExplanation] = useState("");
   const [insight,     setInsight]     = useState("");
   const [explainAnswer, setExplainAnswer] = useState(null);
-  const [mode,        setMode]        = useState("filter"); // "filter" | "explain"
+  const [,            setMode]        = useState("filter"); // "filter" | "explain"
   const [simpleMode,  setSimpleMode]  = useState(false);
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState(null);

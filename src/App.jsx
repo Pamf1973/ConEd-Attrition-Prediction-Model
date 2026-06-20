@@ -1,18 +1,19 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import { useBuildings, riskTier } from "./data/useBuildings";
 import { useKeyboard } from "./hooks/useKeyboard";
-import RiskTable from "./components/RiskTable";
-import BuildingPanel from "./components/BuildingPanel";
-import AIAgent from "./components/AIAgent";
 import Login from "./components/Login";
-import YoYScatter from "./components/YoYScatter";
-import RiskHistogram from "./components/RiskHistogram";
-import Watchlist, { useWatchlist } from "./components/Watchlist";
 import ErrorBoundary from "./components/ErrorBoundary";
-import ClusterExplorer from "./components/ClusterExplorer";
-import AlertBanner from "./components/AlertBanner";
-import AlertsPanel from "./components/AlertsPanel";
-import ProactiveAlertSummary from "./components/ProactiveAlertSummary";
+import { useWatchlist } from "./components/Watchlist";
+const RiskTable = lazy(() => import("./components/RiskTable"));
+const BuildingPanel = lazy(() => import("./components/BuildingPanel"));
+const AIAgent = lazy(() => import("./components/AIAgent"));
+const YoYScatter = lazy(() => import("./components/YoYScatter"));
+const RiskHistogram = lazy(() => import("./components/RiskHistogram"));
+const Watchlist = lazy(() => import("./components/Watchlist"));
+const ClusterExplorer = lazy(() => import("./components/ClusterExplorer"));
+const AlertBanner = lazy(() => import("./components/AlertBanner"));
+const AlertsPanel = lazy(() => import("./components/AlertsPanel"));
+const ProactiveAlertSummary = lazy(() => import("./components/ProactiveAlertSummary"));
 
 export default function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
@@ -269,7 +270,9 @@ export default function App() {
 
       {/* Alert Banner — shows most critical active alert */}
       {activeAlertCount > 0 && (
-        <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
+        </Suspense>
       )}
 
       {/* Cluster Stats Banner */}
@@ -311,16 +314,19 @@ export default function App() {
 
       {/* Proactive Alert Summary */}
       {summary && (
-        <div className="border-b border-[#082244] shrink-0">
-          <div className="px-5 py-2">
-            <ProactiveAlertSummary summary={summary} />
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <div className="border-b border-[#082244] shrink-0">
+            <div className="px-5 py-2">
+              <ProactiveAlertSummary summary={summary} />
+            </div>
           </div>
-        </div>
+        </Suspense>
       )}
 
       {/* Body */}
       <div className="flex flex-1 min-h-0">
         {activeTab === "rankings" && (
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <RiskTable
@@ -346,16 +352,20 @@ export default function App() {
               </div>
             )}
           </>
+          </Suspense>
         )}
 
         {activeTab === "trends" && (
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
           <div className="flex-1 min-w-0 overflow-y-auto p-5 grid gap-5">
             <RiskHistogram buildings={buildings} onFilterByRisk={handleHistogramFilter} />
             <YoYScatter buildings={buildings} onFilterCluster={handleScatterFilterCluster} onSelectBuilding={handleScatterSelect} />
           </div>
+          </Suspense>
         )}
 
         {activeTab === "targets" && (
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <ClusterExplorer
@@ -370,9 +380,11 @@ export default function App() {
               </div>
             )}
           </>
+          </Suspense>
         )}
 
         {activeTab === "watchlist" && (
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <Watchlist
@@ -390,9 +402,11 @@ export default function App() {
               </div>
             )}
           </>
+          </Suspense>
         )}
 
         {activeTab === "agent" && (
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <AIAgent
@@ -412,11 +426,13 @@ export default function App() {
               </div>
             )}
           </>
+          </Suspense>
         )}
       </div>
 
       {/* Alerts Panel Overlay */}
       {showAlertsPanel && (
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
         <>
           {/* Backdrop */}
           <div
@@ -438,6 +454,7 @@ export default function App() {
             <AlertsPanel alerts={alerts} onDismiss={dismissAlert} />
           </div>
         </>
+        </Suspense>
       )}
     </div>
     </ErrorBoundary>

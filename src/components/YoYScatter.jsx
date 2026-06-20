@@ -96,7 +96,6 @@ export default function YoYScatter({ buildings, onFilterCluster, onSelectBuildin
     y: Math.max(-CAP, Math.min(CAP, b.norm_delta_23_24)),
   }));
 
-  const projectedCount = data.filter(b => b.norm_delta_23_24_projected).length;
   const outlierCount = data.filter(b => b.outlier_22_23 || b.outlier_23_24).length;
 
   // Group by cluster for separate Scatter series (Legend)

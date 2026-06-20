@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { riskTier } from "../data/useBuildings";
 
-export default function ClusterExplorer({ buildings, onSelect, token: _token }) {
+export default function ClusterExplorer({ buildings, onSelect }) {
   const clusterStats = useMemo(() => {
     // Group buildings by cluster_id (1-5)
     const groups = {};

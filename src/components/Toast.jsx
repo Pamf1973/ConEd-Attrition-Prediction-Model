@@ -4,6 +4,7 @@ const ToastContext = createContext(null);
 
 let globalShowToast = null;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function showToast(message, type = "info") {
   if (globalShowToast) {
     globalShowToast(message, type);
@@ -69,6 +70,7 @@ export function ToastProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast() {
   const ctx = useContext(ToastContext);
   return ctx || (() => {});
