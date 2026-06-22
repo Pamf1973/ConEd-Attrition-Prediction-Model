@@ -824,8 +824,6 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000).unref();
 
-// EXPLAIN_PROMPT imported from ./prompts/explainPrompt.js
-
 app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   const { question } = req.body ?? {};
 
