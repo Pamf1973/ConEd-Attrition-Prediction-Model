@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "node api/server.js",
     "dev": "concurrently \"node api/server.js\" \"vite\" --names api,vite --prefix-colors cyan,green",
     "dev:api": "node api/server.js",
     "dev:ui": "vite",

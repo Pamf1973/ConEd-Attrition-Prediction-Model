@@ -45,7 +45,7 @@ const GROQ_KEY        = process.env.GROQ_API_KEY;
 const OPENROUTER_KEY  = process.env.OPENROUTER_API_KEY;
 
 const app  = express();
-const PORT = process.env.API_PORT ?? 3001;
+const PORT = process.env.PORT ?? process.env.API_PORT ?? 3001;
 
 app.use(helmet({
   contentSecurityPolicy: {
