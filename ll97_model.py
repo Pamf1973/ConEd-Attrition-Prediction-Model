@@ -18,6 +18,7 @@ Run: python ll97_model.py
 
 import csv, json, math, os, sys
 import numpy as np
+import shap
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score, StratifiedKFold
@@ -285,13 +286,30 @@ def predict_all(clf, scaler, rows):
     X = np.array([[r[f] for f in FEATURES] for r in rows])
     X_sc = scaler.transform(X)
     probs = clf.predict_proba(X_sc)[:, 1]
-    return probs
+
+    explainer = shap.TreeExplainer(clf)
+    shap_values = explainer.shap_values(X_sc)
+    # GradientBoostingClassifier returns a list [neg_class, pos_class] — take pos_class
+    if isinstance(shap_values, list):
+        shap_values = shap_values[1]
+
+    drivers = []
+    for i, row in enumerate(rows):
+        sv = shap_values[i]
+        top5 = sorted(
+            [{"feature": FEATURES[j], "contribution": round(float(sv[j]), 4), "value": row[FEATURES[j]]}
+             for j in range(len(FEATURES))],
+            key=lambda x: -abs(x["contribution"])
+        )[:5]
+        drivers.append(top5)
+
+    return probs, drivers
 
 
 # ── Write enrichment ──────────────────────────────────────────────────────────
 
-def update_enrichment(enrichment, rows, probs):
-    for row, prob in zip(rows, probs):
+def update_enrichment(enrichment, rows, probs, drivers):
+    for row, prob, top5 in zip(rows, probs, drivers):
         addr = row["address"]
         if addr not in enrichment:
             enrichment[addr] = {}
@@ -303,7 +321,8 @@ def update_enrichment(enrichment, rows, probs):
         enrichment[addr]["ll97_cap_2030"]     = row["ll97_cap_2030"]
         enrichment[addr]["floor_sqft"]        = int(row["floor_sqft"])
         enrichment[addr]["steam_ghg_share"]   = round(row["steam_ghg_share"], 3)
-        enrichment[addr]["ml_risk"]           = round(float(prob), 4)
+        enrichment[addr]["ml_risk"]            = round(float(prob), 4)
+        enrichment[addr]["ml_drivers"]         = top5
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -317,7 +336,7 @@ def main():
         sys.exit("Too few labeled examples — check thresholds")
 
     clf, scaler = train(labeled)
-    probs = predict_all(clf, scaler, rows)
+    probs, drivers = predict_all(clf, scaler, rows)
 
     # Summary stats
     high   = sum(1 for p in probs if p > 0.7)
@@ -334,7 +353,7 @@ def main():
         sig = "big_drop" if r["steam_signal_ord"] == 2 else "mod_drop" if r["steam_signal_ord"] == 1 else "—"
         print(f"  {r['address']:<45} {p:>8.3f}  ${r['ll97_penalty_2024']:>10,}  {sig}")
 
-    update_enrichment(enrichment, rows, probs)
+    update_enrichment(enrichment, rows, probs, drivers)
 
     tmp = ENRICHMENT_JSON + ".tmp"
     with open(tmp, "w") as f:

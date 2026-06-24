@@ -1,6 +1,50 @@
 import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+const DRIVER_FORMATS = {
+  log_steam:             v => ({ label: "Steam demand",        formatted: `${v} M kBtu` }),
+  log_ghg:               v => ({ label: "Total emissions",     formatted: `${v?.toLocaleString()} MT CO₂e` }),
+  log_dob_jobs:          v => ({ label: "DOB filings",         formatted: String(v) }),
+  ll97_penalty_2024_log: v => ({ label: "LL97 2024 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
+  ll97_penalty_2030_log: v => ({ label: "LL97 2030 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
+  ll97_over_2024:        v => ({ label: "Over 2024 cap",       formatted: v ? "Yes" : "No" }),
+  year_built:            v => ({ label: "Year built",          formatted: String(v) }),
+  energy_star:           v => ({ label: "Energy Star",         formatted: `${v} / 100` }),
+  peer_score:            v => ({ label: "Peer attrition zone", formatted: `${Math.round(v * 100)}%` }),
+  use_type_ord:          v => ({ label: "Use-type risk",       formatted: `${v} / 4` }),
+  cluster_id:            v => ({ label: "Customer archetype",  formatted: `Cluster ${v}` }),
+  steam_ghg_share:       v => ({ label: "Steam GHG share",     formatted: `${Math.round(v * 100)}%` }),
+};
+
+function MLDrivers({ drivers }) {
+  if (!drivers || drivers.length === 0) return null;
+  return (
+    <div className="rounded-lg p-3 mt-2" style={{ background: "#1E293B" }}>
+      <div className="text-xs text-slate-500 mb-2">WHY THIS SCORE</div>
+      <div className="space-y-1.5">
+        {drivers.map((d, i) => {
+          const up  = d.contribution > 0;
+          const fmt = DRIVER_FORMATS[d.feature]?.(d.value) ?? { label: d.feature, formatted: String(d.value) };
+          return (
+            <div key={i} className="flex justify-between items-center text-sm">
+              <span className="flex items-center gap-2">
+                <span style={{ color: up ? "#EF4444" : "#64748B" }} className="font-bold w-3">
+                  {up ? "↑" : "↓"}
+                </span>
+                <span className="text-slate-400">{fmt.label}</span>
+              </span>
+              <span className="text-slate-300 font-medium tabular-nums">{fmt.formatted}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+        Top 5 model drivers (SHAP) · ↑ pushes risk higher · ↓ pulls it lower
+      </p>
+    </div>
+  );
+}
+
 const DIAG_COLORS = {
   High:      { color: "#ef4444", bg: "#450a0a" },
   Medium:    { color: "#f59e0b", bg: "#451a03" },
@@ -245,6 +289,8 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
               </div>
             </div>
           )}
+
+          <MLDrivers drivers={b.ml_drivers} />
 
           {/* Peer + portfolio signals */}
           {(Number.isFinite(b.peer_score) && b.peer_score > 0) && (
