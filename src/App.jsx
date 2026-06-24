@@ -4,16 +4,31 @@ import { useKeyboard } from "./hooks/useKeyboard";
 import Login from "./components/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useWatchlist } from "./components/Watchlist";
-const RiskTable = lazy(() => import("./components/RiskTable"));
-const BuildingPanel = lazy(() => import("./components/BuildingPanel"));
-const AIAgent = lazy(() => import("./components/AIAgent"));
-const YoYScatter = lazy(() => import("./components/YoYScatter"));
-const RiskHistogram = lazy(() => import("./components/RiskHistogram"));
-const Watchlist = lazy(() => import("./components/Watchlist"));
-const ClusterExplorer = lazy(() => import("./components/ClusterExplorer"));
-const AlertBanner = lazy(() => import("./components/AlertBanner"));
-const AlertsPanel = lazy(() => import("./components/AlertsPanel"));
-const ProactiveAlertSummary = lazy(() => import("./components/ProactiveAlertSummary"));
+
+// When Railway redeploys, old chunk filenames disappear. Any cached HTML that
+// still references old hashes will get a 404 on dynamic import. Force a
+// one-time reload to pick up the new HTML + new asset manifest.
+const lazyWithReload = (importer) =>
+  lazy(() =>
+    importer().catch((e) => {
+      if (!sessionStorage.getItem("chunk_reload_attempted")) {
+        sessionStorage.setItem("chunk_reload_attempted", "1");
+        window.location.reload();
+      }
+      return Promise.reject(e);
+    })
+  );
+
+const RiskTable           = lazyWithReload(() => import("./components/RiskTable"));
+const BuildingPanel       = lazyWithReload(() => import("./components/BuildingPanel"));
+const AIAgent             = lazyWithReload(() => import("./components/AIAgent"));
+const YoYScatter          = lazyWithReload(() => import("./components/YoYScatter"));
+const RiskHistogram       = lazyWithReload(() => import("./components/RiskHistogram"));
+const Watchlist           = lazyWithReload(() => import("./components/Watchlist"));
+const ClusterExplorer     = lazyWithReload(() => import("./components/ClusterExplorer"));
+const AlertBanner         = lazyWithReload(() => import("./components/AlertBanner"));
+const AlertsPanel         = lazyWithReload(() => import("./components/AlertsPanel"));
+const ProactiveAlertSummary = lazyWithReload(() => import("./components/ProactiveAlertSummary"));
 
 export default function App() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
