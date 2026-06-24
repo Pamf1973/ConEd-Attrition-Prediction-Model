@@ -63,10 +63,11 @@ app.use(helmet({
   hsts: { maxAge: 31536000, includeSubDomains: true },
 }));
 
-// trust proxy only when behind a real reverse proxy (nginx in prod)
-// Do NOT set "trust proxy" in dev — X-Forwarded-For would be client-controlled
-// and would allow rate limit bypass by spoofing different IPs per request.
-// In production: set to the specific nginx IP, e.g. app.set("trust proxy", "loopback")
+// Railway (and most PaaS) terminate TLS at their load balancer and forward the
+// real client IP via X-Forwarded-For. Without trust proxy, express-rate-limit
+// throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and can't identify clients correctly.
+if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+
 app.use(express.json({ limit: "16kb" }));
 app.use((err, req, res, next) => {
   if (err.status === 413 || err.type === "entity.too.large")
