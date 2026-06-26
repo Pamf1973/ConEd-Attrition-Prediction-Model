@@ -1,18 +1,26 @@
 import { riskTier, signalMeta, recommendedAction } from "../data/useBuildings";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
+// d.value from ml_drivers is the MODEL-SPACE feature value (log or log1p transformed).
+// These formatters invert the transform so the displayed number matches the real-world unit.
+const fmt$ = (n) => `$${Math.round(n).toLocaleString()}`;
 const DRIVER_FORMATS = {
-  log_steam:             v => ({ label: "Steam demand",        formatted: `${v} M kBtu` }),
-  log_ghg:               v => ({ label: "Total emissions",     formatted: `${v?.toLocaleString()} MT CO₂e` }),
-  log_dob_jobs:          v => ({ label: "DOB filings",         formatted: String(v) }),
-  ll97_penalty_2024_log: v => ({ label: "LL97 2024 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
-  ll97_penalty_2030_log: v => ({ label: "LL97 2030 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
+  // math.log(steam_kBtu) → exp → kBtu → ÷1e6 = M kBtu
+  log_steam:             v => ({ label: "Steam demand",        formatted: `${(Math.exp(v) / 1e6).toFixed(1)} M kBtu` }),
+  // math.log1p(ghg_MT) → expm1 = MT CO₂e
+  log_ghg:               v => ({ label: "Total emissions",     formatted: `${Math.round(Math.expm1(v)).toLocaleString()} MT CO₂e` }),
+  // math.log1p(dob_count) → expm1 = filing count
+  log_dob_jobs:          v => ({ label: "DOB filings",         formatted: String(Math.round(Math.expm1(v))) }),
+  // math.log1p(penalty_$) → expm1 = dollars
+  ll97_penalty_2024_log: v => ({ label: "LL97 2024 penalty",   formatted: Math.expm1(v) > 0 ? fmt$(Math.expm1(v)) : "Compliant" }),
+  ll97_penalty_2030_log: v => ({ label: "LL97 2030 penalty",   formatted: Math.expm1(v) > 0 ? fmt$(Math.expm1(v)) : "Compliant" }),
+  // raw (not log-transformed)
   ll97_over_2024:        v => ({ label: "Over 2024 cap",       formatted: v ? "Yes" : "No" }),
-  year_built:            v => ({ label: "Year built",          formatted: String(v) }),
-  energy_star:           v => ({ label: "Energy Star",         formatted: `${v} / 100` }),
+  year_built:            v => ({ label: "Year built",          formatted: String(Math.round(v)) }),
+  energy_star:           v => ({ label: "Energy Star",         formatted: `${Math.round(v)} / 100` }),
   peer_score:            v => ({ label: "Peer attrition zone", formatted: `${Math.round(v * 100)}%` }),
   use_type_ord:          v => ({ label: "Use-type risk",       formatted: `${v} / 4` }),
-  cluster_id:            v => ({ label: "Customer archetype",  formatted: `Cluster ${v}` }),
+  cluster_id:            v => ({ label: "Customer archetype",  formatted: `Cluster ${Math.round(v)}` }),
   steam_ghg_share:       v => ({ label: "Steam GHG share",     formatted: `${Math.round(v * 100)}%` }),
 };
 

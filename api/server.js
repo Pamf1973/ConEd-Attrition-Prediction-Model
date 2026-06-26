@@ -63,9 +63,13 @@ app.use(helmet({
   hsts: { maxAge: 31536000, includeSubDomains: true },
 }));
 
-// Railway (and most PaaS) terminate TLS at their load balancer and forward the
-// real client IP via X-Forwarded-For. Without trust proxy, express-rate-limit
-// throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and can't identify clients correctly.
+// Railway terminates TLS at its load balancer and forwards the real client IP via
+// X-Forwarded-For. Railway strips client-supplied XFF headers before appending
+// its own, so trust proxy=1 (trust exactly one hop from right) safely resolves
+// to the real client IP. Without this, express-rate-limit throws
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and cannot identify clients for rate limiting.
+// If a CDN is ever placed in front of Railway, increment this count to match
+// the total number of trusted proxy hops.
 if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "16kb" }));
@@ -208,6 +212,10 @@ const DATA_CACHE = {
   yoyDeltas:  loadJsonFile("yoy_deltas.json"),
 };
 
+// ETag for the enrichment payload — changes each time the server starts (i.e. after redeploy).
+// Lets browsers skip re-downloading 1.17MB when the data hasn't changed within a session.
+const ENRICHMENT_ETAG = `"enrich-${Date.now()}"`;
+
 // Parsed versions used by endpoints that need to iterate over the data (e.g. CSV export)
 const DATA_PARSED = {
   buildings:  JSON.parse(DATA_CACHE.buildings),
@@ -218,7 +226,12 @@ const DATA_PARSED = {
 
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
 app.get("/api/data/buildings",   requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.buildings));
-app.get("/api/data/enrichment",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.enrichment));
+app.get("/api/data/enrichment",  requireAuth, (req, res) => {
+  if (req.headers["if-none-match"] === ENRICHMENT_ETAG) return res.status(304).end();
+  res.setHeader("ETag", ENRICHMENT_ETAG);
+  res.setHeader("Cache-Control", "private, no-cache");
+  res.type("json").send(DATA_CACHE.enrichment);
+});
 app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
 app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
 
@@ -533,8 +546,18 @@ app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_de
   res.status(403).json({ error: "Access Forbidden — Data is protected" });
 });
 
-// Serve built frontend assets in production (if built)
-app.use(express.static(resolve(process.cwd(), "dist")));
+// Serve built frontend assets. index.html must never be cached — browsers that
+// serve a stale index.html will reference old Vite chunk hashes that no longer
+// exist after a redeploy, causing "Failed to fetch dynamically imported module".
+// Hashed asset files (*.js, *.css with content hash in filename) get long-lived
+// immutable caching handled by express.static's default max-age.
+app.use(express.static(resolve(process.cwd(), "dist"), {
+  setHeaders(res, filePath) {
+    if (filePath.endsWith("index.html")) {
+      res.setHeader("Cache-Control", "no-store");
+    }
+  },
+}));
 
 // Wrap user input in XML tags to structurally isolate it from the system prompt,
 // and strip the most common injection patterns. This is defense-in-depth —

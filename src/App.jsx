@@ -7,16 +7,26 @@ import { useWatchlist } from "./components/Watchlist";
 
 // When Railway redeploys, old chunk filenames disappear. Any cached HTML that
 // still references old hashes will get a 404 on dynamic import. Force a
-// one-time reload to pick up the new HTML + new asset manifest.
+// one-time reload per tab session to pick up the new HTML + new asset manifest.
+// - On success: clear the flag so a future deployment also gets one retry.
+// - On first failure: set flag, reload, return a never-settling promise so
+//   React stays in Suspense (no ErrorBoundary flash) until navigation completes.
+// - On second failure (flag already set): reject so ErrorBoundary shows an error.
 const lazyWithReload = (importer) =>
   lazy(() =>
-    importer().catch((e) => {
-      if (!sessionStorage.getItem("chunk_reload_attempted")) {
-        sessionStorage.setItem("chunk_reload_attempted", "1");
-        window.location.reload();
-      }
-      return Promise.reject(e);
-    })
+    importer()
+      .then((mod) => {
+        sessionStorage.removeItem("chunk_reload_attempted");
+        return mod;
+      })
+      .catch((e) => {
+        if (!sessionStorage.getItem("chunk_reload_attempted")) {
+          sessionStorage.setItem("chunk_reload_attempted", "1");
+          window.location.reload();
+          return new Promise(() => {}); // stay in Suspense until page reloads
+        }
+        return Promise.reject(e);
+      })
   );
 
 const RiskTable           = lazyWithReload(() => import("./components/RiskTable"));

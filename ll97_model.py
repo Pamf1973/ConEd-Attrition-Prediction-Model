@@ -289,7 +289,9 @@ def predict_all(clf, scaler, rows):
 
     explainer = shap.TreeExplainer(clf)
     shap_values = explainer.shap_values(X_sc)
-    # GradientBoostingClassifier returns a list [neg_class, pos_class] — take pos_class
+    # shap.TreeExplainer for GradientBoostingClassifier returns an ndarray (not a list);
+    # this guard is a forward-compatibility shim for classifiers like RandomForestClassifier
+    # that return [neg_class_array, pos_class_array]. Index 1 = positive class in that case.
     if isinstance(shap_values, list):
         shap_values = shap_values[1]
 
