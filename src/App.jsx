@@ -379,13 +379,15 @@ export default function App() {
               />
             </div>
             {selected && (
-              <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel
-                  building={selected}
-                  onClose={() => setSelected(null)}
-                  allBuildings={buildings}
-                />
-              </div>
+              <Suspense fallback={<BuildingPanelSkeleton />}>
+                <div className="w-[380px] shrink-0 overflow-hidden">
+                  <BuildingPanel
+                    building={selected}
+                    onClose={() => setSelected(null)}
+                    allBuildings={buildings}
+                  />
+                </div>
+              </Suspense>
             )}
           </>
           </Suspense>
@@ -411,9 +413,11 @@ export default function App() {
               />
             </div>
             {selected && (
-              <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
-              </div>
+              <Suspense fallback={<BuildingPanelSkeleton />}>
+                <div className="w-[380px] shrink-0 overflow-hidden">
+                  <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
+                </div>
+              </Suspense>
             )}
           </>
           </Suspense>
@@ -433,9 +437,11 @@ export default function App() {
               />
             </div>
             {selected && (
-              <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
-              </div>
+              <Suspense fallback={<BuildingPanelSkeleton />}>
+                <div className="w-[380px] shrink-0 overflow-hidden">
+                  <BuildingPanel building={selected} onClose={() => setSelected(null)} allBuildings={buildings} />
+                </div>
+              </Suspense>
             )}
           </>
           </Suspense>
@@ -453,13 +459,15 @@ export default function App() {
               />
             </div>
             {selected && (
-              <div className="w-[380px] shrink-0 overflow-hidden">
-                <BuildingPanel
-                  building={selected}
-                  onClose={() => setSelected(null)}
-                  allBuildings={buildings}
-                />
-              </div>
+              <Suspense fallback={<BuildingPanelSkeleton />}>
+                <div className="w-[380px] shrink-0 overflow-hidden">
+                  <BuildingPanel
+                    building={selected}
+                    onClose={() => setSelected(null)}
+                    allBuildings={buildings}
+                  />
+                </div>
+              </Suspense>
             )}
           </>
           </Suspense>

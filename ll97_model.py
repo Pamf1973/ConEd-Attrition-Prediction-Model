@@ -21,6 +21,7 @@ import numpy as np
 import shap
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -244,24 +245,32 @@ def train(labeled_rows):
     X = np.array([[r[f] for f in FEATURES] for r, _ in labeled_rows])
     y = np.array([label for _, label in labeled_rows])
 
+    pos = int(y.sum())
+    neg = len(y) - pos
+    spw = round(neg / pos) if pos > 0 else 1
+    print(f"Class balance: {neg} neg / {pos} pos → scale_pos_weight={spw}")
+
     clf = xgb.XGBClassifier(
         n_estimators=300,
         learning_rate=0.1,
         max_depth=6,
         subsample=0.8,
         colsample_bytree=1.0,
-        scale_pos_weight=18,
+        scale_pos_weight=spw,
         random_state=42,
         eval_metric="logloss",
         verbosity=0,
     )
-    scaler = StandardScaler()
-    X_sc = scaler.fit_transform(X)
 
+    # CV uses Pipeline to prevent scaler fit-leakage across folds
+    pipe_cv = Pipeline([("scaler", StandardScaler()), ("clf", clf)])
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    scores = cross_val_score(clf, X_sc, y, cv=skf, scoring="roc_auc")
+    scores = cross_val_score(pipe_cv, X, y, cv=skf, scoring="roc_auc")
     print(f"5-fold stratified CV AUC: {scores.mean():.3f} ± {scores.std():.3f}")
 
+    # Final fit on full data with standalone scaler (needed for SHAP's TreeExplainer)
+    scaler = StandardScaler()
+    X_sc = scaler.fit_transform(X)
     clf.fit(X_sc, y)
 
     # Feature importances (MDI gain)

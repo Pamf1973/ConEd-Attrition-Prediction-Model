@@ -8,6 +8,7 @@ import { randomBytes, timingSafeEqual } from "crypto";
 
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
+import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -547,7 +548,7 @@ app.get("/api/meta", (_req, res) => {
     dataset_date: "2026-06",
     steam_year: "2024",
     ll84_date: "2025-05",
-    model_version: "GBM-v2+SHAP",
+    model_version: "XGBoost-v1+SHAP",
     buildings: DATA_PARSED.buildings?.length ?? 0,
   };
   res.setHeader("Cache-Control", "public, max-age=3600");
@@ -701,13 +702,6 @@ async function callOpenRouter(question, systemOverride, timeoutMs = 10_000, maxT
   return data.choices?.[0]?.message?.content ?? "";
 }
 
-// Returns true for transient/quota errors that warrant trying the next provider.
-// Auth errors (401) and validation errors (400 without credit language) are NOT retryable.
-function _isRetryable(msg) {
-  return msg.includes("402") || msg.includes("429") || msg.includes("credit balance") ||
-         /\b5\d{2}\b/.test(msg);
-}
-
 // ── Unified LLM caller: Claude → Groq → OpenRouter ────────────────────────────
 async function callLLM(question, systemOverride, timeoutMs = 10_000, maxTokens = 512) {
   if (ANTHROPIC_KEY) {
@@ -737,53 +731,6 @@ async function callLLM(question, systemOverride, timeoutMs = 10_000, maxTokens =
   }
 
   throw new Error("All LLM providers unavailable — try again later");
-}
-
-// ── Spec schema validation ────────────────────────────────────────────────────
-const ALLOWED_SORT_BY  = ["risk", "ll97_penalty_2024", "steam", "dob_jobs"];
-const ALLOWED_SORT_DIR = ["asc", "desc"];
-const ALLOWED_SIGNALS  = ["big_drop", "mod_drop", "any", null];
-const ALLOWED_USES     = [
-  "Office", "Multifamily Housing", "Hotel", "K-12 School",
-  "College/University", "Hospital (General Medical & Surgical)",
-  "Retail Store", "Other", null,
-];
-const ALLOWED_CLUSTERS = [
-  "Pre-War Active — Permit-Driven Churn",
-  "Mid-Size Post-War — Moderate Signal",
-  "Pre-War Stable — Low Signal",
-  "Large Commercial — Capital Mobilized",
-  "Low-Compliance Commercial — Quiet Attrition",
-  null,
-];
-
-function validateSpec(raw) {
-  const numOrNull = (v, min = -Infinity, max = Infinity) => {
-    if (v == null) return null;
-    const n = Number(v);
-    if (!Number.isFinite(n)) return null;
-    return Math.min(max, Math.max(min, n));
-  };
-  const oneOf = (v, allowed) => allowed.includes(v) ? v : null;
-
-  return {
-    risk_min:         numOrNull(raw.risk_min, 0, 1),
-    risk_max:         numOrNull(raw.risk_max, 0, 1),
-    use:              oneOf(raw.use, ALLOWED_USES),
-    dob_jobs_min:     numOrNull(raw.dob_jobs_min, 0, 1000),
-    signal:           oneOf(raw.signal, ALLOWED_SIGNALS),
-    ll97_over_2024:   (raw.ll97_over_2024 === true || raw.ll97_over_2024 === 1) ? true : (raw.ll97_over_2024 === false || raw.ll97_over_2024 === 0) ? false : null,
-    ll97_penalty_min: numOrNull(raw.ll97_penalty_min, 0, 1e9),
-    steam_min:        numOrNull(raw.steam_min, 0, 1e12),
-    steam_max:        numOrNull(raw.steam_max, 0, 1e12),
-    cluster_name:     oneOf(raw.cluster_name, ALLOWED_CLUSTERS),
-    address_search:   typeof raw.address_search === "string" ? raw.address_search.slice(0, 100) : null,
-    yr_min:           numOrNull(raw.yr_min, 1800, 2030),
-    yr_max:           numOrNull(raw.yr_max, 1800, 2030),
-    sort_by:          ALLOWED_SORT_BY.includes(raw.sort_by) ? raw.sort_by : "risk",
-    sort_dir:         ALLOWED_SORT_DIR.includes(raw.sort_dir) ? raw.sort_dir : "desc",
-    explanation:      typeof raw.explanation === "string" ? raw.explanation.slice(0, 200) : "",
-  };
 }
 
 // ── /api/query ────────────────────────────────────────────────────────────────
@@ -864,18 +811,28 @@ setInterval(() => {
 }, 5 * 60 * 1000).unref();
 
 // ── Static FAQ for offline / LLM-failure fallback ────────────────────────────
+// Stats are computed once at startup from live data so they stay accurate after retrains.
+const _enrVals  = Object.values(DATA_PARSED.enrichment ?? {});
+const _bldTotal = DATA_PARSED.buildings?.length ?? 0;
+const _hrCount  = _enrVals.filter(e => (e.ml_risk ?? 0) > 0.70).length;
+const _hrPct    = _bldTotal > 0 ? (_hrCount  / _bldTotal * 100).toFixed(1) : "N/A";
+const _o24Count = _enrVals.filter(e => e.ll97_over_2024 === 1).length;
+const _o30Count = _enrVals.filter(e => e.ll97_over_2030 === 1).length;
+const _o24Pct   = _bldTotal > 0 ? (_o24Count / _bldTotal * 100).toFixed(1) : "N/A";
+const _o30Pct   = _bldTotal > 0 ? (_o30Count / _bldTotal * 100).toFixed(1) : "N/A";
+
 const FAQ = [
   {
     keywords: ["how many", "buildings", "high risk", "count"],
-    answer: "There are currently 58 high-risk buildings (ml_risk > 0.70) in the portfolio, representing 4.8% of the 1,210 active steam customers tracked in this dashboard."
+    answer: `There are currently ${_hrCount} high-risk buildings (ml_risk > 0.70) in the portfolio, representing ${_hrPct}% of the ${_bldTotal.toLocaleString()} active steam customers tracked in this dashboard.`
   },
   {
     keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
-    answer: "The attrition risk score (ml_risk) is a GradientBoosting model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
+    answer: "The attrition risk score (ml_risk) is an XGBoost model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
-    answer: "NYC Local Law 97 sets carbon emissions caps on large buildings. Violations incur a $268/MT CO₂e penalty above the cap. The 2024 cap applies now; the stricter 2030 cap applies from 2030. Currently 13.6% of tracked buildings are over the 2024 cap, and 68.6% would be over the 2030 cap."
+    answer: `NYC Local Law 97 sets carbon emissions caps on large buildings. Violations incur a $268/MT CO₂e penalty above the cap. The 2024 cap applies now; the stricter 2030 cap applies from 2030. Currently ${_o24Pct}% of tracked buildings are over the 2024 cap, and ${_o30Pct}% would be over the 2030 cap.`
   },
   {
     keywords: ["cluster", "archetype", "segment", "group", "kmeans"],
@@ -932,7 +889,8 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
     // Stale-serve: return an older cached answer if available (up to 24h old)
     const stale = explainCache.get(safe);
     if (stale) {
-      return res.json({ answer: stale.answer, cached: true });
+      const age_minutes = Math.round((Date.now() - stale.timestamp) / 60_000);
+      return res.json({ answer: stale.answer, cached: true, age_minutes });
     }
     // FAQ fallback: check if question matches a pre-computed answer
     const faqAnswer = matchFAQ(safe);
@@ -944,19 +902,6 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
 });
 
 // ── /api/export/csv ───────────────────────────────────────────────────────────
-// Escape CSV cells: wrap in double-quotes, escape internal quotes, and prefix
-// cells starting with =, +, -, @ with a single-quote to prevent Excel/Sheets
-// formula injection (double-quoting alone does NOT prevent this).
-function csvCell(v) {
-  // Finite numbers are safe as-is — no quoting, no injection risk
-  if (typeof v === "number" && Number.isFinite(v)) return String(v);
-  const s = String(v ?? "").replace(/"/g, '""');
-  // Prefix text cells starting with =, +, -, @ to block Excel formula injection
-  // (double-quoting alone does NOT prevent this — panel verdict: unanimous)
-  const safe = /^[=+\-@]/.test(s) ? `'${s}` : s;
-  return `"${safe}"`;
-}
-
 const exportLimiter = rateLimit({
   windowMs: 60_000,
   max: 10,

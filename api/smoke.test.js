@@ -1,22 +1,6 @@
-/**
- * Smoke tests for pure utility functions from server.js.
- *
- * server.js does not export `app` (it calls app.listen() directly), so
- * we test the business-logic functions here by replicating them — this
- * keeps tests fast and dependency-free while covering the same code paths.
- *
- * For full HTTP integration testing (auth, endpoints, etc.) the server
- * would need to be refactored to export `app` before the listen() call.
- */
+// Smoke tests for pure utility functions from api/utils.js.
 import { describe, it, expect } from "vitest";
-
-// ── csvCell — replicated from api/server.js ──────────────────────────────────
-function csvCell(v) {
-  if (typeof v === "number" && Number.isFinite(v)) return String(v);
-  const s = String(v ?? "").replace(/"/g, '""');
-  const safe = /^[=+\-@]/.test(s) ? `'${s}` : s;
-  return `"${safe}"`;
-}
+import { csvCell, validateSpec, _isRetryable } from "./utils.js";
 
 describe("csvCell", () => {
   it("returns number as string (no quotes)", () => {
@@ -53,7 +37,6 @@ describe("csvCell", () => {
     expect(csvCell("")).toBe('""');
   });
   it("does NOT quote Infinity (non-finite number falls through to string path)", () => {
-    // Infinity is not finite, so it goes through the string path
     expect(csvCell(Infinity)).toBe('"Infinity"');
   });
   it("does NOT quote NaN (non-finite, goes through string path)", () => {
@@ -66,36 +49,6 @@ describe("csvCell", () => {
     expect(csvCell(-99)).toBe("-99");
   });
 });
-
-// ── validateSpec field logic — replicated from api/server.js ─────────────────
-const ALLOWED_SORT_BY  = ["risk", "ll97_penalty_2024", "steam", "dob_jobs"];
-const ALLOWED_SORT_DIR = ["asc", "desc"];
-const ALLOWED_SIGNALS  = ["big_drop", "mod_drop", "any", null];
-const ALLOWED_USES     = [
-  "Office", "Multifamily Housing", "Hotel", "K-12 School",
-  "College/University", "Hospital (General Medical & Surgical)",
-  "Retail Store", "Other", null,
-];
-
-function validateSpec(raw) {
-  const numOrNull = (v, min = -Infinity, max = Infinity) => {
-    if (v == null) return null;
-    const n = Number(v);
-    if (!Number.isFinite(n)) return null;
-    return Math.min(max, Math.max(min, n));
-  };
-  const oneOf = (v, allowed) => allowed.includes(v) ? v : null;
-
-  return {
-    risk_min:     numOrNull(raw.risk_min, 0, 1),
-    risk_max:     numOrNull(raw.risk_max, 0, 1),
-    use:          oneOf(raw.use, ALLOWED_USES),
-    signal:       oneOf(raw.signal, ALLOWED_SIGNALS),
-    sort_by:      ALLOWED_SORT_BY.includes(raw.sort_by) ? raw.sort_by : "risk",
-    sort_dir:     ALLOWED_SORT_DIR.includes(raw.sort_dir) ? raw.sort_dir : "desc",
-    explanation:  typeof raw.explanation === "string" ? raw.explanation.slice(0, 200) : "",
-  };
-}
 
 describe("validateSpec", () => {
   it("clamps risk_min to [0, 1]", () => {
@@ -144,12 +97,6 @@ describe("validateSpec", () => {
     expect(validateSpec({ explanation: null }).explanation).toBe("");
   });
 });
-
-// ── _isRetryable — replicated from api/server.js ─────────────────────────────
-function _isRetryable(msg) {
-  return msg.includes("402") || msg.includes("429") || msg.includes("credit balance") ||
-         /\b5\d{2}\b/.test(msg);
-}
 
 describe("_isRetryable", () => {
   it("retries on 402 payment errors", () => {
