@@ -4,6 +4,7 @@ import { useKeyboard } from "./hooks/useKeyboard";
 import Login from "./components/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useWatchlist } from "./components/Watchlist";
+import { RiskTableSkeleton, BuildingPanelSkeleton, ChartSkeleton, AgentSkeleton, SlimSkeleton } from "./components/Skeletons";
 
 // When Railway redeploys, old chunk filenames disappear. Any cached HTML that
 // still references old hashes will get a 404 on dynamic import. Force a
@@ -50,6 +51,10 @@ export default function App() {
   const [riskMin, setRiskMin] = useState(null);
   const [riskMax, setRiskMax] = useState(null);
   const searchInputRef = useRef(null);
+  const [meta, setMeta] = useState(null);
+  useEffect(() => {
+    fetch("/api/meta").then(r => r.ok ? r.json() : null).then(d => d && setMeta(d)).catch(() => {});
+  }, []);
 
   // ── Alert state ──────────────────────────────────────────────────────────────
   const [alerts, setAlerts] = useState([]);
@@ -263,9 +268,15 @@ export default function App() {
           <span className="text-xs text-slate-600">
             {buildings.length.toLocaleString()} active steam customers
           </span>
-          <span className="text-xs text-slate-500/70">
-            Data: Jun 2026 · Steam: 2024 · LL84: May 2025
-          </span>
+          {meta ? (
+            <span className="text-xs text-slate-500/70" title={`Model: ${meta.model_version}`}>
+              Data: {meta.dataset_date} · Steam: {meta.steam_year} · LL84: {meta.ll84_date}
+            </span>
+          ) : (
+            <span className="text-xs text-slate-500/70">
+              Data: Jun 2026 · Steam: 2024 · LL84: May 2025
+            </span>
+          )}
           {/* Alert bell badge */}
           <button
             onClick={() => setShowAlertsPanel(true)}
@@ -295,7 +306,7 @@ export default function App() {
 
       {/* Alert Banner — shows most critical active alert */}
       {activeAlertCount > 0 && (
-        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+        <Suspense fallback={<SlimSkeleton />}>
           <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
         </Suspense>
       )}
@@ -339,7 +350,7 @@ export default function App() {
 
       {/* Proactive Alert Summary */}
       {summary && (
-        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+        <Suspense fallback={<SlimSkeleton />}>
           <div className="border-b border-[#082244] shrink-0">
             <div className="px-5 py-2">
               <ProactiveAlertSummary summary={summary} />
@@ -351,7 +362,7 @@ export default function App() {
       {/* Body */}
       <div className="flex flex-1 min-h-0">
         {activeTab === "rankings" && (
-          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <Suspense fallback={<RiskTableSkeleton />}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <RiskTable
@@ -381,7 +392,7 @@ export default function App() {
         )}
 
         {activeTab === "trends" && (
-          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <Suspense fallback={<ChartSkeleton />}>
           <div className="flex-1 min-w-0 overflow-y-auto p-5 grid gap-5">
             <RiskHistogram buildings={buildings} onFilterByRisk={handleHistogramFilter} />
             <YoYScatter buildings={buildings} onFilterCluster={handleScatterFilterCluster} onSelectBuilding={handleScatterSelect} />
@@ -390,7 +401,7 @@ export default function App() {
         )}
 
         {activeTab === "targets" && (
-          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <Suspense fallback={<ChartSkeleton />}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <ClusterExplorer
@@ -409,7 +420,7 @@ export default function App() {
         )}
 
         {activeTab === "watchlist" && (
-          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <Suspense fallback={<RiskTableSkeleton />}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <Watchlist
@@ -431,7 +442,7 @@ export default function App() {
         )}
 
         {activeTab === "agent" && (
-          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+          <Suspense fallback={<AgentSkeleton />}>
           <>
             <div className={`flex-1 min-w-0 overflow-hidden transition-all duration-200 ${selected ? "max-w-[calc(100%-380px)]" : ""}`}>
               <AIAgent
@@ -457,7 +468,7 @@ export default function App() {
 
       {/* Alerts Panel Overlay */}
       {showAlertsPanel && (
-        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-slate-500 text-sm">Loading...</div>}>
+        <Suspense fallback={<SlimSkeleton />}>
         <>
           {/* Backdrop */}
           <div

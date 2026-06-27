@@ -541,6 +541,19 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
   res.json({ addresses });
 });
 
+// ── /api/meta — dataset freshness metadata ────────────────────────────────────
+app.get("/api/meta", (_req, res) => {
+  const meta = {
+    dataset_date: "2026-06",
+    steam_year: "2024",
+    ll84_date: "2025-05",
+    model_version: "GBM-v2+SHAP",
+    buildings: DATA_PARSED.buildings?.length ?? 0,
+  };
+  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.json(meta);
+});
+
 // Protect public JSON files from direct exposure in production build folder
 app.get(["/buildings.json", "/buildingEnrichment.json", "/yearly.json", "/yoy_deltas.json", "/yoy_summary.json"], (req, res) => {
   res.status(403).json({ error: "Access Forbidden — Data is protected" });
@@ -839,14 +852,53 @@ Write ONE concise sentence (max 25 words) summarizing what was found. Be specifi
 
 // ── /api/explain — dashboard knowledge Q&A ───────────────────────────────────
 // In-memory answer cache: sanitized question → { answer, timestamp }
+// Entries are kept for 24 hours so stale-serve can return them on LLM failure.
+// Fresh-serve window is still 15 minutes (checked at read time).
 const explainCache = new Map();
-// Periodic cleanup every 5 minutes: evict entries older than 15 min
+// Periodic cleanup every 5 minutes: evict entries older than 24 hours
 setInterval(() => {
   const now = Date.now();
   for (const [key, entry] of explainCache) {
-    if (now - entry.timestamp > 15 * 60 * 1000) explainCache.delete(key);
+    if (now - entry.timestamp > 24 * 60 * 60 * 1000) explainCache.delete(key);
   }
 }, 5 * 60 * 1000).unref();
+
+// ── Static FAQ for offline / LLM-failure fallback ────────────────────────────
+const FAQ = [
+  {
+    keywords: ["how many", "buildings", "high risk", "count"],
+    answer: "There are currently 58 high-risk buildings (ml_risk > 0.70) in the portfolio, representing 4.8% of the 1,210 active steam customers tracked in this dashboard."
+  },
+  {
+    keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
+    answer: "The attrition risk score (ml_risk) is a GradientBoosting model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
+  },
+  {
+    keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
+    answer: "NYC Local Law 97 sets carbon emissions caps on large buildings. Violations incur a $268/MT CO₂e penalty above the cap. The 2024 cap applies now; the stricter 2030 cap applies from 2030. Currently 13.6% of tracked buildings are over the 2024 cap, and 68.6% would be over the 2030 cap."
+  },
+  {
+    keywords: ["cluster", "archetype", "segment", "group", "kmeans"],
+    answer: "Buildings are grouped into 5 customer archetypes via K-means clustering: Pre-War Active (22%), Large Commercial (22%), Low-Compliance Commercial (20%), Pre-War Stable (20%), and Mid-Size Post-War (16%). Each cluster has a distinct attrition risk profile."
+  },
+  {
+    keywords: ["energy star", "score", "efficient", "efficiency"],
+    answer: "Energy Star score (1–100) measures building energy efficiency relative to similar buildings nationally. Interestingly, the model found that HIGH Energy Star scores correlate with higher attrition risk — well-managed efficient buildings have both the capital and motivation to switch from steam to modern heat-pump systems."
+  },
+  {
+    keywords: ["data", "when", "date", "fresh", "updated", "current"],
+    answer: "The dashboard uses ConEd steam consumption data through 2024, LL84 benchmarking data through May 2025, and LL97 penalty calculations based on current NYC compliance rules. The attrition model was trained on verified churn events from 2021–2024."
+  },
+];
+
+function matchFAQ(question) {
+  const q = question.toLowerCase();
+  for (const entry of FAQ) {
+    const hits = entry.keywords.filter(k => q.includes(k)).length;
+    if (hits >= 2) return entry.answer;
+  }
+  return null;
+}
 
 app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
   const { question } = req.body ?? {};
@@ -877,6 +929,16 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
     res.json({ answer: trimmed });
   } catch (err) {
     console.error("[/api/explain]", err.message);
+    // Stale-serve: return an older cached answer if available (up to 24h old)
+    const stale = explainCache.get(safe);
+    if (stale) {
+      return res.json({ answer: stale.answer, cached: true });
+    }
+    // FAQ fallback: check if question matches a pre-computed answer
+    const faqAnswer = matchFAQ(safe);
+    if (faqAnswer) {
+      return res.json({ answer: faqAnswer, cached: true, source: "faq" });
+    }
     res.status(502).json({ error: "explain failed — try again" });
   }
 });

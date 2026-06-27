@@ -19,11 +19,9 @@ Run: python ll97_model.py
 import csv, json, math, os, sys
 import numpy as np
 import shap
-from sklearn.ensemble import GradientBoostingClassifier
+import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import classification_report
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BUILDINGS_JSON     = "public/buildings.json"
@@ -242,40 +240,35 @@ def make_labels(rows):
 
 # ── Model training ────────────────────────────────────────────────────────────
 
-def _class_weights(y):
-    pos = sum(y)
-    neg = len(y) - pos
-    w_pos = len(y) / (2 * pos)
-    w_neg = len(y) / (2 * neg)
-    return np.array([w_pos if yi == 1 else w_neg for yi in y])
-
-
 def train(labeled_rows):
     X = np.array([[r[f] for f in FEATURES] for r, _ in labeled_rows])
-    y = np.array([lbl for _, lbl in labeled_rows])
+    y = np.array([label for _, label in labeled_rows])
 
-    clf = GradientBoostingClassifier(
-        n_estimators=300, learning_rate=0.05,
-        max_depth=4, subsample=0.8,
+    clf = xgb.XGBClassifier(
+        n_estimators=300,
+        learning_rate=0.1,
+        max_depth=6,
+        subsample=0.8,
+        colsample_bytree=1.0,
+        scale_pos_weight=18,
         random_state=42,
+        eval_metric="logloss",
+        verbosity=0,
     )
-
-    # Pipeline prevents scaler fit-leakage across CV folds
-    pipe = Pipeline([("scaler", StandardScaler()), ("clf", clf)])
-    skf  = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    cv_scores = cross_val_score(pipe, X, y, cv=skf, scoring="roc_auc")
-    print(f"5-fold stratified CV AUC: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
-
-    # Fit final model on full training set
     scaler = StandardScaler()
-    X_sc   = scaler.fit_transform(X)
-    sample_w = _class_weights(y)
-    clf.fit(X_sc, y, sample_weight=sample_w)
+    X_sc = scaler.fit_transform(X)
 
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    scores = cross_val_score(clf, X_sc, y, cv=skf, scoring="roc_auc")
+    print(f"5-fold stratified CV AUC: {scores.mean():.3f} ± {scores.std():.3f}")
+
+    clf.fit(X_sc, y)
+
+    # Feature importances (MDI gain)
     importances = sorted(zip(FEATURES, clf.feature_importances_), key=lambda x: -x[1])
     print("\nFeature importances:")
     for feat, imp in importances:
-        print(f"  {feat:<30} {imp:.4f}")
+        print(f"  {feat:<35} {imp:.4f}")
 
     return clf, scaler
 
@@ -289,7 +282,7 @@ def predict_all(clf, scaler, rows):
 
     explainer = shap.TreeExplainer(clf)
     shap_values = explainer.shap_values(X_sc)
-    # shap.TreeExplainer for GradientBoostingClassifier returns an ndarray (not a list);
+    # shap.TreeExplainer for XGBClassifier returns an ndarray (not a list);
     # this guard is a forward-compatibility shim for classifiers like RandomForestClassifier
     # that return [neg_class_array, pos_class_array]. Index 1 = positive class in that case.
     if isinstance(shap_values, list):
