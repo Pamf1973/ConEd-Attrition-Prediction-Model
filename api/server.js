@@ -551,7 +551,7 @@ app.get("/api/meta", (_req, res) => {
     model_version: "XGBoost-v1+SHAP",
     buildings: DATA_PARSED.buildings?.length ?? 0,
   };
-  res.setHeader("Cache-Control", "public, max-age=3600");
+  res.setHeader("Cache-Control", "private, max-age=3600");
   res.json(meta);
 });
 
@@ -579,7 +579,8 @@ app.use(express.static(resolve(process.cwd(), "dist"), {
 const INJECTION_RE = /\b(ignore|forget|disregard|override|system prompt|instructions|you are now|act as|jailbreak|new task|pretend|roleplay)\b/gi;
 function sanitizeQuestion(q) {
   const stripped = q.replace(INJECTION_RE, "[filtered]").trim();
-  return `<user_query>${stripped}</user_query>`;
+  const escaped = stripped.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return `<user_query>${escaped}</user_query>`;
 }
 
 const SYSTEM_PROMPT = `You are a data query assistant for a ConEd steam customer attrition dashboard.
