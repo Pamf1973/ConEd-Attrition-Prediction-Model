@@ -200,10 +200,19 @@ app.get("/api/auth/check", (req, res) => {
 
 // Preload JSON files at startup — avoids blocking readFileSync on every request
 function loadJsonFile(filename) {
+  const publicPath = resolve(process.cwd(), "public", filename);
+  const distPath   = resolve(process.cwd(), "dist", filename);
   try {
-    return readFileSync(resolve(process.cwd(), "public", filename), "utf8");
-  } catch {
-    return readFileSync(resolve(process.cwd(), "dist", filename), "utf8");
+    return readFileSync(publicPath, "utf8");
+  } catch (primaryErr) {
+    console.warn(`[startup] ${filename}: public/ read failed (${primaryErr.code ?? primaryErr.message}), trying dist/`);
+    try {
+      return readFileSync(distPath, "utf8");
+    } catch (fallbackErr) {
+      throw new Error(
+        `FATAL: cannot load ${filename} — public/ (${primaryErr.code ?? primaryErr.message}), dist/ (${fallbackErr.code ?? fallbackErr.message})`
+      );
+    }
   }
 }
 const DATA_CACHE = {
@@ -218,11 +227,18 @@ const DATA_CACHE = {
 const ENRICHMENT_ETAG = `"enrich-${Date.now()}"`;
 
 // Parsed versions used by endpoints that need to iterate over the data (e.g. CSV export)
+function parseJsonFile(name, raw) {
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    throw new Error(`FATAL: ${name} contains invalid JSON — ${err.message}`);
+  }
+}
 const DATA_PARSED = {
-  buildings:  JSON.parse(DATA_CACHE.buildings),
-  enrichment: JSON.parse(DATA_CACHE.enrichment),
-  yearly:     JSON.parse(DATA_CACHE.yearly),
-  yoyDeltas:  JSON.parse(DATA_CACHE.yoyDeltas),
+  buildings:  parseJsonFile("buildings.json",          DATA_CACHE.buildings),
+  enrichment: parseJsonFile("buildingEnrichment.json", DATA_CACHE.enrichment),
+  yearly:     parseJsonFile("yearly.json",             DATA_CACHE.yearly),
+  yoyDeltas:  parseJsonFile("yoy_deltas.json",         DATA_CACHE.yoyDeltas),
 };
 
 // ── Protected Data Endpoints ──────────────────────────────────────────────────
@@ -252,23 +268,30 @@ app.get("/api/buildings", requireAuth, (req, res) => {
   });
 
   // Filters
-  if (risk_min) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk >= parseFloat(risk_min));
-  if (risk_max) rows = rows.filter(b => Number.isFinite(b.risk) && b.risk <= parseFloat(risk_max));
+  if (risk_min !== undefined) {
+    const rmin = parseFloat(risk_min);
+    if (!Number.isFinite(rmin)) return res.status(400).json({ error: "risk_min must be a number" });
+    rows = rows.filter(b => Number.isFinite(b.risk) && b.risk >= rmin);
+  }
+  if (risk_max !== undefined) {
+    const rmax = parseFloat(risk_max);
+    if (!Number.isFinite(rmax)) return res.status(400).json({ error: "risk_max must be a number" });
+    rows = rows.filter(b => Number.isFinite(b.risk) && b.risk <= rmax);
+  }
   if (use)      rows = rows.filter(b => b.use === use);
   if (signal)   rows = rows.filter(b => b.signal === signal);
   if (ll97_over === "1" || ll97_over === "true")  rows = rows.filter(b => b.ll97_over_2024 === 1);
   if (ll97_over === "0" || ll97_over === "false") rows = rows.filter(b => b.ll97_over_2024 === 0);
   if (cluster_name) rows = rows.filter(b => b.cluster_name === cluster_name);
   if (search) {
-    const q = search.toLowerCase();
+    const q = search.slice(0, 200).toLowerCase();
     rows = rows.filter(b =>
       [b.address, b.use, b.cluster_name, b.sc_class].some(f => (f ?? "").toLowerCase().includes(q))
     );
   }
 
-  // Sort
-  const SORTABLE = ["risk", "ll97_penalty_2024", "ll97_penalty_2030", "steam", "yr", "energy_star", "peer_score"];
-  const sortKey = SORTABLE.includes(sort_by) ? sort_by : "risk";
+  // Sort — use the same allow-list as validateSpec to prevent drift
+  const sortKey = ALLOWED_SORT_BY.includes(sort_by) ? sort_by : "risk";
   const sortAsc = sort_dir === "asc";
   rows.sort((a, b) => {
     const av = a[sortKey], bv = b[sortKey];
@@ -398,7 +421,9 @@ async function _doComputeProactiveAlerts() {
   // Kick off async LLM enrichment for top items (fire-and-forget)
   // Set SKIP_ENRICHMENT=true in env to skip (preserves rate limits for testing)
   if (!process.env.SKIP_ENRICHMENT) {
-    enrichAlertDescriptions(top50).catch(() => {});
+    enrichAlertDescriptions(top50).catch((err) => {
+      console.error("[enrich] top-level enrichment failure:", err?.message?.slice(0, 200) ?? String(err));
+    });
   }
 }
 
@@ -431,7 +456,11 @@ Respond with valid JSON only:
         if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
         if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
         } catch (err) {
-        // Retry with exponential backoff on rate-limit / transient errors
+        console.warn(`[enrich] ${alert.address}: attempt 1 failed (${err.message?.slice(0, 100)}), retrying…`);
+        if (!_isRetryable(String(err.message ?? err))) {
+          console.warn(`[enrich] ${alert.address}: non-retryable error — skipping retries`);
+          return;
+        }
         for (let retry = 1; retry <= MAX_RETRIES; retry++) {
           await new Promise(r => setTimeout(r, retry * 2000));
           try {
@@ -441,11 +470,12 @@ Respond with valid JSON only:
             if (typeof parsed.description === "string") alert.description = parsed.description.trim().slice(0, 160);
             if (typeof parsed.recommendation === "string") alert.recommendation = parsed.recommendation.trim().slice(0, 240);
             break; // success — exit retry loop
-          } catch {
-            // still failed — retry or fall through
+          } catch (retryErr) {
+            if (retry === MAX_RETRIES) {
+              console.warn(`[enrich] ${alert.address}: all ${MAX_RETRIES} retries exhausted — ${retryErr.message?.slice(0, 120) ?? String(retryErr)}`);
+            }
           }
         }
-        // leave empty if all retries exhausted — acceptable
       }
     });
     await Promise.all(promises);
@@ -458,11 +488,15 @@ Respond with valid JSON only:
 }
 
 // Compute at startup (module-level init)
-computeProactiveAlerts();
+computeProactiveAlerts().catch((err) => {
+  console.error("[alerts] startup computation failed:", err?.message?.slice(0, 200) ?? String(err));
+});
 
 // Refresh every 30 minutes — 5min was too aggressive and saturated per-minute LLM rate limits
 setInterval(() => {
-  computeProactiveAlerts();
+  computeProactiveAlerts().catch((err) => {
+    console.error("[alerts] scheduled recompute failed:", err?.message?.slice(0, 200) ?? String(err));
+  });
 }, 30 * 60 * 1000).unref();
 
 // ── Proactive Alert API ──────────────────────────────────────────────────────
@@ -548,7 +582,7 @@ app.get("/api/meta", (_req, res) => {
     dataset_date: "2026-06",
     steam_year: "2024",
     ll84_date: "2025-05",
-    model_version: "XGBoost-v1+SHAP",
+    model_version: "GBM-v1+SHAP",
     buildings: DATA_PARSED.buildings?.length ?? 0,
   };
   res.setHeader("Cache-Control", "private, max-age=3600");
@@ -642,14 +676,14 @@ async function callClaude(question, systemOverride, timeoutMs = 10_000, maxToken
     }),
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
+    const body = await res.text().catch((e) => `[body read failed: ${e.message}]`);
     throw new Error(`Claude API ${res.status}: ${body.slice(0, 300)}`);
   }
   const data = await res.json();
   return data.content?.[0]?.text ?? "";
 }
 
-async function callGroq(question, systemOverride, timeoutMs = 10_000) {
+async function callGroq(question, systemOverride, timeoutMs = 10_000, maxTokens = 512) {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     signal: AbortSignal.timeout(timeoutMs),
@@ -660,7 +694,7 @@ async function callGroq(question, systemOverride, timeoutMs = 10_000) {
     body: JSON.stringify({
       model:       "llama-3.3-70b-versatile",
       temperature: 0,
-      max_tokens:  512,
+      max_tokens:  maxTokens,
       messages: [
         { role: "system", content: systemOverride ?? SYSTEM_PROMPT },
         { role: "user",   content: question },
@@ -668,7 +702,7 @@ async function callGroq(question, systemOverride, timeoutMs = 10_000) {
     }),
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
+    const body = await res.text().catch((e) => `[body read failed: ${e.message}]`);
     throw new Error(`Groq API ${res.status}: ${body.slice(0, 300)}`);
   }
   const data = await res.json();
@@ -696,7 +730,7 @@ async function callOpenRouter(question, systemOverride, timeoutMs = 10_000, maxT
     }),
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
+    const body = await res.text().catch((e) => `[body read failed: ${e.message}]`);
     throw new Error(`OpenRouter API ${res.status}: ${body.slice(0, 300)}`);
   }
   const data = await res.json();
@@ -716,7 +750,7 @@ async function callLLM(question, systemOverride, timeoutMs = 10_000, maxTokens =
 
   if (GROQ_KEY) {
     try {
-      return await callGroq(question, systemOverride, timeoutMs);
+      return await callGroq(question, systemOverride, timeoutMs, maxTokens);
     } catch (e) {
       if (!_isRetryable(String(e.message))) throw e;
       console.warn("[callLLM] Groq unavailable — falling back:", e.message.slice(0, 80));
@@ -727,6 +761,7 @@ async function callLLM(question, systemOverride, timeoutMs = 10_000, maxTokens =
     try {
       return await callOpenRouter(question, systemOverride, timeoutMs, maxTokens);
     } catch (e) {
+      if (!_isRetryable(String(e.message))) throw e;
       console.error("[callLLM] OpenRouter fallback failed:", e.message.slice(0, 80));
     }
   }
@@ -829,7 +864,7 @@ const FAQ = [
   },
   {
     keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
-    answer: "The attrition risk score (ml_risk) is an XGBoost model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
+    answer: "The attrition risk score (ml_risk) is a GBM (Gradient Boosting Machine) model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
@@ -891,7 +926,8 @@ app.post("/api/explain", requireAuth, aiLimiter, async (req, res) => {
     const stale = explainCache.get(safe);
     if (stale) {
       const age_minutes = Math.round((Date.now() - stale.timestamp) / 60_000);
-      return res.json({ answer: stale.answer, cached: true, age_minutes });
+      console.warn(`[/api/explain] LLM failed, stale-serving ${age_minutes}m old answer: ${err.message?.slice(0, 80)}`);
+      return res.json({ answer: stale.answer, cached: true, age_minutes, degraded: true });
     }
     // FAQ fallback: check if question matches a pre-computed answer
     const faqAnswer = matchFAQ(safe);
@@ -934,6 +970,14 @@ app.get("/api/health", requireAuth, (_req, res) => {
     ok:       true,
     provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : OPENROUTER_KEY ? "openrouter-llama3.3" : "none",
   });
+});
+
+// Terminal error handler — catches anything that reaches next(err) and isn't
+// already handled above; prevents Express default from leaking stack traces.
+// eslint-disable-next-line no-unused-vars
+app.use((err, _req, res, _next) => {
+  console.error("[server] unhandled express error:", err?.message?.slice(0, 200));
+  res.status(500).json({ error: "Internal server error" });
 });
 
 const server = app.listen(PORT, () => {
