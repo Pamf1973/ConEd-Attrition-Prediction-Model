@@ -20,13 +20,13 @@ Bottom-left quadrant = sustained steam decline both years (highest churn concern
 GBM classifier, 0–1 scale. Strongly bimodal: 54 bldgs ≥0.90 (Extreme), 4 at 0.70–0.90 (High), 5 at 0.40–0.70 (Medium), 1,076 <0.10 (Low). Middle nearly empty — trained on confirmed big-drop vs. stable only; moderate-drop buildings excluded from training.
 Actionability: ≥0.90 → outreach within 1–2 wks; 0.70–0.90 → watch list + quarterly review; 0.40–0.70 → watch list + monitor; <0.40 → passive (flag if YoY ≥20% drop two consecutive years).
 Escalation signals: new HVAC/boiler DOB permit, LL97 fine >$200K/yr, two consecutive normalized steam drops, peer score turning strongly negative.
-LL97 exposure: 165 bldgs over 2024 cap ($81.9M); 830 over 2030 cap ($270.9M total, 3.3× jump).
+LL97 exposure: 168 bldgs over 2024 cap ($82.0M); 830 over 2030 cap ($270.9M total, 3.3× jump).
 
 === GBM FEATURES (SHAP importance order) ===
 LL97 penalty 2024 22%, steam kBtu 17%, LL97 over-limit 13%, GHG 12%, peer score 9%, LL97 2030 7%, cluster 6%, steam-GHG share 5%, Energy Star 4%, yr built 2%, DOB permits 2%, use-type ordinal 1%. Features log-transformed. sklearn GBM: n_estimators=300, lr=0.1, max_depth=4, subsample=0.8; AUC=0.645 (5-fold, ±0.04); 782 training labels (391 big-drop, 391 stable). KMeans: k=5, silhouette s(5)=0.31.
 
 === LL97 FORMULA ===
-GHG_steam = steam_kBtu × 4.493e-5 MT CO₂e (NYC DOB Ch.103 coeff, NOT EPA eGRID). Cap = floor_sqft × intensity_limit[use_type][phase]. Fine = max(0, GHG−cap) × $268/ton. Phase 1 (2024) intensity limits (MT CO₂e/ft²/yr): Office (B) 0.00846, Multifamily (R-2) 0.00675, Hotel (R-1) 0.01450 [UNVERIFIED — multi-model review disputed this; R-1 may be 0.00987; data awaits legal confirmation against §28-320.3 Table 1], Hospital (I-2) 0.02381. Phase 2 (2030) ~40–60% stricter. Portfolio totals: 2024=$81.9M, 2030=$270.9M.
+GHG_steam = steam_kBtu × 4.493e-5 MT CO₂e (NYC DOB Ch.103 coeff, NOT EPA eGRID). Cap = floor_sqft × intensity_limit[use_type][phase]. Fine = max(0, GHG−cap) × $268/ton. Phase 1 (2024) intensity limits (MT CO₂e/ft²/yr per §28-320.3.1 Table 320.3.1): Office (B) 0.00846, Multifamily (R-2) 0.00675, Hotel (R-1) 0.00987, Assembly/Museum/Worship (A) 0.01074, Hospital (I-2) 0.02381. Phase 2 (2030) ~40–60% stricter. Portfolio totals: 2024=$82.0M (168 bldgs), 2030=$270.9M (830 bldgs).
 
 === 5 CLUSTERS ===
 0 "Pre-War Active — Permit-Driven Churn" 269 bldgs HIGH: mixed-era, moderate permits, diverse use types.
