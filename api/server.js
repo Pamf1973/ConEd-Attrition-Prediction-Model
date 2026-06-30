@@ -868,6 +868,11 @@ const FAQ = [
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
+    // DATA NOTE: Hotel (R-1) cap stored as 0.01450 in buildingEnrichment.json.
+    // Multi-model review (GPT-5.3 + Gemini-3-Flash) disputes this — both cite 0.00987 for R-1 hotels
+    // per §28-320.3 Table 1, and indicate 0.01450 may be the Assembly (Group A) limit.
+    // Impact if wrong: 3 hotels (currently $0 penalty) may owe ~$117K/yr combined.
+    // TODO: verify against NYC Admin Code §28-320.3 Table 1 before next data refresh.
     answer: `NYC Local Law 97 sets carbon emissions caps on large buildings. Violations incur a $268/MT CO₂e penalty above the cap. The 2024 cap applies now; the stricter 2030 cap applies from 2030. Currently ${_o24Pct}% of tracked buildings are over the 2024 cap, and ${_o30Pct}% would be over the 2030 cap.`
   },
   {
