@@ -26,6 +26,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const [clusterFilter,  setClusterFilter] = useState("All");
   const [signalFilter,   setSignalFilter]  = useState("All");
   const [ll97Filter,     setLl97Filter]    = useState("All");
+  const [diagFilter,     setDiagFilter]    = useState("All");
   const [scFilter,       setScFilter]      = useState("All");
   const [outlierFilter,  setOutlierFilter] = useState("All");
   const [demandMin,      setDemandMin]     = useState("");
@@ -125,6 +126,10 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       rows = rows.filter(b => b.ll97_over_2024 === 0);
     }
 
+    if (diagFilter !== "All") {
+      rows = rows.filter(b => b.diagnostic_risk === diagFilter);
+    }
+
     if (scFilter !== "All") {
       rows = rows.filter(b => b.sc_class === scFilter);
     }
@@ -158,7 +163,7 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
       }
       return 0;
     });
-  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, scFilter, outlierFilter, demandMin, demandMax, chartRiskMin, chartRiskMax, sortStack]);
+  }, [buildings, search, tierFilter, typeFilter, clusterFilter, signalFilter, ll97Filter, diagFilter, scFilter, outlierFilter, demandMin, demandMax, chartRiskMin, chartRiskMax, sortStack]);
 
   // Paginate
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -376,6 +381,17 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           <option value="All">All LL97</option>
           <option value="Over Limit">Over Limit</option>
           <option value="Compliant">Compliant</option>
+        </select>
+        <select
+          value={diagFilter}
+          onChange={e => { setDiagFilter(e.target.value); resetFilters(); }}
+          className="px-3 py-1.5 text-sm rounded bg-[#002469] border border-[#0F3B7E] text-slate-200 focus:outline-none"
+        >
+          <option value="All">All Diagnostic</option>
+          <option value="High">Diag: High</option>
+          <option value="Medium">Diag: Medium</option>
+          <option value="Low">Diag: Low</option>
+          <option value="Uncertain">Diag: Uncertain</option>
         </select>
         <select
           value={scFilter}

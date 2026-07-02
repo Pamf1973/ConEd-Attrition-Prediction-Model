@@ -2,9 +2,13 @@
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { readFileSync } from "fs";
-import { resolve } from "path";
+import { readFileSync, existsSync } from "fs";
+import { resolve, join, dirname } from "path";
 import { randomBytes, timingSafeEqual } from "crypto";
+import { fileURLToPath } from "url";
+import { spawn } from "child_process";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
@@ -966,6 +970,74 @@ app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
   res.setHeader("Content-Disposition", 'attachment; filename="coned-steam-portfolio.csv"');
   res.setHeader("Cache-Control", "no-store, private");
   res.send([header, ...rows].join("\n"));
+});
+
+// ── ML Prediction endpoints ───────────────────────────────────────────────────
+const PREDICT_PY   = join(__dirname, "predict.py");
+const PYTHON_BIN   = join(__dirname, "..", ".ml_venv", "bin", "python3");
+const PREDICT_FEATURES = [
+  "log_steam","year_built","log_ghg","log_dob_jobs","peer_score","energy_star",
+  "use_type_ord","cluster_id","ll97_penalty_2024_log","ll97_penalty_2030_log",
+  "ll97_over_2024","steam_ghg_share",
+];
+
+function runPredict(features, model = "both") {
+  return new Promise((resolve, reject) => {
+    if (!existsSync(PREDICT_PY) || !existsSync(PYTHON_BIN)) {
+      return reject(new Error("Prediction service not available — models not trained"));
+    }
+    const py = spawn(PYTHON_BIN, [PREDICT_PY]);
+    let out = "", err = "";
+    py.stdout.on("data", d => { out += d; });
+    py.stderr.on("data", d => { err += d; });
+    py.on("close", code => {
+      if (code !== 0) return reject(new Error(err || "predict.py exited non-zero"));
+      try { resolve(JSON.parse(out)); }
+      catch { reject(new Error("Invalid JSON from predict.py")); }
+    });
+    py.stdin.write(JSON.stringify({ features, model }));
+    py.stdin.end();
+  });
+}
+
+// Normalize address for lookup: uppercase + collapse runs of whitespace
+function lookupEnrichment(rawAddr) {
+  const norm = rawAddr.trim().toUpperCase().replace(/\s+/g, " ");
+  // Try exact key first, then space-normalized fallback
+  if (DATA_PARSED.enrichment[rawAddr.trim().toUpperCase()]) return DATA_PARSED.enrichment[rawAddr.trim().toUpperCase()];
+  const key = Object.keys(DATA_PARSED.enrichment).find(
+    k => k.replace(/\s+/g, " ").toUpperCase() === norm
+  );
+  return key ? DATA_PARSED.enrichment[key] : null;
+}
+
+// Return pre-computed scores for a building by address
+app.get("/api/predict/xgboost", requireAuth, (req, res) => {
+  const addr = (req.query.address ?? "").trim();
+  if (!addr) return res.status(400).json({ error: "address query param required" });
+  const e = lookupEnrichment(addr);
+  if (!e) return res.status(404).json({ error: "Building not found" });
+  if (e.xgb_risk == null) return res.status(503).json({ error: "XGBoost scores not available — run save_models.py" });
+  res.json({ address: addr.toUpperCase(), xgb_risk: e.xgb_risk, gbm_risk: e.gbm_risk ?? null, auc: 0.6833 });
+});
+
+// Compare GBM vs XGBoost for a building
+app.get("/api/predict/compare", requireAuth, (req, res) => {
+  const addr = (req.query.address ?? "").trim();
+  if (!addr) return res.status(400).json({ error: "address query param required" });
+  const e = lookupEnrichment(addr);
+  if (!e) return res.status(404).json({ error: "Building not found" });
+  if (e.xgb_risk == null) return res.status(503).json({ error: "XGBoost scores not available — run save_models.py" });
+  const delta = (e.xgb_risk - (e.gbm_risk ?? e.ml_risk ?? 0));
+  res.json({
+    address:   addr.toUpperCase(),
+    xgb_risk:  e.xgb_risk,
+    gbm_risk:  e.gbm_risk ?? e.ml_risk,
+    delta:     Math.round(delta * 10000) / 10000,
+    xgb_auc:   0.6833,
+    gbm_auc:   0.6639,
+    features:  PREDICT_FEATURES,
+  });
 });
 
 app.get("/api/health", requireAuth, (_req, res) => {
