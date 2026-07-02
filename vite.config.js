@@ -11,6 +11,9 @@ export default defineConfig({
       "/buildingEnrichment.json": "http://localhost:3001",
       "/yearly.json": "http://localhost:3001",
     },
+    watch: {
+      ignored: ["**/.venv/**", "**/__pycache__/**", "**/analysis/**"],
+    },
   },
   build: {
     rollupOptions: {

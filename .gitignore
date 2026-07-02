@@ -25,6 +25,10 @@ dist-ssr
 .env
 
 # Python
+.venv/
 __pycache__/
 *.pyc
 smoke_test_report.md
+
+# Local analysis scratch
+analysis/

@@ -19,6 +19,9 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest"
   },
+  "overrides": {
+    "es-toolkit": "1.46.1"
+  },
   "dependencies": {
     "concurrently": "^10.0.3",
     "dotenv": "^17.4.2",

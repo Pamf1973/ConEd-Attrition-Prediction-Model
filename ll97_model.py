@@ -310,6 +310,56 @@ def predict_all(clf, scaler, rows):
     return probs, drivers
 
 
+# ── Per-building SHAP drivers ─────────────────────────────────────────────────
+# TreeExplainer returns log-odds contributions for the positive class.
+# Sign: positive pushes toward attrition, negative pulls away.
+
+def _natural_value(row, feature):
+    # Map model features back to the building's value in its natural unit
+    # (un-log where applicable) so the JSON carries human-readable numbers.
+    if feature == "log_steam":              return round(math.exp(row["log_steam"]) / 1e6, 2)   # M kBtu
+    if feature == "log_ghg":                return round(math.expm1(row["log_ghg"]), 1)         # MT CO₂e
+    if feature == "log_dob_jobs":           return int(round(math.expm1(row["log_dob_jobs"])))  # count
+    if feature == "ll97_penalty_2024_log":  return row["ll97_penalty_2024"]
+    if feature == "ll97_penalty_2030_log":  return row["ll97_penalty_2030"]
+    if feature == "ll97_over_2024":         return int(row["ll97_over_2024"])
+    if feature == "year_built":             return int(row["year_built"])
+    if feature == "energy_star":            return round(row["energy_star"], 1)
+    if feature == "peer_score":             return round(row["peer_score"], 3)
+    if feature == "use_type_ord":           return int(row["use_type_ord"])
+    if feature == "cluster_id":             return int(row["cluster_id"])
+    if feature == "steam_ghg_share":        return round(row["steam_ghg_share"], 3)
+    return row.get(feature)
+
+
+def compute_shap_drivers(clf, scaler, rows, top_n=5):
+    X = np.array([[r[f] for f in FEATURES] for r in rows])
+    X_sc = scaler.transform(X)
+    explainer   = shap.TreeExplainer(clf)
+    shap_values = explainer.shap_values(X_sc)
+    # For binary GBC, shap_values is a 2D array of shape (n, n_features).
+    # If a 3D array shape (n, n_features, 2) is returned, take the positive-class slice.
+    if shap_values.ndim == 3:
+        shap_values = shap_values[:, :, 1]
+
+    drivers_per_building = []
+    for i, row in enumerate(rows):
+        contribs = shap_values[i]
+        ranked   = sorted(enumerate(contribs), key=lambda x: -abs(x[1]))[:top_n]
+        drivers  = [
+            {
+                "feature":      FEATURES[idx],
+                "contribution": round(float(contribs[idx]), 4),
+                "value":        _natural_value(row, FEATURES[idx]),
+            }
+            for idx, _ in ranked
+        ]
+        drivers_per_building.append(drivers)
+
+    print(f"SHAP drivers computed for {len(drivers_per_building)} buildings (top {top_n} each)")
+    return drivers_per_building
+
+
 # ── Write enrichment ──────────────────────────────────────────────────────────
 
 def update_enrichment(enrichment, rows, probs, drivers):

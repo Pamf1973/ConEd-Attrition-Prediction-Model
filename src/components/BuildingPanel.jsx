@@ -192,6 +192,78 @@ function TrendChart({ building, allBuildings }) {
   );
 }
 
+const DRIVER_FORMATS = {
+  log_steam:             v => ({ label: "Steam demand",        formatted: `${v} M kBtu` }),
+  log_ghg:               v => ({ label: "Total emissions",     formatted: `${v?.toLocaleString()} MT CO₂e` }),
+  log_dob_jobs:          v => ({ label: "DOB filings",         formatted: String(v) }),
+  ll97_penalty_2024_log: v => ({ label: "LL97 2024 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
+  ll97_penalty_2030_log: v => ({ label: "LL97 2030 penalty",   formatted: v > 0 ? `$${v.toLocaleString()}` : "Compliant" }),
+  ll97_over_2024:        v => ({ label: "Over 2024 cap",       formatted: v ? "Yes" : "No" }),
+  year_built:            v => ({ label: "Year built",          formatted: String(v) }),
+  energy_star:           v => ({ label: "Energy Star",         formatted: `${v} / 100` }),
+  peer_score:            v => ({ label: "Peer attrition zone", formatted: `${Math.round(v * 100)}%` }),
+  use_type_ord:          v => ({ label: "Use-type risk",       formatted: `${v} / 4` }),
+  cluster_id:            v => ({ label: "Customer archetype",  formatted: `Cluster ${v}` }),
+  steam_ghg_share:       v => ({ label: "Steam GHG share",     formatted: `${Math.round(v * 100)}%` }),
+};
+
+function MLDrivers({ drivers }) {
+  if (!drivers || drivers.length === 0) return null;
+
+  return (
+    <div className="rounded-lg p-3 mt-2" style={{ background: "#1e293b" }}>
+      <div className="text-xs text-slate-500 mb-2">WHY THIS SCORE</div>
+      <div className="space-y-1.5">
+        {drivers.map((d, i) => {
+          const up    = d.contribution > 0;
+          const arrow = up ? "↑" : "↓";
+          const color = up ? "#ef4444" : "#64748b";
+          const fmt   = DRIVER_FORMATS[d.feature]?.(d.value) ?? { label: d.feature, formatted: String(d.value) };
+          return (
+            <div key={i} className="flex justify-between items-center text-sm">
+              <span className="flex items-center gap-2">
+                <span style={{ color }} className="font-bold w-3">{arrow}</span>
+                <span className="text-slate-400">{fmt.label}</span>
+              </span>
+              <span className="text-slate-300 font-medium tabular-nums">{fmt.formatted}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+        Top 5 model drivers (SHAP) · ↑ pushes risk higher · ↓ pulls it lower
+      </p>
+    </div>
+  );
+}
+
+function LL97Gauge({ emissions, cap, periodLabel }) {
+  if (emissions == null || cap == null || cap <= 0) return null;
+  const ratio   = emissions / cap;
+  const pct     = Math.round(ratio * 100);
+  const fillPct = Math.min(ratio * 50, 100);
+  const color   = ratio <= 1 ? "#22c55e" : ratio <= 1.5 ? "#f97316" : "#ef4444";
+
+  return (
+    <div className="mb-2 last:mb-0">
+      <div className="flex justify-between items-baseline text-xs mb-1">
+        <span className="text-slate-500">
+          {periodLabel} cap · {Math.round(cap).toLocaleString()} MT CO₂e
+        </span>
+        <span className="font-bold" style={{ color }}>{pct}% of cap</span>
+      </div>
+      <div className="relative h-2.5 bg-slate-800 rounded overflow-hidden">
+        <div className="h-full" style={{ width: `${fillPct}%`, background: color }} />
+        <div
+          className="absolute top-0 bottom-0 w-px"
+          style={{ left: "50%", background: "#64748b" }}
+          aria-label="LL97 cap line"
+        />
+      </div>
+    </div>
+  );
+}
+
 const EUI_MEDIANS = {
   Office:                              27.5,
   "Multifamily Housing":               46.4,
@@ -347,6 +419,46 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
                     "smallest cluster"
                   }
                 </div>
+              )}
+            </div>
+          </Section>
+        )}
+
+        {/* LL97 Compliance */}
+        {(b.ll97_penalty_2024 != null || b.ll97_penalty_2030 != null) && (
+          <Section title="LL97 Carbon Compliance">
+            <div className="rounded-lg p-3 mt-1 space-y-2" style={{ background: "#1e293b" }}>
+              {b.ghg != null && (b.ll97_cap_2024 != null || b.ll97_cap_2030 != null) && (
+                <div className="pb-2 border-b border-slate-700/50">
+                  <div className="text-xs text-slate-500 mb-2">
+                    Emissions vs Cap · {Math.round(b.ghg).toLocaleString()} MT CO₂e current
+                  </div>
+                  <LL97Gauge emissions={b.ghg} cap={b.ll97_cap_2024} periodLabel="2024" />
+                  <LL97Gauge emissions={b.ghg} cap={b.ll97_cap_2030} periodLabel="2030" />
+                </div>
+              )}
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">2024–2029 Annual Penalty</span>
+                <span className="text-sm font-bold"
+                  style={{ color: b.ll97_penalty_2024 > 100_000 ? "#ef4444" : b.ll97_penalty_2024 > 0 ? "#f97316" : "#22c55e" }}>
+                  {b.ll97_penalty_2024 > 0
+                    ? `$${b.ll97_penalty_2024.toLocaleString()}`
+                    : "✓ Compliant"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-500">2030–2034 Annual Penalty</span>
+                <span className="text-sm font-bold"
+                  style={{ color: b.ll97_penalty_2030 > 100_000 ? "#ef4444" : b.ll97_penalty_2030 > 0 ? "#f97316" : "#22c55e" }}>
+                  {b.ll97_penalty_2030 > 0
+                    ? `$${b.ll97_penalty_2030.toLocaleString()}`
+                    : "✓ Compliant"}
+                </span>
+              </div>
+              {b.ll97_penalty_2024 > 0 && (
+                <p className="text-xs text-slate-600 pt-1">
+                  Based on {b.floor_sqft?.toLocaleString()} ft² · $268/MT CO₂e over limit · LL97 of 2019
+                </p>
               )}
             </div>
           </Section>
