@@ -2,11 +2,10 @@
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 import { resolve, join, dirname } from "path";
 import { randomBytes, timingSafeEqual } from "crypto";
 import { fileURLToPath } from "url";
-import { spawn } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -973,41 +972,24 @@ app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
 });
 
 // ── ML Prediction endpoints ───────────────────────────────────────────────────
-const PREDICT_PY   = join(__dirname, "predict.py");
-const PYTHON_BIN   = join(__dirname, "..", ".ml_venv", "bin", "python3");
 const PREDICT_FEATURES = [
   "log_steam","year_built","log_ghg","log_dob_jobs","peer_score","energy_star",
   "use_type_ord","cluster_id","ll97_penalty_2024_log","ll97_penalty_2030_log",
   "ll97_over_2024","steam_ghg_share",
 ];
 
-function runPredict(features, model = "both") {
-  return new Promise((resolve, reject) => {
-    if (!existsSync(PREDICT_PY) || !existsSync(PYTHON_BIN)) {
-      return reject(new Error("Prediction service not available — models not trained"));
-    }
-    const py = spawn(PYTHON_BIN, [PREDICT_PY]);
-    let out = "", err = "";
-    py.stdout.on("data", d => { out += d; });
-    py.stderr.on("data", d => { err += d; });
-    py.on("close", code => {
-      if (code !== 0) return reject(new Error(err || "predict.py exited non-zero"));
-      try { resolve(JSON.parse(out)); }
-      catch { reject(new Error("Invalid JSON from predict.py")); }
-    });
-    py.stdin.write(JSON.stringify({ features, model }));
-    py.stdin.end();
-  });
-}
+// Pre-built O(1) lookup: normalized address → original enrichment key
+const ENRICHMENT_NORM_INDEX = (() => {
+  const idx = new Map();
+  for (const k of Object.keys(DATA_PARSED.enrichment ?? {})) {
+    idx.set(k.replace(/\s+/g, " ").toUpperCase(), k);
+  }
+  return idx;
+})();
 
-// Normalize address for lookup: uppercase + collapse runs of whitespace
 function lookupEnrichment(rawAddr) {
   const norm = rawAddr.trim().toUpperCase().replace(/\s+/g, " ");
-  // Try exact key first, then space-normalized fallback
-  if (DATA_PARSED.enrichment[rawAddr.trim().toUpperCase()]) return DATA_PARSED.enrichment[rawAddr.trim().toUpperCase()];
-  const key = Object.keys(DATA_PARSED.enrichment).find(
-    k => k.replace(/\s+/g, " ").toUpperCase() === norm
-  );
+  const key = ENRICHMENT_NORM_INDEX.get(norm);
   return key ? DATA_PARSED.enrichment[key] : null;
 }
 

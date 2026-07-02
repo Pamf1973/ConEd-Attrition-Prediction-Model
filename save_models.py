@@ -83,23 +83,28 @@ def main():
     addresses = [r["address"] for r in all_rows]
 
     gbm_scores = gbm_pipe.predict_proba(X_all)[:, 1]
-    xgb_scores = xgb_pipe.predict_proba(X_all)[:, 1] if xgb_pipe else gbm_scores
+    xgb_scores = xgb_pipe.predict_proba(X_all)[:, 1] if xgb_pipe else None
 
     with open(ENRICHMENT_PATH) as f:
         enrichment_data = json.load(f)
 
     updated = 0
-    for addr, gbm_s, xgb_s in zip(addresses, gbm_scores, xgb_scores):
+    for i, (addr, gbm_s) in enumerate(zip(addresses, gbm_scores)):
         if addr in enrichment_data:
-            enrichment_data[addr]["xgb_risk"] = round(float(xgb_s), 4)
             enrichment_data[addr]["gbm_risk"] = round(float(gbm_s), 4)
+            if xgb_scores is not None:
+                enrichment_data[addr]["xgb_risk"] = round(float(xgb_scores[i]), 4)
             updated += 1
 
-    with open(ENRICHMENT_PATH, "w") as f:
+    # Atomic write — truncate only after full serialize succeeds
+    tmp_path = ENRICHMENT_PATH + ".tmp"
+    with open(tmp_path, "w") as f:
         json.dump(enrichment_data, f, separators=(",", ":"))
+    os.replace(tmp_path, ENRICHMENT_PATH)
 
     print(f"  Updated {updated}/{len(all_rows)} buildings in buildingEnrichment.json")
-    print(f"  XGBoost score range: {xgb_scores.min():.4f} – {xgb_scores.max():.4f}")
+    if xgb_scores is not None:
+        print(f"  XGBoost score range: {xgb_scores.min():.4f} – {xgb_scores.max():.4f}")
     print(f"  GBM score range:     {gbm_scores.min():.4f} – {gbm_scores.max():.4f}")
     print("\nDone.")
 
