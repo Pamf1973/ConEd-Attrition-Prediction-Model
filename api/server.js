@@ -579,13 +579,28 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
   res.json({ addresses });
 });
 
+// ── /api/model_meta — model provenance object (written by train_xgboost.py) ──
+const MODEL_META_PATH = join(__dirname, "../public/model_meta.json");
+let _modelMeta = null;
+function getModelMeta() {
+  if (!_modelMeta) {
+    try { _modelMeta = JSON.parse(readFileSync(MODEL_META_PATH, "utf8")); }
+    catch { _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1", validation_status: "unvalidated" }; }
+  }
+  return _modelMeta;
+}
+app.get("/api/model_meta", requireAuth, (_req, res) => {
+  res.setHeader("Cache-Control", "private, max-age=3600");
+  res.json(getModelMeta());
+});
+
 // ── /api/meta — dataset freshness metadata ────────────────────────────────────
 app.get("/api/meta", (_req, res) => {
   const meta = {
     dataset_date: "2026-06",
     steam_year: "2024",
     ll84_date: "2025-05",
-    model_version: "GBM-v1+SHAP",
+    model_version: getModelMeta().model_version,
     buildings: DATA_PARSED.buildings?.length ?? 0,
   };
   res.setHeader("Cache-Control", "private, max-age=3600");
@@ -867,7 +882,7 @@ const FAQ = [
   },
   {
     keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
-    answer: "The attrition risk score (ml_risk) is a GBM (Gradient Boosting Machine) model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
+    answer: `The attrition risk score (ml_risk) is an XGBoost classifier prediction (0–1) that ranks a building's likelihood of significant steam demand decline relative to peers. It ranks a true churner above a non-churner about ${Math.round((getModelMeta().cv_auc ?? 0.68) * 100)}% of the time (${getModelMeta().cv_kfold ?? 5}-fold CV, ${getModelMeta().n_positive ?? 54} positive labels). Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster.`
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
