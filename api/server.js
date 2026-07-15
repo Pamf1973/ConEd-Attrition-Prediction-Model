@@ -4,7 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve, join, dirname } from "path";
-import { randomBytes, timingSafeEqual } from "crypto";
+import { randomBytes, timingSafeEqual, createHash } from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -75,7 +75,8 @@ app.use(helmet({
 // ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and cannot identify clients for rate limiting.
 // If a CDN is ever placed in front of Railway, increment this count to match
 // the total number of trusted proxy hops.
-if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+// Trust proxy whenever deployed (DATABASE_URL present = Railway), not just NODE_ENV=production
+if (process.env.DATABASE_URL || process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "16kb" }));
 app.use((err, req, res, next) => {
@@ -102,6 +103,22 @@ const aiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "AI query rate limit — max 20 per minute" },
+});
+
+const statusWriteLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Status write rate limit — max 10 per minute" },
+});
+
+const statusBulkLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Bulk status rate limit — max 20 per minute" },
 });
 
 // ── Authentication & Sessions ──────────────────────────────────────────────────
@@ -164,10 +181,11 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
-  const pwdBuf  = Buffer.from(password);
-  const hashBuf = Buffer.from(DASHBOARD_PASSWORD);
-  const match   = pwdBuf.length === hashBuf.length &&
-                  timingSafeEqual(pwdBuf, hashBuf);
+  // Hash both to fixed 32-byte digests so timingSafeEqual always runs
+  // regardless of submitted password length — prevents length oracle attack
+  const pwdBuf  = createHash("sha256").update(password).digest();
+  const hashBuf = createHash("sha256").update(DASHBOARD_PASSWORD).digest();
+  const match   = timingSafeEqual(pwdBuf, hashBuf);
   if (match) {
     // Enforce hard cap inline: if at limit, reject new sessions immediately
     if (activeSessions.size >= MAX_SESSIONS) {
@@ -583,27 +601,45 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
 // ── /api/buildings status endpoints — append-only workflow state ──────────────
 // IMPORTANT: bulk route must be registered before :bbl to prevent Express
 // matching the literal string "status" as a BBL parameter value.
-const BBL_RE = /^\d{1,10}$/;
 
-// Bulk current status for a list of BBLs (POST body: { bbls: string[] })
-app.post("/api/buildings/status/bulk", requireAuth, async (req, res) => {
+// NYC BBLs are always exactly 10 digits (1 borough + 5 block + 4 lot, zero-padded)
+const BBL_RE = /^\d{10}$/;
+
+// Stable per-session pseudonym for actor attribution — hashes the bearer token
+// so the raw token is never written to the DB or returned in read responses
+function actorTag(token) {
+  return createHash("sha256").update(token).digest("hex").slice(0, 16);
+}
+
+// Strip null bytes and Unicode bidi-override/isolate control characters from note text
+function sanitizeNote(raw) {
+  return raw
+    .normalize("NFC")
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f‪-‮⁦-⁩]/g, "");
+}
+
+// Bulk current status — registered before :bbl route to avoid param shadowing
+app.post("/api/buildings/status/bulk", requireAuth, statusBulkLimiter, async (req, res) => {
   const { bbls } = req.body ?? {};
   if (!Array.isArray(bbls) || bbls.length > 2000) {
     return res.status(400).json({ error: "bbls must be an array of ≤ 2000 strings" });
   }
   const clean = bbls.filter((b) => typeof b === "string" && BBL_RE.test(b));
+  if (clean.length === 0 && bbls.length > 0) {
+    return res.status(400).json({ error: "No valid BBLs in request (expected 10-digit strings)" });
+  }
   try {
     const result = await getBulkCurrentStatus(clean);
     res.json(result);
   } catch (err) {
-    console.error("[status] bulk read failed:", err.message);
+    console.error("[status] bulk read failed:", err?.message ?? String(err));
     res.status(500).json({ error: "Failed to read bulk status" });
   }
 });
 
-app.post("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
+app.post("/api/buildings/:bbl/status", requireAuth, statusWriteLimiter, async (req, res) => {
   const { bbl } = req.params;
-  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL format" });
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
 
   const { status, note } = req.body ?? {};
   if (!VALID_STATUSES.has(status)) {
@@ -613,25 +649,26 @@ app.post("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
     return res.status(400).json({ error: "note must be a string ≤ 2000 chars" });
   }
 
+  const cleanNote = note !== undefined ? sanitizeNote(note) : undefined;
   try {
-    const event = await appendStatus(bbl, status, note, req.sessionToken);
+    const event = await appendStatus(bbl, status, cleanNote, actorTag(req.sessionToken));
     res.status(201).json(event);
   } catch (err) {
-    console.error("[status] write failed:", err.message);
+    console.error("[status] write failed:", err?.message ?? String(err));
     res.status(500).json({ error: "Failed to persist status event" });
   }
 });
 
 app.get("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
   const { bbl } = req.params;
-  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL format" });
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
 
   try {
-    const current = await getCurrentStatus(bbl);
+    // Single query — current is just history[0]
     const history = await getStatusHistory(bbl);
-    res.json({ current, history });
+    res.json({ current: history[0] ?? null, history });
   } catch (err) {
-    console.error("[status] read failed:", err.message);
+    console.error("[status] read failed:", err?.message ?? String(err));
     res.status(500).json({ error: "Failed to read status" });
   }
 });
@@ -1109,15 +1146,16 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Initialise DB schema before accepting connections
-initSchema().catch((err) => {
-  console.error("[db] schema init failed — status endpoints unavailable:", err.message);
-});
-
-const server = app.listen(PORT, () => {
-  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
-  console.log(`[api] listening on :${PORT} | provider: ${provider}`);
-});
+// Schema must be ready before accepting connections — exit on failure
+const server = await initSchema()
+  .then(() => app.listen(PORT, () => {
+    const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
+    console.log(`[api] listening on :${PORT} | provider: ${provider}`);
+  }))
+  .catch((err) => {
+    console.error("[db] FATAL: schema init failed:", err?.message ?? String(err));
+    process.exit(1);
+  });
 
 // Kill slow/stalled connections — prevents Slowloris exhaustion attacks
 server.requestTimeout  = 30_000; // 30s to complete request
