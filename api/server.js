@@ -12,6 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
+import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -579,6 +580,62 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
   res.json({ addresses });
 });
 
+// ── /api/buildings status endpoints — append-only workflow state ──────────────
+// IMPORTANT: bulk route must be registered before :bbl to prevent Express
+// matching the literal string "status" as a BBL parameter value.
+const BBL_RE = /^\d{1,10}$/;
+
+// Bulk current status for a list of BBLs (POST body: { bbls: string[] })
+app.post("/api/buildings/status/bulk", requireAuth, async (req, res) => {
+  const { bbls } = req.body ?? {};
+  if (!Array.isArray(bbls) || bbls.length > 2000) {
+    return res.status(400).json({ error: "bbls must be an array of ≤ 2000 strings" });
+  }
+  const clean = bbls.filter((b) => typeof b === "string" && BBL_RE.test(b));
+  try {
+    const result = await getBulkCurrentStatus(clean);
+    res.json(result);
+  } catch (err) {
+    console.error("[status] bulk read failed:", err.message);
+    res.status(500).json({ error: "Failed to read bulk status" });
+  }
+});
+
+app.post("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
+  const { bbl } = req.params;
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL format" });
+
+  const { status, note } = req.body ?? {};
+  if (!VALID_STATUSES.has(status)) {
+    return res.status(400).json({ error: `status must be one of: ${[...VALID_STATUSES].join(", ")}` });
+  }
+  if (note !== undefined && (typeof note !== "string" || note.length > 2000)) {
+    return res.status(400).json({ error: "note must be a string ≤ 2000 chars" });
+  }
+
+  try {
+    const event = await appendStatus(bbl, status, note, req.sessionToken);
+    res.status(201).json(event);
+  } catch (err) {
+    console.error("[status] write failed:", err.message);
+    res.status(500).json({ error: "Failed to persist status event" });
+  }
+});
+
+app.get("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
+  const { bbl } = req.params;
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL format" });
+
+  try {
+    const current = await getCurrentStatus(bbl);
+    const history = await getStatusHistory(bbl);
+    res.json({ current, history });
+  } catch (err) {
+    console.error("[status] read failed:", err.message);
+    res.status(500).json({ error: "Failed to read status" });
+  }
+});
+
 // ── /api/model_meta — model provenance object (written by train_xgboost.py) ──
 const MODEL_META_PATH = join(__dirname, "../public/model_meta.json");
 let _modelMeta = null;
@@ -1050,6 +1107,11 @@ app.get("/api/health", requireAuth, (_req, res) => {
 app.use((err, _req, res, _next) => {
   console.error("[server] unhandled express error:", err?.message?.slice(0, 200));
   res.status(500).json({ error: "Internal server error" });
+});
+
+// Initialise DB schema before accepting connections
+initSchema().catch((err) => {
+  console.error("[db] schema init failed — status endpoints unavailable:", err.message);
 });
 
 const server = app.listen(PORT, () => {
