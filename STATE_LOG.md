@@ -15,3 +15,9 @@ Examples:
 ```
 
 ---
+
+## 2026-07-16 09:29 sync
+- bc1700c | Edwin Perez: build-ops scaffold installed (PROJECT_STATE, ROADMAP R1–R14, DECISIONS D1, DISTILLED_GOALS, STATE_LOG, DOCS_INDEX, CONVENTIONS.md, docs/ library). Fable roadmap moved to docs/ref/. Design profile declared. No R-item code advanced; this is tracking infrastructure.
+- PRs open: #9 (ismael/monday-workflow) — W1/W4/W6 Monday workflow features by ismaelcaraballo-afk; updated 2026-07-15.
+- Roadmap advanced: none (bc1700c is docs/infra only)
+- Drift flags: PR #9 implements W1/W4/W6 laws (queue arithmetic, pipeline timestamp, QuickFilters) against legacy components (RiskTable.jsx, App.jsx, BuildingPanel.jsx) using localStorage — this is pre-M6 workaround territory; R7 scopes Postgres migration. Branch name (monday-workflow) is not milestone-tagged per CLAUDE.md convention. PR owner is Ismael but scope overlaps R9/R10 (Pedro-owned). Needs Edwin review before merge to confirm legacy-vs-new-build boundary compliance.
