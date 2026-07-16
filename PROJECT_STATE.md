@@ -45,7 +45,8 @@ Current snapshot only. Rewritten by /sync. History lives in STATE_LOG.md. Hard c
 - 2026-07-16 | Edwin: FAQ copy pass on Ismael's rewritten ml_risk answer (server.js:867 area, R2 scope split). Unblocks PR-9a merge. Expected this week. Unconfirmed.
 - 2026-07-16 | Ismael: split PR #9 into three PRs per Path A (PR-9a R2+R3 backend, PR-9b R7 backbone + security, PR-9c W1/W4/W6 frontend parked). Expected this week. Unconfirmed.
 - 2026-07-16 | Ismael: R7 watchlist migration (in-memory Map at server.js:314 retires to Postgres). Second half of M6, not in PR #9 diff. Unconfirmed.
-- 2026-07-16 | Pedro: start R1 (M0 legacy separation) per checkpoint brief at docs/briefs/2026-07-16_pedro-checkpoint.md. Unconfirmed.
+- 2026-07-16 | Pedro: start R1 (M0 legacy separation) per checkpoint brief at docs/briefs/2026-07-16_pedro-checkpoint.md. Expected by end of 2026-07-16 (tonight). Unconfirmed.
+- 2026-07-16 | Edwin: contingency — absorb R1 (M0 legacy separation) if Pedro hasn't started by end of 2026-07-16. Requires editing Pedro's brief at docs/briefs/2026-07-16_pedro-checkpoint.md + adjusting Slack message already sent. Contingent; not yet triggered.
 - 2026-07-16 | Edwin: R14 David packet item #5 external sign-off (Critical v1.1 with n=23). Ismael internally signed. Unconfirmed.
 
 ## Current Risks
