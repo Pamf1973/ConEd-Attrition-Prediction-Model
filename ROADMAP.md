@@ -4,7 +4,7 @@ Structured data, not prose. Every item has an ID, status, and dependency links. 
 
 Statuses: planned | active | done | cut | superseded
 
-Narrative source: `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` (Fable, 2026-07-13) + `roadmap-supplement-m0.md`. Each R-item's scope names the milestone it covers ("covers M#"). Keep this file and the fable roadmap reconcilable — when a milestone changes, update both.
+Narrative source: `docs/ref/2026-07-16_fable-roadmap.md` (Fable, 2026-07-13) + `roadmap-supplement-m0.md`. Each R-item's scope names the milestone it covers ("covers M#"). Keep this file and the fable roadmap reconcilable — when a milestone changes, update both.
 
 ---
 

@@ -3,7 +3,7 @@
 **From:** Ismael
 **To:** Edwin
 **Date:** 2026-07-13
-**Re:** `ISMAEL-BRIEF-PATH-C-AND-BACKEND-DECISIONS-2026-07-13.md` Q1–Q10
+**Re:** `docs/briefs/2026-07-13_ismael-path-c-decisions.md` Q1–Q10
 
 ## Q1 — Path C sign-off
 **Yes, Path C.** Independently ran the cross-tab against live data: 176 base-Low → final-High, 78.1% of final-High modifier-promoted, modifier-shifted rate 69.7% of non-Uncertain. Numbers match. The "rule-based" framing was always wrong to ship. **No code change to `compute_diagnostic_risk`.**

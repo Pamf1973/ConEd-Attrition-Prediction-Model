@@ -40,7 +40,7 @@ Bloomberg Terminal that explains itself, workflow-first. The old dashboard shows
 | 4 | Rule-based tier assignment with empirical thresholds | Hybrid tier (§4.1) on every surface; Exhibit D in the reasoning report | Fully learned tier explored |
 | 5 | Positioning as complementary signals | Methodology page §8 and report method footer | Pattern-mining research track named as Round 2 engine |
 
-Full analysis: `CONED_METHODOLOGY_ALIGNMENT.md` in repo. Methodology page ships in M10.
+Full analysis: `docs/ref/2026-07-16_methodology-alignment.md` in repo. Methodology page ships in M10.
 
 ---
 
@@ -98,7 +98,7 @@ Answers can be async — Slack, email, or reply to the meeting notes. Item numbe
 | M11 | Queue aggregate view (toggle) | Pedro | M8 |
 | M12 | Weekly digest + compose flow | Edwin + Pedro | M9, M5, M1 |
 
-Full roadmap with acceptance criteria: `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` in repo.
+Full roadmap with acceptance criteria: `docs/ref/2026-07-16_fable-roadmap.md` in repo.
 
 ---
 

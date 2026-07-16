@@ -280,7 +280,7 @@ Please respond in whatever format is easiest. If you're feeding this to your LLM
 - `'22→'24` delta (Q9) is scope-planning only; doesn't gate the build.
 - Server.js fixes (Q10) is a coordination question so we don't double-commit.
 
-Once you send the answers back, Edwin will fold them into Fable's roadmap prompt (prompt 03 in the `fable-prompts-2026-07-13/` folder), and Fable will emit `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` with sequenced milestones, dependencies, and acceptance criteria. That is the document Pedro builds from.
+Once you send the answers back, Edwin will fold them into Fable's roadmap prompt (prompt 03 in the `fable-prompts-2026-07-13/` folder), and Fable will emit `docs/ref/2026-07-16_fable-roadmap.md` with sequenced milestones, dependencies, and acceptance criteria. That is the document Pedro builds from.
 
 ---
 
@@ -297,6 +297,6 @@ Once you send the answers back, Edwin will fold them into Fable's roadmap prompt
 - `fable-checkin-1-2026-07-12/system.md` — Fable's design system document
 - `fable-checkin-2-2026-07-13/integration-check-round-1-response.md` — Fable's first pass integration check
 - `fable-checkin-2-2026-07-13/integration-check-round-1-1-delta-response.md` — Fable's follow-up delta after we sent it the actual code and data (this is where the modifier-driven finding lives)
-- `coned-dashboard-BLACKSTONE-PREP-ASKS-FOR-TEAM.md` — the ASKS doc; §1, §4, §5, §6 are the most relevant sections for the decisions above
+- `docs/archive/demo-cycle-2026-07-01/2026-07-13_blackstone-prep-asks.md` — the ASKS doc; §1, §4, §5, §6 are the most relevant sections for the decisions above
 
 If your LLM asks for context on the design vocabulary (score cell, provenance chip, freshness chip, S-states L1–L6, ledger, atom, register), the source of truth is `fable-checkin-1-2026-07-12/system.md`.

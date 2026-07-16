@@ -1,7 +1,7 @@
 # ConEd Steam Attrition · Build Roadmap
 
 **Emitted:** 2026-07-13
-**Canonical references:** `system-v1.1.md` (all law and rule citations below), the five spec HTML atoms, `ISMAEL-RESPONSE-2026-07-13.md` (Q-scopes), `CONED_METHODOLOGY_ALIGNMENT.md` (methodology section source).
+**Canonical references:** `system-v1.1.md` (all law and rule citations below), the five spec HTML atoms, `docs/ref/2026-07-13_ismael-q1-q10-response.md` (Q-scopes), `docs/ref/2026-07-16_methodology-alignment.md` (methodology section source).
 **Anchor deadline:** September ConEd session. Milestones and dependencies only, no dates.
 **Team:** Ismael (pipeline/backend), Pedro (frontend atoms + workbench composition), Edwin (domain composition, report/methodology content, David-facing follow-ups).
 

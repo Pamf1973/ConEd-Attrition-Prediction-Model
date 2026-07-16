@@ -10,7 +10,7 @@
 **Before the meeting:**
 - Print 3–5 copies of `TOUCHPOINT-ONEPAGER.md` (double-sided)
 - Have the 4 atoms open in browser tabs: `fable-checkin-1-2026-07-12/this-week-landing.html`, `.../score-cell-anatomy.html`, `.../reasoning-report.html`, `.../weekly-digest-email.html`
-- Have `system-v1.1.md` and `CONED_METHODOLOGY_ALIGNMENT.md` open in a second window in case Ildi asks for the source
+- Have `system-v1.1.md` and `docs/ref/2026-07-16_methodology-alignment.md` open in a second window in case Ildi asks for the source
 - Ismael: know the Q4 rerun status (in progress / landed). Pedro: know M0 status (shipped / in flight).
 - Edwin on Slack during the meeting for questions that go past what these notes cover.
 
@@ -165,7 +165,7 @@
 | 4. Rule-based tier assignment | Hybrid tier with the chain named on every surface (§4.1 case file, Exhibit D report) | Fully learned tier explored |
 | 5. Positioning as complementary signals | Ships now in methodology page §8 and report method footer | Pattern-mining research track named |
 
-- Pointer: full methodology page ships in M10; `CONED_METHODOLOGY_ALIGNMENT.md` in repo has the full analysis; one-pager handout has the summary.
+- Pointer: full methodology page ships in M10; `docs/ref/2026-07-16_methodology-alignment.md` in repo has the full analysis; one-pager handout has the summary.
 
 **Speaker notes:**
 > "Ildi — this slide is for you. Your team's methodology alignment doc from June, our response item by item."

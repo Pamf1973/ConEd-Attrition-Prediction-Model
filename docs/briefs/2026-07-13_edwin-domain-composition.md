@@ -2,13 +2,13 @@
 
 **From:** Edwin (for future-me and anyone reading over my shoulder)
 **Date:** 2026-07-14
-**Purpose:** My milestone-by-milestone brief. Ismael owns backend; Pedro owns frontend. I own domain content, copy, the report, the methodology page, the digest, and the David packet. This file is the shim between my head, `system-v1.1.md`, `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`, and the codebase (`CLAUDE.md`).
+**Purpose:** My milestone-by-milestone brief. Ismael owns backend; Pedro owns frontend. I own domain content, copy, the report, the methodology page, the digest, and the David packet. This file is the shim between my head, `system-v1.1.md`, `docs/ref/2026-07-16_fable-roadmap.md`, and the codebase (`CLAUDE.md`).
 
 **Read first, before writing anything:**
 - `system-v1.1.md` — voice, laws, copy rules (§7 rules 8/9 especially), §4.1 hybrid chain, §5 components table
-- `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` — full milestone list; my ownership is M1 (paired), M4 (paired, Pedro leads), M5 (I lead), M10 (I own), M12 (I lead), plus the David packet
-- `CONED_METHODOLOGY_ALIGNMENT.md` — Johan/Ildi five items, feeds M10 §8
-- `ISMAEL-RESPONSE-2026-07-13.md` — Q1–Q10, the ground truth for numbers
+- `docs/ref/2026-07-16_fable-roadmap.md` — full milestone list; my ownership is M1 (paired), M4 (paired, Pedro leads), M5 (I lead), M10 (I own), M12 (I lead), plus the David packet
+- `docs/ref/2026-07-16_methodology-alignment.md` — Johan/Ildi five items, feeds M10 §8
+- `docs/ref/2026-07-13_ismael-q1-q10-response.md` — Q1–Q10, the ground truth for numbers
 - `CLAUDE.md` — repo layout, file map, legacy discipline
 
 Everything below quotes acceptance criteria verbatim from those docs. Where a rule number appears (L1, W3, §7 rule 8, M1-family, etc.), the canonical text is in `system-v1.1.md` — do not paraphrase.
@@ -32,7 +32,7 @@ Do them roughly in this order. **M1 first — the chatbot copy is small but it's
 
 ## M1 (paired with Ismael): chatbot answer rewrite
 
-**Spec source:** `system-v1.1.md` §7 rules 8/9, L1, ledger #20; `ISMAEL-RESPONSE-2026-07-13.md` Q10.
+**Spec source:** `system-v1.1.md` §7 rules 8/9, L1, ledger #20; `docs/ref/2026-07-13_ismael-q1-q10-response.md` Q10.
 
 ### What I ship
 
@@ -64,7 +64,7 @@ The chatbot is legacy per `roadmap-supplement-m0.md` — but the endpoint is sha
 
 ## M4 (paired, Pedro leads): ledger + caveat copy
 
-**Spec source:** `system-v1.1.md` §5 (claim ledger, driver row, narrative slot), §4.1, §7 rules 8/9; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M4.
+**Spec source:** `system-v1.1.md` §5 (claim ledger, driver row, narrative slot), §4.1, §7 rules 8/9; `docs/ref/2026-07-16_fable-roadmap.md` M4.
 
 ### What I ship
 
@@ -138,7 +138,7 @@ Per §4.2 vocabulary: `Unreviewed`, `In review`, `Contacted`, `Confirmed at-risk
 
 ## M5 (I lead): reasoning report
 
-**Spec source:** `system-v1.1.md` §5 report sheet row, Spec 3 HTML atom, §7 rules 8/9, §4.1, R1-R5 laws; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M5.
+**Spec source:** `system-v1.1.md` §5 report sheet row, Spec 3 HTML atom, §7 rules 8/9, §4.1, R1-R5 laws; `docs/ref/2026-07-16_fable-roadmap.md` M5.
 
 ### What I ship (content lead)
 
@@ -151,7 +151,7 @@ Everything that renders on the report page. Pedro owns the print stylesheet and 
 - Method footer
 - Signature block with DRAFT watermark
 
-### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M5, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_fable-roadmap.md` M5, verbatim)
 
 - **R1** — every value matches the case file to the digit. If the case file says `Δ '24 -34%`, the report says `Δ '24 -34%`. Not "roughly 34%," not "about a third."
 - **R2** — page one is the argument, page two is exhibits only. Pedro's print stylesheet enforces the break; I structure the content so it naturally lands that way.
@@ -243,20 +243,20 @@ Ledger #10 open: DRAFT watermark vs hard gate. **Recommendation:** watermark, no
 
 ## M10 (I own): methodology page
 
-**Spec source:** `system-v1.1.md` §5 methodology page row, M1-M5 laws (portfolio-scale), §4.1, §4.5, §4.6, §7, `CONED_METHODOLOGY_ALIGNMENT.md` §4; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M10.
+**Spec source:** `system-v1.1.md` §5 methodology page row, M1-M5 laws (portfolio-scale), §4.1, §4.5, §4.6, §7, `docs/ref/2026-07-16_methodology-alignment.md` §4; `docs/ref/2026-07-16_fable-roadmap.md` M10.
 
 ### What I ship
 
 Nine-section page, Report register, editorial and printable. Linked from the landing footer, provenance chips, and report method footer. **No one else touches this.** I author the content; Pedro drops it into a component (or MDX file — pick a format and stick with it).
 
-### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M10, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_fable-roadmap.md` M10, verbatim)
 
 - M1 to M5 laws hold: named populations with snapshots, dual stamps for model-version vs run-date facts, no causal verbs, explicit "research pending" placeholders in §8, definitions live here and surfaces link.
 - §3 is the §4.1 chain verbatim.
 - §5 is the Critical definition with the 23 buildings.
 - §6 carries the §8 rule 1 compression sentence (bimodal distribution + quasi-tie block).
 - §7 carries the four tech-spec limitations.
-- §8 implements methodology item 5 (complementary signals) per `CONED_METHODOLOGY_ALIGNMENT.md` §4.
+- §8 implements methodology item 5 (complementary signals) per `docs/ref/2026-07-16_methodology-alignment.md` §4.
 - Two clocks stamped per section: sections 2/5/7 revise per model version; 4/9 regenerate per pipeline run; 8 backfills when the research track runs. Each section carries its own stamp.
 
 ### Nine sections
@@ -304,12 +304,12 @@ Version stamp: `model_meta.model_version` (bimodality is a model property).
 Version stamp: `model_meta.model_version`.
 
 **§8 — The ConEd framework and ours: complementary signals.**
-This is the alignment doc's §4 comparison, written as the two-stances/where-they-meet argument. Follow `CONED_METHODOLOGY_ALIGNMENT.md` §4 for the five methodology items:
+This is the alignment doc's §4 comparison, written as the two-stances/where-they-meet argument. Follow `docs/ref/2026-07-16_methodology-alignment.md` §4 for the five methodology items:
 
 1. **Per-customer weather-normalized usage regression** — Round 2 deferral. Ship: acknowledgment that our citywide HDD is the known weakness; NYCHA 24-development regression as the shipped exemplar of the target method; what unblocks each resolution level (Ismael feasibility read → NDA/billing pathway from David).
 2. **Diagnostic metrics suite (6 metrics)** — partial ship. Case-file coverage column surfaces the fields that already exist (decline trend label, decline acceleration, regression R² where present). Full-usage baseline, HDD slope stability, slope-intercept sync, portfolio-wide R² all depend on item 1 landing. Table of "6 metrics × status" showing ~2 of 6 partially present.
 3. **Uncertain tier aligned with regression fit** — partially converged. Our Uncertain gates include Johan's fit-based meaning where fit exists (NYCHA R² < 0.3) and years-based gate where no per-building fit can exist on public data. Round 2 extends fit-based gate portfolio-wide when item 1 lands.
-4. **Rule-based tier assignment with empirical thresholds** — Round 2 deferral. We ship Path C honesty about our hybrid (§4.1 on every tier surface, Exhibit D in M5). One supersession to name: `CONED_METHODOLOGY_ALIGNMENT.md` §8(g)'s dual-tier disagreement badge is not our DIVERGE class (DIVERGE is intra-hybrid: base vs modifiers within one method). True two-independent-methods disagreement becomes possible only when the Johan-style tier exists in Round 2. Also superseded: §3d's "81% probability" display language, killed by L1.
+4. **Rule-based tier assignment with empirical thresholds** — Round 2 deferral. We ship Path C honesty about our hybrid (§4.1 on every tier surface, Exhibit D in M5). One supersession to name: `docs/ref/2026-07-16_methodology-alignment.md` §8(g)'s dual-tier disagreement badge is not our DIVERGE class (DIVERGE is intra-hybrid: base vs modifiers within one method). True two-independent-methods disagreement becomes possible only when the Johan-style tier exists in Round 2. Also superseded: §3d's "81% probability" display language, killed by L1.
 5. **Positioning as complementary signals** — ships now, as content, here and in M5's method footer. This is Johan's "repeatable pattern-based approach" answered at the positioning level pre-demo; the pattern-mining research track is named as the Round 2 engine behind it.
 
 **Explicit "research pending" placeholders** per M4 law wherever an item isn't shipped. No empty charts. No invented examples.
@@ -346,13 +346,13 @@ Regenerates per pipeline run. Run stamp: `model_meta.run_date`.
 
 ## M12 (I lead): weekly digest
 
-**Spec source:** `system-v1.1.md` §5 digest email row, Spec 5 HTML atom, D1-D6 laws, C1-C3 compose laws, §7 copy rules; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M12.
+**Spec source:** `system-v1.1.md` §5 digest email row, Spec 5 HTML atom, D1-D6 laws, C1-C3 compose laws, §7 copy rules; `docs/ref/2026-07-16_fable-roadmap.md` M12.
 
 ### What I ship (content lead)
 
 Everything that renders in the digest. Pedro owns the compose UI. I own the templates, the finding paragraph, and the send framing.
 
-### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M12, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_fable-roadmap.md` M12, verbatim)
 
 - D1 to D6 as specced.
 - C1 numbers injected, never generated.
@@ -433,7 +433,7 @@ If Pedro's locked-token spike fails, plain textarea with trust is acceptable for
 
 ## Parallel non-build track: the David packet
 
-**Spec source:** `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` §Parallel non-build track; `system-v1.1.md` §10 (open questions ledger).
+**Spec source:** `docs/ref/2026-07-16_fable-roadmap.md` §Parallel non-build track; `system-v1.1.md` §10 (open questions ledger).
 
 Runs alongside M1–M5. One email or sync with David covering **open ledger items #5–10.** None of these block starting any milestone above; but #7 gates M12 send framing and #8 gates M7/M9 TIER-down suppression copy.
 
@@ -503,11 +503,11 @@ None. This is a documentation and communication track, not a code track. Update 
 | Critical definition (verbatim) | `system-v1.1.md` §4.1 |
 | Freshness state names | `system-v1.1.md` §4.5 |
 | M-family portfolio-scale laws | `system-v1.1.md` §6 |
-| Chatbot answer scope | `ISMAEL-RESPONSE-2026-07-13.md` Q10 |
-| Methodology item mapping | `CONED_METHODOLOGY_ALIGNMENT.md` §4 |
+| Chatbot answer scope | `docs/ref/2026-07-13_ismael-q1-q10-response.md` Q10 |
+| Methodology item mapping | `docs/ref/2026-07-16_methodology-alignment.md` §4 |
 | Legacy discipline | `roadmap-supplement-m0.md`; `CLAUDE.md` §Legacy |
-| Report format & PDF plumbing | `PEDRO-BRIEF-FRONTEND-BUILD.md` M5 |
-| model_meta full schema | `ISMAEL-BRIEF-BACKEND-BUILD.md` M1; `CLAUDE.md` §Pipeline |
+| Report format & PDF plumbing | `docs/briefs/2026-07-13_pedro-frontend-build.md` M5 |
+| model_meta full schema | `docs/briefs/2026-07-13_ismael-backend-build.md` M1; `CLAUDE.md` §Pipeline |
 
 ---
 

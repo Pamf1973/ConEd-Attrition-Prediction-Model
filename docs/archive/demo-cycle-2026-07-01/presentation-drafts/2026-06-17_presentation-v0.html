@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Driftwatch — ConEd Steam Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Light, editorial palette — built for a bright projector room */
+  --bg:#f1ece2;
+  --canvas:#faf6ee;
+  --surface:#ffffff;
+  --surface-2:#f5efe2;
+  --line:#e2dbcb;
+  --line-2:#cdc3ae;
+  --ink:#16202a;
+  --ink-2:#27313d;
+  --muted:#71695b;
+  --faint:#a39a89;
+  /* Deep teal — analytical, financial-deck appropriate */
+  --accent:#1f4e5f;
+  --accent-2:#2d6a82;
+  --accent-soft:#dfe9ec;
+  --accent-glow:rgba(31,78,95,.14);
+  --warm:#a36a2d;
+  --red:#a23c2c;
+  --green:#3e7c5b;
+  --r:18px;
+  --gap:clamp(16px,2vw,32px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink-2);
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:21px;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.stage{
+  position:fixed;inset:0;
+  display:grid;place-items:center;
+  padding:clamp(12px,2vw,32px);
+  background:
+    radial-gradient(900px 600px at 12% -10%,rgba(31,78,95,.06),transparent 60%),
+    radial-gradient(700px 500px at 95% 105%,rgba(163,106,45,.05),transparent 55%),
+    var(--bg);
+}
+.deck{
+  position:relative;
+  width:min(96vw,calc(94vh*16/9));
+  aspect-ratio:16/9;
+  filter:drop-shadow(0 24px 60px rgba(22,32,42,.12));
+}
+.slide{
+  position:absolute;inset:0;
+  border-radius:var(--r);
+  background:var(--canvas);
+  border:1px solid var(--line);
+  overflow:hidden;
+  opacity:0;visibility:hidden;
+  transform:scale(.985) translateY(6px);
+  transition:opacity .45s var(--ease),transform .45s var(--ease),visibility .45s;
+}
+.slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide-inner{position:absolute;inset:0;overflow:hidden}
+.pad{
+  position:relative;z-index:1;
+  height:100%;
+  display:flex;flex-direction:column;
+  gap:var(--gap);
+  padding:clamp(28px,3.6vw,60px);
+  padding-bottom:clamp(56px,7vh,84px);
+}
+.row{display:flex;gap:var(--gap)}
+.col{display:flex;flex-direction:column;gap:var(--gap)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.grow{flex:1 1 0;min-width:0;min-height:0}
+.center{align-items:center;justify-content:center}
+.between{justify-content:space-between}
+.mt-auto{margin-top:auto}
+
+/* ---------- Reveal system ---------- */
+.reveal{opacity:0;transform:translateY(10px)}
+.slide.active .reveal{animation:rise .6s var(--ease) both;animation-delay:var(--d,0s)}
+@keyframes rise{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;animation:none}
+}
+
+/* ---------- Typography primitives ---------- */
+.eyebrow{
+  font-family:'Space Grotesk';
+  font-weight:600;
+  font-size:clamp(14px,1.15vw,18px);
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--accent);
+  display:inline-flex;align-items:center;gap:14px;
+}
+.eyebrow::before{
+  content:'';
+  width:28px;height:2px;
+  background:var(--accent);
+  display:inline-block;border-radius:2px;
+}
+.slide-title{
+  font-family:'Fraunces',Georgia,serif;
+  font-weight:400;
+  font-style:normal;
+  font-size:clamp(44px,5vw,76px);
+  line-height:1.05;
+  letter-spacing:-.015em;
+  color:var(--ink);
+}
+.slide-title em{
+  font-style:italic;
+  color:var(--accent);
+  font-weight:400;
+}
+.lead{
+  font-size:clamp(22px,1.8vw,28px);
+  line-height:1.45;
+  color:var(--ink-2);
+  max-width:58ch;
+}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+.mono{font-family:'Space Grotesk';letter-spacing:.02em}
+
+/* ---------- Panel / card ---------- */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:clamp(18px,2vw,28px);
+}
+.divider{height:1px;background:var(--line);width:100%}
+
+/* ---------- Chrome (progress, dots, nav) ---------- */
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:60;transition:width .4s var(--ease)}
+.ctrl{
+  position:fixed;left:0;right:0;bottom:14px;z-index:55;
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  color:var(--muted);font-size:12px;
+}
+.ctrl-pill{
+  display:flex;align-items:center;gap:14px;
+  background:var(--canvas);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 16px;
+  box-shadow:0 6px 18px rgba(22,32,42,.06);
+}
+.nbtn{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);font-size:16px;cursor:pointer;
+  display:grid;place-items:center;transition:.2s;
+}
+.nbtn:hover{background:var(--accent-soft);border-color:var(--accent)}
+.dots{display:flex;gap:8px}
+.dot{
+  width:7px;height:7px;border-radius:50%;
+  border:none;background:var(--line-2);cursor:pointer;padding:0;
+  transition:.25s var(--ease);
+}
+.dot.active{width:22px;border-radius:5px;background:var(--accent)}
+.notesbtn{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid transparent;background:transparent;
+  color:var(--muted);cursor:pointer;
+  display:grid;place-items:center;padding:0;transition:.2s;
+  font-size:14px;
+}
+.notesbtn:hover{color:var(--ink);background:var(--surface-2);border-color:var(--line)}
+.notesbtn.active{color:var(--canvas);background:var(--accent);border-color:var(--accent)}
+
+.notes-overlay{
+  position:fixed;right:18px;bottom:64px;z-index:55;
+  width:min(440px,46vw);max-height:60vh;overflow:auto;
+  padding:20px 22px;border-radius:14px;
+  background:var(--surface);border:1px solid var(--line);
+  box-shadow:0 16px 40px rgba(22,32,42,.16);
+  font-size:14px;color:var(--ink-2);line-height:1.55;
+  opacity:0;transform:translateY(8px);
+  pointer-events:none;transition:.3s var(--ease);
+}
+.notes-overlay.show{opacity:1;transform:none;pointer-events:auto}
+.notes-overlay h3{
+  font-family:'Space Grotesk';font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:10px;
+}
+.notes-overlay p+p{margin-top:10px}
+
+/* ============================================================
+   SLIDE 1 — COVER
+   ============================================================ */
+#slide-cover{
+  background:
+    radial-gradient(1200px 700px at 75% -20%,rgba(31,78,95,.10),transparent 55%),
+    radial-gradient(700px 500px at 5% 110%,rgba(163,106,45,.06),transparent 55%),
+    var(--canvas);
+}
+#slide-cover .cover-inner{
+  position:absolute;inset:0;
+  display:grid;grid-template-columns:1.25fr 1fr;
+  padding:clamp(40px,4.5vw,72px);
+  padding-bottom:clamp(56px,7vh,84px);
+  gap:clamp(24px,3vw,48px);
+}
+#slide-cover .cover-left{
+  display:flex;flex-direction:column;gap:clamp(16px,2vw,28px);
+  align-self:end;
+}
+#slide-cover .cover-mark{
+  font-family:'Space Grotesk';font-weight:600;
+  font-size:clamp(13px,1.05vw,16px);
+  letter-spacing:.32em;text-transform:uppercase;
+  color:var(--muted);
+}
+#slide-cover .cover-mark span{color:var(--accent)}
+#slide-cover .cover-title{
+  font-family:'Fraunces',Georgia,serif;
+  font-weight:300;
+  font-size:clamp(72px,10vw,154px);
+  line-height:.9;letter-spacing:-.035em;
+  color:var(--ink);
+}
+#slide-cover .cover-title em{
+  font-style:italic;color:var(--accent);font-weight:400;
+}
+#slide-cover .cover-sub{
+  font-family:'Fraunces',serif;font-style:italic;font-weight:400;
+  font-size:clamp(24px,2.3vw,36px);
+  line-height:1.3;color:var(--ink-2);
+  max-width:24ch;
+}
+#slide-cover .cover-foot{
+  margin-top:clamp(20px,2.5vw,40px);
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  color:var(--muted);font-size:16px;
+}
+#slide-cover .cover-names{
+  font-family:'Space Grotesk';font-weight:500;color:var(--ink-2);
+  letter-spacing:.02em;
+}
+#slide-cover .cover-bar{
+  width:1px;height:14px;background:var(--line-2);display:inline-block;
+}
+#slide-cover .cover-right{
+  position:relative;display:grid;place-items:center;
+}
+
+/* Gauge — visual metaphor for the 0–100 risk score */
+.gauge{
+  width:min(100%,420px);aspect-ratio:1;
+  position:relative;
+}
+.gauge svg{width:100%;height:100%;display:block}
+.gauge .gauge-ring{fill:none;stroke:var(--line);stroke-width:2}
+.gauge .gauge-arc{fill:none;stroke:var(--accent);stroke-width:2;opacity:.4}
+.gauge .gauge-tick{stroke:var(--line-2);stroke-width:1.5}
+.gauge .gauge-tick-major{stroke:var(--ink);stroke-width:2}
+.gauge .gauge-label{font-family:'Space Grotesk';font-size:9px;fill:var(--muted);letter-spacing:.12em}
+.gauge .gauge-needle{
+  transform-box:fill-box;transform-origin:bottom center;
+  animation:gauge-sweep 7s ease-in-out infinite;
+}
+.gauge .gauge-hub{fill:var(--ink)}
+.gauge .gauge-center{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:28px;fill:var(--ink);letter-spacing:-.02em;
+}
+.gauge .gauge-center-sub{
+  font-family:'Space Grotesk';font-weight:500;
+  font-size:8px;fill:var(--muted);letter-spacing:.24em;
+  text-transform:uppercase;
+}
+@keyframes gauge-sweep{
+  0%,100%{transform:rotate(-62deg)}
+  50%{transform:rotate(58deg)}
+}
+@media (prefers-reduced-motion:reduce){
+  .gauge .gauge-needle{animation:none}
+}
+
+/* ============================================================
+   SLIDE 2 — THE TEAM
+   ============================================================ */
+#slide-team .pad{gap:clamp(20px,2.6vh,36px)}
+#slide-team .team-head{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+#slide-team .team-lead{max-width:60ch;margin:0 auto;text-align:center}
+#slide-team .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2vw,28px)}
+#slide-team .team-member{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:14px;padding:clamp(20px,2.4vw,32px) clamp(16px,2vw,24px);
+}
+#slide-team .team-av{
+  width:clamp(96px,9vw,140px);height:clamp(96px,9vw,140px);
+  border-radius:50%;
+  background:var(--accent-soft);
+  border:2px solid var(--accent);
+  color:var(--accent);
+  display:grid;place-items:center;
+  font-family:'Space Grotesk';font-weight:700;font-size:clamp(28px,2.6vw,38px);
+  letter-spacing:.04em;
+  overflow:hidden;
+  animation:av-breathe 5.5s ease-in-out infinite;
+}
+#slide-team .team-av img{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  border-radius:50%;
+}
+@keyframes av-breathe{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.03)}
+}
+@media (prefers-reduced-motion:reduce){
+  #slide-team .team-av{animation:none}
+}
+#slide-team .team-name{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(26px,2.6vw,36px);
+  color:var(--ink);letter-spacing:-.01em;
+}
+#slide-team .team-role{
+  font-family:'Space Grotesk';font-weight:500;
+  font-size:clamp(14px,1.2vw,18px);
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);
+}
+#slide-team .team-rule{
+  width:36px;height:1px;background:var(--line-2);margin:4px 0;
+}
+#slide-team .team-journey{
+  font-size:clamp(17px,1.4vw,21px);
+  line-height:1.5;color:var(--muted);
+  max-width:24ch;
+}
+
+/* ============================================================
+   SLIDE 3 — THE PROBLEM
+   ============================================================ */
+#slide-problem .problem-grid{
+  display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(28px,3vw,48px);
+  align-items:center;height:100%;
+}
+#slide-problem .problem-left{display:flex;flex-direction:column;gap:18px}
+#slide-problem .problem-quote{
+  font-family:'Fraunces',serif;font-weight:300;font-style:italic;
+  font-size:clamp(34px,3.6vw,54px);line-height:1.18;
+  color:var(--ink);letter-spacing:-.01em;
+}
+#slide-problem .problem-quote em{
+  font-style:italic;color:var(--accent);
+}
+#slide-problem .problem-attr{
+  font-family:'Space Grotesk';font-size:15px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  margin-top:8px;
+}
+#slide-problem .problem-stats{
+  display:flex;flex-direction:column;gap:clamp(18px,2.2vw,28px);
+}
+#slide-problem .pstat{
+  display:flex;flex-direction:column;gap:6px;
+  padding:clamp(18px,2vw,28px) 0;
+  border-top:1px solid var(--line);
+}
+#slide-problem .pstat:last-child{border-bottom:1px solid var(--line)}
+#slide-problem .pstat-num{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(48px,6vw,84px);line-height:1;
+  color:var(--ink);letter-spacing:-.02em;
+}
+#slide-problem .pstat-num em{font-style:italic;color:var(--accent)}
+#slide-problem .pstat-label{
+  font-family:'Space Grotesk';font-size:clamp(13px,1.15vw,17px);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+#slide-problem .pstat-detail{font-size:18px;color:var(--ink-2);margin-top:8px;line-height:1.5}
+
+/* ============================================================
+   SLIDE 4 — APPROACH + JOURNEY + LAWS
+   ============================================================ */
+#slide-approach .approach-grid{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(28px,3vw,48px);
+  height:100%;
+}
+#slide-approach .approach-body{display:flex;flex-direction:column;gap:18px;justify-content:center}
+#slide-approach .approach-flow{
+  display:flex;align-items:center;gap:14px;margin-top:12px;
+  font-family:'Space Grotesk';font-size:15px;letter-spacing:.06em;
+  flex-wrap:wrap;
+}
+#slide-approach .flow-chip{
+  padding:8px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);
+  color:var(--muted);
+}
+#slide-approach .flow-chip.now{
+  background:var(--accent);border-color:var(--accent);color:var(--canvas);
+}
+#slide-approach .flow-arrow{color:var(--faint)}
+#slide-approach .laws-panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:clamp(22px,2.4vw,32px);
+  display:flex;flex-direction:column;gap:16px;
+  align-self:center;
+}
+#slide-approach .laws-head{
+  font-family:'Space Grotesk';font-size:14px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--accent);
+}
+#slide-approach .law-row{
+  display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+  padding:16px 0;border-bottom:1px solid var(--line);
+}
+#slide-approach .law-row:last-of-type{border-bottom:none}
+#slide-approach .law-tag{
+  font-family:'Space Grotesk';font-weight:700;
+  font-size:clamp(18px,1.6vw,22px);
+  color:var(--accent);letter-spacing:.02em;
+  white-space:nowrap;
+}
+#slide-approach .law-name{
+  font-family:'Fraunces',serif;font-weight:400;font-style:italic;
+  font-size:clamp(20px,1.7vw,24px);
+  color:var(--ink);line-height:1.3;
+}
+#slide-approach .law-detail{font-size:16px;color:var(--muted);margin-top:6px;line-height:1.45}
+#slide-approach .law-extras{
+  font-family:'Space Grotesk';font-size:15px;letter-spacing:.04em;
+  color:var(--muted);padding-top:10px;
+}
+
+/* ============================================================
+   SLIDE 5 — THE MACHINE LEARNING
+   ============================================================ */
+#slide-ml .ml-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,3vw,44px);
+  height:100%;
+}
+#slide-ml .ml-layer{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;padding:clamp(22px,2.4vw,32px);
+  display:flex;flex-direction:column;gap:14px;
+}
+#slide-ml .ml-num{
+  font-family:'Space Grotesk';font-weight:700;
+  font-size:14px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);
+}
+#slide-ml .ml-name{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(28px,2.7vw,40px);
+  color:var(--ink);letter-spacing:-.01em;
+}
+#slide-ml .ml-detail{font-size:18px;color:var(--muted);line-height:1.5}
+
+/* Archetype bar chart */
+#slide-ml .archetype-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+#slide-ml .arch-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+#slide-ml .arch-label{
+  font-family:'Space Grotesk';font-size:15px;color:var(--ink-2);
+  letter-spacing:.02em;
+}
+#slide-ml .arch-bar-wrap{
+  grid-column:1 / -1;
+  height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;
+}
+#slide-ml .arch-bar{
+  height:100%;background:var(--accent);border-radius:3px;
+  transform-origin:left;transform:scaleX(0);
+}
+.slide.active #slide-ml .arch-bar,
+.slide.active#slide-ml .arch-bar{transform:scaleX(0)}
+#slide-ml.active .arch-bar{
+  animation:arch-grow 1.1s var(--ease) both;
+}
+#slide-ml.active .arch-row:nth-child(1) .arch-bar{animation-delay:.20s}
+#slide-ml.active .arch-row:nth-child(2) .arch-bar{animation-delay:.30s}
+#slide-ml.active .arch-row:nth-child(3) .arch-bar{animation-delay:.40s}
+#slide-ml.active .arch-row:nth-child(4) .arch-bar{animation-delay:.50s}
+#slide-ml.active .arch-row:nth-child(5) .arch-bar{animation-delay:.60s}
+@keyframes arch-grow{
+  to{transform:scaleX(var(--w,1))}
+}
+@media (prefers-reduced-motion:reduce){
+  #slide-ml.active .arch-bar{animation:none;transform:scaleX(var(--w,1))}
+}
+#slide-ml .arch-count{
+  font-family:'Space Grotesk';font-weight:600;
+  font-size:15px;color:var(--accent);
+}
+
+#slide-ml .feat-list{
+  display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;
+}
+#slide-ml .feat-pill{
+  padding:7px 13px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--line);
+  font-family:'Space Grotesk';font-size:14px;
+  color:var(--ink-2);letter-spacing:.02em;
+}
+#slide-ml .ml-footer{
+  font-family:'Fraunces',serif;font-style:italic;
+  font-size:clamp(18px,1.55vw,22px);
+  color:var(--muted);line-height:1.45;margin-top:8px;
+}
+
+/* ============================================================
+   SLIDE 6 — LIVE DEMO TITLE CARD
+   ============================================================ */
+#slide-demo{
+  background:
+    radial-gradient(800px 500px at 50% 50%,rgba(31,78,95,.06),transparent 60%),
+    var(--canvas);
+}
+#slide-demo .demo-inner{
+  position:absolute;inset:0;display:grid;place-items:center;
+}
+#slide-demo .demo-card{
+  display:flex;flex-direction:column;align-items:center;gap:24px;
+  text-align:center;padding:clamp(30px,4vw,60px);
+}
+#slide-demo .live-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Space Grotesk';font-size:15px;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);
+  padding:10px 20px;border-radius:999px;
+  background:var(--accent-soft);border:1px solid var(--accent);
+}
+#slide-demo .live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--accent);
+  animation:live-pulse 1.6s ease-in-out infinite;
+}
+@keyframes live-pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%{opacity:.3;transform:scale(.7)}
+}
+#slide-demo .demo-title{
+  font-family:'Fraunces',serif;font-weight:300;
+  font-size:clamp(64px,8vw,128px);line-height:.95;
+  color:var(--ink);letter-spacing:-.03em;
+}
+#slide-demo .demo-title em{font-style:italic;color:var(--accent);font-weight:400}
+#slide-demo .demo-sub{
+  font-size:clamp(20px,1.7vw,26px);
+  color:var(--muted);max-width:38ch;line-height:1.5;
+}
+
+/* ============================================================
+   SLIDE 7 — WHAT THIS CHANGES
+   ============================================================ */
+#slide-impact .impact-head{display:flex;flex-direction:column;gap:14px}
+#slide-impact .impact-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,2.4vw,36px);
+  margin-top:clamp(16px,2vw,28px);
+}
+#slide-impact .istat{
+  display:flex;flex-direction:column;gap:8px;
+  padding:clamp(18px,2vw,28px) 0;
+  border-top:1px solid var(--ink);
+}
+#slide-impact .istat-num{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(56px,7vw,104px);line-height:.95;
+  color:var(--ink);letter-spacing:-.025em;
+}
+#slide-impact .istat-num em{font-style:italic;color:var(--accent)}
+#slide-impact .istat-label{
+  font-family:'Space Grotesk';font-size:clamp(13px,1.15vw,17px);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+}
+#slide-impact .istat-detail{font-size:18px;color:var(--ink-2);line-height:1.5}
+#slide-impact .impact-caveat{
+  margin-top:auto;
+  padding:22px 26px;
+  background:var(--surface);
+  border:1px solid var(--line);border-radius:12px;
+  font-size:17px;color:var(--muted);line-height:1.55;
+}
+#slide-impact .impact-caveat strong{color:var(--ink);font-weight:600}
+
+/* ============================================================
+   SLIDE 8 — WHAT'S NEXT + THANK YOU
+   ============================================================ */
+#slide-close{
+  background:
+    radial-gradient(900px 600px at 25% 110%,rgba(31,78,95,.10),transparent 60%),
+    radial-gradient(600px 400px at 90% -10%,rgba(163,106,45,.05),transparent 55%),
+    var(--canvas);
+}
+#slide-close .close-grid{
+  display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(32px,4vw,72px);
+  align-items:center;height:100%;
+}
+#slide-close .close-left{display:flex;flex-direction:column;gap:18px}
+#slide-close .close-list{
+  display:flex;flex-direction:column;gap:14px;margin-top:12px;
+}
+#slide-close .close-item{
+  display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+#slide-close .close-item:last-child{border-bottom:none}
+#slide-close .close-tag{
+  font-family:'Space Grotesk';font-weight:700;font-size:15px;
+  letter-spacing:.04em;color:var(--accent);
+  background:var(--accent-soft);
+  padding:6px 12px;border-radius:6px;white-space:nowrap;
+}
+#slide-close .close-body{font-size:19px;color:var(--ink-2);line-height:1.5}
+#slide-close .close-thanks{
+  font-family:'Fraunces',serif;font-weight:300;
+  font-size:clamp(80px,11vw,180px);line-height:.9;
+  letter-spacing:-.035em;color:var(--ink);text-align:right;
+}
+#slide-close .close-thanks em{font-style:italic;color:var(--accent);font-weight:400}
+#slide-close .close-sig{
+  margin-top:18px;font-family:'Space Grotesk';font-size:14px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+  text-align:right;
+}
+
+/* Slide label (top-right corner) */
+.slide-label{
+  position:absolute;top:22px;right:28px;z-index:3;
+  font-family:'Space Grotesk';font-size:13px;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);
+}
+.slide-num{
+  position:absolute;bottom:22px;left:28px;z-index:3;
+  font-family:'Space Grotesk';font-size:13px;
+  letter-spacing:.22em;color:var(--faint);
+}
+
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="deck" id="deck">
+
+    <!-- ============================================================
+         SLIDE 1 — COVER
+         ============================================================ -->
+    <section class="slide" id="slide-cover" data-label="Cover">
+      <div class="slide-inner">
+        <div class="cover-inner">
+          <div class="cover-left">
+            <div class="cover-mark reveal" style="--d:.15s">
+              <span>●</span>&nbsp; Driftwatch / for Con&nbsp;Edison Steam
+            </div>
+            <h1 class="cover-title reveal" style="--d:.3s">Drift<em>watch</em></h1>
+            <p class="cover-sub reveal" style="--d:.5s">A drop-off predictor for Con Edison's steam team.</p>
+            <div class="cover-foot reveal" style="--d:.75s">
+              <span class="cover-names">Edwin Perez</span>
+              <span class="cover-bar"></span>
+              <span class="cover-names">Pedro Martins</span>
+              <span class="cover-bar"></span>
+              <span class="cover-names">Ismael Caraballo</span>
+              <span class="cover-bar"></span>
+              <span class="mono">Pursuit&nbsp;Data&nbsp;Fellowship&nbsp;·&nbsp;June&nbsp;2026</span>
+            </div>
+          </div>
+          <div class="cover-right reveal" style="--d:.4s">
+            <div class="gauge" aria-hidden="true">
+              <svg viewBox="0 0 200 200">
+                <!-- outer ring -->
+                <circle class="gauge-ring" cx="100" cy="100" r="88"/>
+                <!-- arc spanning the gauge dial -->
+                <path class="gauge-arc" d="M28 130 A 88 88 0 0 1 172 130" />
+                <!-- ticks -->
+                <g>
+                  <line class="gauge-tick-major" x1="28" y1="130" x2="35" y2="123"/>
+                  <line class="gauge-tick" x1="46" y1="92" x2="51" y2="98"/>
+                  <line class="gauge-tick" x1="72" y1="64" x2="75" y2="71"/>
+                  <line class="gauge-tick-major" x1="100" y1="50" x2="100" y2="58"/>
+                  <line class="gauge-tick" x1="128" y1="64" x2="125" y2="71"/>
+                  <line class="gauge-tick" x1="154" y1="92" x2="149" y2="98"/>
+                  <line class="gauge-tick-major" x1="172" y1="130" x2="165" y2="123"/>
+                </g>
+                <text class="gauge-label" x="22" y="148">0</text>
+                <text class="gauge-label" x="95" y="44">50</text>
+                <text class="gauge-label" x="170" y="148">100</text>
+                <!-- needle -->
+                <g class="gauge-needle">
+                  <line x1="100" y1="130" x2="100" y2="64" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+                <circle class="gauge-hub" cx="100" cy="130" r="5"/>
+                <!-- center label -->
+                <text class="gauge-center" x="100" y="170" text-anchor="middle">risk</text>
+                <text class="gauge-center-sub" x="100" y="184" text-anchor="middle">0 – 100</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">01 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 2 — THE TEAM
+         ============================================================ -->
+    <section class="slide" id="slide-team" data-label="The team">
+      <div class="slide-inner">
+        <div class="slide-label">The team</div>
+        <div class="pad">
+          <div class="team-head reveal" style="--d:.1s">
+            <div class="eyebrow">The team</div>
+            <h2 class="slide-title">Who built <em>Driftwatch</em></h2>
+          </div>
+          <p class="lead muted team-lead reveal" style="--d:.25s">
+            Pursuit's data fellowship taught us how to learn anything next — and pointed us at this problem.
+          </p>
+          <div class="team-grid">
+            <div class="panel team-member reveal" style="--d:.4s">
+              <div class="team-av"><img src="presentation-assets/pedro.png" alt="Pedro Martins"></div>
+              <div class="team-name">Pedro Martins</div>
+              <div class="team-role">Front End &amp; Project Lead</div>
+              <div class="team-rule"></div>
+              <p class="team-journey">Learned to lead delivery and ship a working dashboard end-to-end.</p>
+            </div>
+            <div class="panel team-member reveal" style="--d:.55s">
+              <div class="team-av"><img src="presentation-assets/edwin.jpg" alt="Edwin Perez"></div>
+              <div class="team-name">Edwin Perez</div>
+              <div class="team-role">Product &amp; Analytics Lead</div>
+              <div class="team-rule"></div>
+              <p class="team-journey">Learned to translate model output into a screen relationship managers actually trust.</p>
+            </div>
+            <div class="panel team-member reveal" style="--d:.7s">
+              <div class="team-av"><img src="presentation-assets/ismael.png" alt="Ismael Caraballo"></div>
+              <div class="team-name">Ismael Caraballo</div>
+              <div class="team-role">Data &amp; ML Lead</div>
+              <div class="team-rule"></div>
+              <p class="team-journey">Learned to build a production ML pipeline on public data and explain it to non-engineers.</p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">02 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 3 — THE PROBLEM
+         ============================================================ -->
+    <section class="slide" id="slide-problem" data-label="The problem">
+      <div class="slide-inner">
+        <div class="slide-label">The problem</div>
+        <div class="pad">
+          <div class="problem-grid">
+            <div class="problem-left">
+              <div class="eyebrow reveal" style="--d:.1s">Why this matters</div>
+              <p class="problem-quote reveal" style="--d:.25s">
+                Steam is <em>wholesale,</em> not retail.<br>
+                The ~1,200 customers aren't continuously monitored — and when one drifts, the cost lands on every ratepayer.
+              </p>
+              <p class="problem-attr reveal" style="--d:.55s">— framing from David Caiafa, ConEd Steam Operations</p>
+            </div>
+            <div class="problem-stats">
+              <div class="pstat reveal" style="--d:.3s">
+                <div class="pstat-num">~<em>9M</em></div>
+                <div class="pstat-label">NYers served by ConEd</div>
+                <div class="pstat-detail">Electric &amp; gas customers are metered and monitored continuously.</div>
+              </div>
+              <div class="pstat reveal" style="--d:.42s">
+                <div class="pstat-num">~<em>1,200</em></div>
+                <div class="pstat-label">Steam customers — citywide</div>
+                <div class="pstat-detail">Large residential co-ops and corporate towers. Not individuals.</div>
+              </div>
+              <div class="pstat reveal" style="--d:.54s">
+                <div class="pstat-num"><em>1</em></div>
+                <div class="pstat-label">Drop changes the forecast</div>
+                <div class="pstat-detail">Overshooting generation buys becomes a ratepayer cost.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">03 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 4 — APPROACH + JOURNEY + LAWS
+         ============================================================ -->
+    <section class="slide" id="slide-approach" data-label="Approach &amp; journey">
+      <div class="slide-inner">
+        <div class="slide-label">Our approach</div>
+        <div class="pad">
+          <div class="approach-grid">
+            <div class="approach-body">
+              <div class="eyebrow reveal" style="--d:.1s">The journey</div>
+              <h2 class="slide-title reveal" style="--d:.22s">From one signal to many — building the <em>drop-off predictor.</em></h2>
+              <p class="lead reveal" style="--d:.4s">
+                LL97 looked like the trigger pushing customers off steam — penalties that start in 2024 and tighten hard in 2030.
+                After working with David's team we landed somewhere else: LL97 is one signal in a much bigger picture.
+                A pre-war co-op on the Upper East Side drifts for completely different reasons than a midtown office tower.
+              </p>
+              <div class="approach-flow reveal" style="--d:.6s">
+                <span class="flow-chip">LL97 alone</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-chip">Twelve features</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-chip now">Drop-off predictor</span>
+              </div>
+            </div>
+            <aside class="laws-panel reveal" style="--d:.5s">
+              <div class="laws-head">Public-data backbone</div>
+              <div class="law-row">
+                <span class="law-tag">LL84</span>
+                <div>
+                  <div class="law-name">Benchmarking &amp; Disclosure</div>
+                  <div class="law-detail">Energy use, emissions, Energy Star scores for every covered building.</div>
+                </div>
+              </div>
+              <div class="law-row">
+                <span class="law-tag">LL97</span>
+                <div>
+                  <div class="law-name">Climate Mobilization Act</div>
+                  <div class="law-detail">Carbon caps with penalties starting 2024, tightening 2030.</div>
+                </div>
+              </div>
+              <div class="law-extras">
+                On top of those — DOB permits, ACRIS deed records, PLUTO property data.
+              </div>
+            </aside>
+          </div>
+        </div>
+        <div class="slide-num">04 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 5 — THE MACHINE LEARNING
+         ============================================================ -->
+    <section class="slide" id="slide-ml" data-label="Machine learning">
+      <div class="slide-inner">
+        <div class="slide-label">How it works</div>
+        <div class="pad">
+          <div class="reveal" style="--d:.1s">
+            <div class="eyebrow">The model</div>
+            <h2 class="slide-title">Two layers of <em>machine learning.</em></h2>
+          </div>
+          <div class="ml-grid">
+            <div class="ml-layer reveal" style="--d:.3s">
+              <div class="ml-num">Layer 01</div>
+              <div class="ml-name">K-means clustering</div>
+              <div class="ml-detail">Group all 1,210 steam customers into five building archetypes. Every building gets one tag.</div>
+              <div class="archetype-list" aria-label="Archetype distribution">
+                <div class="arch-row">
+                  <span class="arch-label">Pre-War Active</span>
+                  <span class="arch-count">~320</span>
+                  <div class="arch-bar-wrap"><div class="arch-bar" style="--w:.78"></div></div>
+                </div>
+                <div class="arch-row">
+                  <span class="arch-label">Mid-Size Post-War</span>
+                  <span class="arch-count">~285</span>
+                  <div class="arch-bar-wrap"><div class="arch-bar" style="--w:.69"></div></div>
+                </div>
+                <div class="arch-row">
+                  <span class="arch-label">Pre-War Stable</span>
+                  <span class="arch-count">~245</span>
+                  <div class="arch-bar-wrap"><div class="arch-bar" style="--w:.59"></div></div>
+                </div>
+                <div class="arch-row">
+                  <span class="arch-label">Large Commercial</span>
+                  <span class="arch-count">~210</span>
+                  <div class="arch-bar-wrap"><div class="arch-bar" style="--w:.51"></div></div>
+                </div>
+                <div class="arch-row">
+                  <span class="arch-label">Low-Compliance Residential</span>
+                  <span class="arch-count">~150</span>
+                  <div class="arch-bar-wrap"><div class="arch-bar" style="--w:.36"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="ml-layer reveal" style="--d:.45s">
+              <div class="ml-num">Layer 02</div>
+              <div class="ml-name">Gradient boosting + SHAP</div>
+              <div class="ml-detail">12 features feed in per building. The model returns a risk score 0–100; SHAP surfaces the top 5 drivers, signed.</div>
+              <div class="feat-list">
+                <span class="feat-pill">LL97 carbon exposure</span>
+                <span class="feat-pill">Energy Star score</span>
+                <span class="feat-pill">Building age</span>
+                <span class="feat-pill">HVAC permits</span>
+                <span class="feat-pill">Neighbor patterns</span>
+                <span class="feat-pill">Steam demand size</span>
+                <span class="feat-pill">+ 6 more</span>
+              </div>
+              <p class="ml-footer">
+                A pre-screening: the system surfaces who to look at, the relationship manager decides who to call.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">05 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 6 — LIVE DEMO
+         ============================================================ -->
+    <section class="slide" id="slide-demo" data-label="Live demo">
+      <div class="slide-inner">
+        <div class="demo-inner">
+          <div class="demo-card">
+            <div class="live-pill reveal" style="--d:.1s">
+              <span class="live-dot"></span>
+              Live demo
+            </div>
+            <h2 class="demo-title reveal" style="--d:.25s">The <em>product,</em><br>working.</h2>
+            <p class="demo-sub reveal" style="--d:.5s">
+              Rankings · Archetype filter · Per-building drivers · Watch List.
+            </p>
+          </div>
+        </div>
+        <div class="slide-num">06 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 7 — WHAT THIS CHANGES
+         ============================================================ -->
+    <section class="slide" id="slide-impact" data-label="What this changes">
+      <div class="slide-inner">
+        <div class="slide-label">What this changes</div>
+        <div class="pad">
+          <div class="impact-head">
+            <div class="eyebrow reveal" style="--d:.1s">The shape of the build</div>
+            <h2 class="slide-title reveal" style="--d:.22s">A working <em>drop-off watch list,</em><br>built on public data.</h2>
+          </div>
+          <div class="impact-stats">
+            <div class="istat reveal" style="--d:.4s">
+              <div class="istat-num"><em>1,210</em></div>
+              <div class="istat-label">Steam customers scored</div>
+              <div class="istat-detail">Every customer with a risk score and a driver mix.</div>
+            </div>
+            <div class="istat reveal" style="--d:.5s">
+              <div class="istat-num"><em>5</em></div>
+              <div class="istat-label">Building archetypes</div>
+              <div class="istat-detail">The lens that separates the signal from the noise.</div>
+            </div>
+            <div class="istat reveal" style="--d:.6s">
+              <div class="istat-num"><em>59</em></div>
+              <div class="istat-label">High-risk outreach list</div>
+              <div class="istat-detail">Where the relationship team starts on Monday.</div>
+            </div>
+          </div>
+          <div class="impact-caveat reveal" style="--d:.78s">
+            <strong>What this build does well:</strong> ranking. On public data alone the model gets an at-risk building above a stable one about <strong>2 times out of 3</strong>. The August build calibrates that ranking against ConEd's billing data and verified disconnections.
+          </div>
+        </div>
+        <div class="slide-num">07 / 08</div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SLIDE 8 — WHAT'S NEXT + THANK YOU
+         ============================================================ -->
+    <section class="slide" id="slide-close" data-label="What's next">
+      <div class="slide-inner">
+        <div class="slide-label">What's next</div>
+        <div class="pad">
+          <div class="close-grid">
+            <div class="close-left">
+              <div class="eyebrow reveal" style="--d:.1s">The August build</div>
+              <h2 class="slide-title reveal" style="--d:.22s">Today, the <em>engine.</em><br>August, the dashboard built around it.</h2>
+              <div class="close-list">
+                <div class="close-item reveal" style="--d:.4s">
+                  <span class="close-tag">DATA</span>
+                  <div class="close-body">ConEd billing data folds into the model.</div>
+                </div>
+                <div class="close-item reveal" style="--d:.52s">
+                  <span class="close-tag">CALIBRATE</span>
+                  <div class="close-body">Ranking calibrates against verified disconnections.</div>
+                </div>
+                <div class="close-item reveal" style="--d:.64s">
+                  <span class="close-tag">SHIP</span>
+                  <div class="close-body">Email line for operators ships on the alert engine already in place.</div>
+                </div>
+              </div>
+            </div>
+            <div class="close-right">
+              <h2 class="close-thanks reveal" style="--d:.35s">Thank<br><em>you.</em></h2>
+              <div class="close-sig reveal" style="--d:.6s">Driftwatch · June 17, 2026</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-num">08 / 08</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+
+<!-- Notes overlay -->
+<div class="notes-overlay" id="notes">
+  <h3 id="notes-title">Speaker notes</h3>
+  <div id="notes-body"></div>
+</div>
+
+<!-- Control bar -->
+<div class="ctrl">
+  <div class="ctrl-pill">
+    <button class="nbtn" id="prev" aria-label="Previous slide">‹</button>
+    <div class="dots" id="dots"></div>
+    <button class="nbtn" id="next" aria-label="Next slide">›</button>
+    <span class="mono" id="counter" style="color:var(--muted);font-size:11px;letter-spacing:.18em">1 / 8</span>
+    <span style="width:1px;height:14px;background:var(--line);display:inline-block"></span>
+    <button class="notesbtn" id="notes-btn" aria-label="Toggle speaker notes" title="Notes (N)">N</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsWrap = document.getElementById('dots');
+  const progress = document.getElementById('progress');
+  const counter  = document.getElementById('counter');
+  const notes    = document.getElementById('notes');
+  const notesBody = document.getElementById('notes-body');
+  const notesTitle = document.getElementById('notes-title');
+  const notesBtn = document.getElementById('notes-btn');
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'dot';
+    b.setAttribute('aria-label', `Slide ${i+1}`);
+    b.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(b);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  // Speaker notes — from PRESENTATION-SCRIPT.md
+  const notesContent = [
+    {
+      title: 'Slide 1 — Cover · Edwin (~0:20)',
+      body: `Good [morning/afternoon]. I'm Edwin. We're building a steam customer drop-off predictor for Con Edison — an early-warning system for the steam team. We're calling it Driftwatch. Pedro and Ismael are with me. We'll walk you through it in five minutes.`
+    },
+    {
+      title: 'Slide 2 — The Team · Pedro (~0:20)',
+      body: `That's the three of us. Pursuit data fellowship cohort. We've spent the last several weeks working alongside David Caiafa and the steam operations team at Con Edison. Here's what each of us picked up along the way.`
+    },
+    {
+      title: 'Slide 3 — The Problem · Pedro (~0:50)',
+      body: `Con Edison serves about nine million New Yorkers. Electric, gas, and steam. With electric and gas you have a meter, you're monitored continuously, and you're not going to stop using the service. Steam is different. Steam is wholesale, not retail. There are only around 1,200 steam customers in the entire city, and they're not individuals — they're large residential co-ops and corporate towers. Nobody is continuously monitoring whether their usage is drifting. When one of them drops, it's significant: it throws off Con Edison's energy forecast, which means overspend on generation. That overspend hits the everyday ratepayer. So we built a way to surface who's drifting before the drift hits the bill.`
+    },
+    {
+      title: 'Slide 4 — Approach + Journey + Laws · Edwin (~0:50)',
+      body: `Here's the journey we took. Our first instinct was that Local Law 97 — the city's carbon cap, with penalties starting in 2024 and tightening hard in 2030 — would be the trigger pushing customers off steam. After working with David's team we landed somewhere else. LL97 is one signal in a much bigger picture. A pre-war co-op on the Upper East Side is drifting for completely different reasons than a midtown office tower. Lumping them together hides the signal. So Driftwatch is the drop-off predictor we set out to build — LL97 is one signal among twelve, with the explanation rendered per-building, per-archetype. The public-data backbone is two laws. Local Law 84, the city's energy benchmarking disclosure, which gives us emissions and Energy Star scores. Local Law 97, the carbon cap. On top of those, Department of Buildings permits, ACRIS deed records, and PLUTO property data.`
+    },
+    {
+      title: 'Slide 5 — The Machine Learning · Ismael (~0:50)',
+      body: `Two machine learning layers. First is k-means clustering. We grouped the 1,210 steam customers into five building archetypes: Pre-War Active, Mid-Size Post-War, Pre-War Stable, Large Commercial, and Low-Compliance Residential. Every building gets one archetype tag. Second is a gradient boosting classifier. Twelve features feed in for each building — LL97 carbon exposure, Energy Star score, building age, HVAC permit filings, neighbor patterns, steam demand size — and the model returns one risk score between zero and one hundred. On top of that we layered SHAP, so we can surface the top five drivers for every individual building and show whether each one pushed the score up or down. The explanation is per-building, per-archetype. Think of it as a pre-screening — the system surfaces who to look at, and the relationship manager decides who to call.`
+    },
+    {
+      title: 'Slide 6 — Live Demo · Pedro → Ismael → Pedro (~1:30)',
+      body: `PEDRO (~0:40): The full portfolio — 1,210 steam customers, every one tagged with a building archetype from our k-means clustering. Open archetype filter. Five archetypes. This is the lens. Filter to Pre-War Active. Watch how the population narrows. Sort by risk, click the top building.\n\nISMAEL (~0:30): Open a building and the panel shows the why. Top five drivers, signed — red arrows pushed the score up, gray arrows pulled it down. Navigate from a pre-war co-op to a Large Commercial building at the same risk tier. Same risk band, different driver mix entirely. The archetype lens is doing real work inside the model. Carbon exposure is one input — for some buildings it dominates, for others it barely matters. The model decides.\n\nPEDRO (~0:10): Back to Rankings, save a few buildings to Watch List. From here a relationship manager saves targets to their Watch List, exports a CSV, or asks the AI Agent in plain English. The Watch List is what their team would walk into a Monday meeting with.`
+    },
+    {
+      title: 'Slide 7 — What This Changes · Ismael (~0:25)',
+      body: `1,210 customers. Five archetypes. Every customer with a risk score and a driver mix. 59 buildings sit in the high-risk tier — that's where outreach starts. On public data alone the model gets the ranking right about two times out of three. The August build calibrates that ranking against Con Edison's billing data and verified disconnections.`
+    },
+    {
+      title: 'Slide 8 — What\'s Next + Thank You · Edwin (~0:20)',
+      body: `That's Driftwatch. The August build folds in Con Edison's billing data, calibrates the ranking against verified disconnections, and ships the email line on top of the alert engine already in place. Today you saw the engine. August is the dashboard built around it. Thank you.`
+    }
+  ];
+
+  let current = 0;
+  let notesOpen = false;
+
+  function go(i){
+    if (i < 0 || i >= slides.length) return;
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    progress.style.width = ((current+1) / slides.length * 100) + '%';
+    counter.textContent = `${current+1} / ${slides.length}`;
+    if (notesOpen) renderNotes();
+  }
+
+  function renderNotes(){
+    const n = notesContent[current];
+    if (!n) return;
+    notesTitle.textContent = n.title;
+    notesBody.innerHTML = n.body.split('\n\n').map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+  }
+
+  function toggleNotes(){
+    notesOpen = !notesOpen;
+    notes.classList.toggle('show', notesOpen);
+    notesBtn.classList.toggle('active', notesOpen);
+    if (notesOpen) renderNotes();
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(current - 1));
+  document.getElementById('next').addEventListener('click', () => go(current + 1));
+  notesBtn.addEventListener('click', toggleNotes);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(current + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+    else if (e.key === 'n' || e.key === 'N') { e.preventDefault(); toggleNotes(); }
+    else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  // Init
+  go(0);
+})();
+</script>
+</body>
+</html>

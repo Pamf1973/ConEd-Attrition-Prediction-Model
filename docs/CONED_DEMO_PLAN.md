@@ -82,7 +82,7 @@ The demo has to satisfy both without pandering to either.
 
 **Do:**
 - Have this static HTML on your laptop, ready to open. Don't paste text into a slide — show the actual page.
-- Reference the alignment doc by name: `CONED_METHODOLOGY_ALIGNMENT.md`. "Your team wrote this in June. Here's our response, item by item."
+- Reference the alignment doc by name: `docs/ref/2026-07-16_methodology-alignment.md`. "Your team wrote this in June. Here's our response, item by item."
 
 **Don't:**
 - Don't defend the citywide HDD choice. Just say "this is the known weakness, item 1 addresses it, we ship it deferred pending billing-cycle access."
@@ -91,7 +91,7 @@ The demo has to satisfy both without pandering to either.
 
 ### Part 4 — Roadmap + what David does next (3 min)
 
-**What to show:** a single slide (or the top of `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`) with the milestone list.
+**What to show:** a single slide (or the top of `docs/ref/2026-07-16_fable-roadmap.md`) with the milestone list.
 
 **What to say:**
 
@@ -120,7 +120,7 @@ These are ledger items #5–10, in `system-v1.1.md` §10. Send the David packet 
 ### One day out (Wave 2)
 - Author the static methodology page HTML (~2 hours if you already have §1–§9 outlined)
 - Confirm 660 Madison Ave data still ranks top of Critical queue (Ismael can spot-check)
-- Have `CONED_METHODOLOGY_ALIGNMENT.md` open in a second tab — Johan may quote from it
+- Have `docs/ref/2026-07-16_methodology-alignment.md` open in a second tab — Johan may quote from it
 
 ### Day of (Wave 3)
 - Bring your own laptop, own network dongle
@@ -154,7 +154,7 @@ Never drop the methodology page section. That's the Johan/Ildi handshake.
 - **"Why not use our regression method?"** — "We do at NYCHA scale, 24 developments. Portfolio-wide is Round 2 because we need billing-cycle data. See methodology §8 item 1."
 - **"Is the AUC 0.68 good enough?"** — "AUC is a ranking metric. It says the model puts a true churner above a non-churner about 68% of the time. It's a triage aid, not a decision system — the analyst confirms. That's why the tier vocabulary reads 'Uncertain' when data doesn't support a call. Ismael is rerunning with 5-fold CV to report mean ± std this week."
 - **"How do you handle new buildings coming online?"** — "Uncertain tier by default until 2 years of steam data plus a fit above R² 0.3 exists. That's §4.1 hybrid chain, first gate."
-- **"When can we see this live?"** — "M3 lands the score cell into the Rankings surface next; that's the first visible atom to land in production. M9 assembles the landing. Full timeline in `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`. Nothing here is speculative — every milestone has acceptance criteria written down."
+- **"When can we see this live?"** — "M3 lands the score cell into the Rankings surface next; that's the first visible atom to land in production. M9 assembles the landing. Full timeline in `docs/ref/2026-07-16_fable-roadmap.md`. Nothing here is speculative — every milestone has acceptance criteria written down."
 - **"What about the buildings that show up as false positives?"** — "That's Law R5 — a human signs the report. The tool doesn't confirm attrition, it triages. Confirmed / False positive statuses become training labels for the next model version. That's the feedback loop."
 
 ---
@@ -162,5 +162,5 @@ Never drop the methodology page section. That's the Johan/Ildi handshake.
 ## Post-session
 
 - Send the David packet within 24 hours if it wasn't sent during
-- File any comments/asks from Johan / Ildi as amendments to `CONED_METHODOLOGY_ALIGNMENT.md` and open questions in `system-v1.1.md` §10
-- Update `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` if any milestone re-scopes based on the conversation
+- File any comments/asks from Johan / Ildi as amendments to `docs/ref/2026-07-16_methodology-alignment.md` and open questions in `system-v1.1.md` §10
+- Update `docs/ref/2026-07-16_fable-roadmap.md` if any milestone re-scopes based on the conversation

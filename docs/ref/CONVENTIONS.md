@@ -1,6 +1,22 @@
 # Project doc conventions
 These files are plain markdown. Fonts and sizes are rendering choices,
 not file properties; structure is the style.
+
+## Filename convention (for docs/ intake)
+
+`YYYY-MM-DD_[origin_][type_]topic.ext`
+
+- **origin** is optional. Omit when Ed authored the content. Include only for external sources (ismael, pedro, fable, coned, johan, ildi, web, etc.).
+- **type** is optional. Omit when the containing folder already implies it 1:1 (`docs/briefs/` implies brief, `docs/decks/` implies deck, `docs/design/` implies design, etc.).
+- **topic** is required. kebab-case, 2-5 words.
+
+Examples:
+- `docs/briefs/2026-07-13_pedro-frontend-build.md` (Ed's brief to Pedro; origin+type both implied)
+- `docs/ref/2026-07-16_methodology-alignment.md` (Ed's analysis; origin+type both implied)
+- `docs/ref/2026-07-13_ismael-q1-q10-response.md` (from Ismael; origin included)
+- `docs/ref/2026-07-16_fable-roadmap.md` (from Fable; origin included)
+
+
 - Dates ISO (2026-07-16), times 24h. Timestamps come from a clock,
   never estimated.
 - No emojis. No em dashes. Sentence case headings.

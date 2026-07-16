@@ -5,7 +5,7 @@
 **Purpose:** Diagnostic pass on the specs you already produced (`system.md` + the five HTML atoms) against the actual model. Before component build starts, we need to know where the frontend claims something the model can't back up.
 
 **Attach to this prompt:**
-- `coned-dashboard-BLACKSTONE-PREP-ASKS-FOR-TEAM.md` (domain context — the reconstructed list of what David and ConEd asked for)
+- `docs/archive/demo-cycle-2026-07-01/2026-07-13_blackstone-prep-asks.md` (domain context — the reconstructed list of what David and ConEd asked for)
 - `docs/model-technical-spec.md`
 - `docs/xgboost_results.md`
 - The `data/buildings.json` schema (or a representative row) so you can see what fields exist and their coverage
