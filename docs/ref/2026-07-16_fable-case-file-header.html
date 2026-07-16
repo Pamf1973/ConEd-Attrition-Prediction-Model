@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case-File Header · ConEd Steam Attrition Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F8F8F6;
+    --ink: #17181A;
+    --ink-muted: #6C6F75;
+    --hairline: #DDDDD8;
+
+    --canvas: #0C0F13;
+    --canvas-raised: #12161C;
+    --bench-text: #E6E8EB;
+    --bench-muted: #8A919C;
+    --bench-line: #232A33;
+
+    --low: #4C8A68;
+    --med: #D19A3D;
+    --high: #E05545;
+    --crit: #C22B1F;
+    --uncertain: #7A828D;
+    --action: #E87722;
+
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --body: 'Inter', system-ui, sans-serif;
+    --display: 'Space Grotesk', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 1040px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  header.doc { border-bottom: 1px solid var(--ink); padding-bottom: 28px; margin-bottom: 48px; }
+  .meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-family: var(--display); font-weight: 600; font-size: 34px; line-height: 1.15; letter-spacing: -0.01em; max-width: 24ch; }
+  .lede { margin-top: 16px; max-width: 64ch; color: var(--ink-muted); font-size: 15.5px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  section { margin-bottom: 72px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 10px; }
+  h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin-bottom: 20px; }
+  p.note { max-width: 68ch; color: var(--ink-muted); font-size: 14px; margin-top: 14px; }
+  p.note strong { color: var(--ink); }
+
+  .laws { border-top: 1px solid var(--hairline); }
+  .law { display: grid; grid-template-columns: 56px 280px 1fr; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .law-n { font-family: var(--mono); font-size: 13px; color: var(--ink-muted); padding-top: 2px; }
+  .law-name { font-weight: 600; font-size: 15px; }
+  .law-body { color: var(--ink-muted); font-size: 14px; max-width: 60ch; }
+  .law-body em { font-style: normal; color: var(--ink); font-weight: 500; }
+  @media (max-width: 720px) { .law { grid-template-columns: 40px 1fr; } .law-body { grid-column: 2; } }
+
+  /* ---------- bench + specimen ---------- */
+  .bench { background: var(--canvas); border-radius: 4px; padding: 32px; color: var(--bench-text); overflow-x: auto; }
+  .casefile { min-width: 860px; }
+
+  /* identity row */
+  .id-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--bench-line); }
+  .id-left h3 { font-family: var(--display); font-size: 26px; font-weight: 600; letter-spacing: -0.01em; color: var(--bench-text); margin-bottom: 6px; }
+  .id-meta { font-family: var(--mono); font-size: 11px; color: var(--bench-muted); letter-spacing: 0.03em; display: flex; gap: 14px; flex-wrap: wrap; }
+  .id-meta .sep { color: var(--bench-line); }
+  .cluster-chip { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bench-muted); border: 1px solid var(--bench-line); padding: 3px 8px; border-radius: 2px; }
+  .id-right { text-align: right; font-family: var(--mono); font-size: 10.5px; color: var(--bench-muted); line-height: 1.9; white-space: nowrap; }
+  .id-right b { color: var(--bench-text); font-weight: 500; }
+
+  /* claim ledger */
+  .ledger { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--bench-line); }
+  .claim-col { padding: 18px 20px 18px 0; }
+  .claim-col + .claim-col { border-left: 1px solid var(--bench-line); padding-left: 20px; }
+  .claim-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--bench-muted); margin-bottom: 8px; }
+  .claim-main { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .claim-big { font-family: var(--mono); font-weight: 600; font-size: 26px; color: var(--bench-text); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .claim-word { font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; }
+  .claim-word.high { color: var(--high); }
+  .claim-sub { font-family: var(--mono); font-size: 10.5px; color: var(--bench-muted); line-height: 1.8; }
+  .claim-sub b { color: var(--bench-text); font-weight: 500; }
+  .tick-inline { display: inline-block; width: 3px; height: 12px; background: var(--high); margin-right: 7px; vertical-align: -1px; }
+
+  /* driver band */
+  .drivers { padding: 20px 0 8px; border-bottom: 1px solid var(--bench-line); }
+  .drivers-title { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--bench-muted); margin-bottom: 14px; display: flex; justify-content: space-between; }
+  .driver { display: grid; grid-template-columns: 24px 220px 170px 1fr 56px; gap: 14px; align-items: center; padding: 6px 0; }
+  .d-rank { font-family: var(--mono); font-size: 10px; color: var(--bench-muted); }
+  .d-name { font-size: 13px; color: var(--bench-text); }
+  .d-val { font-family: var(--mono); font-size: 12px; color: var(--bench-muted); font-variant-numeric: tabular-nums; }
+  .d-val b { color: var(--bench-text); font-weight: 500; }
+  .d-bar { position: relative; height: 14px; }
+  .d-axis { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--bench-line); }
+  .d-fill { position: absolute; top: 3px; height: 8px; background: var(--bench-text); opacity: 0.85; }
+  .d-fill.up { left: 50%; }
+  .d-fill.down { right: 50%; opacity: 0.38; }
+  .d-contrib { font-family: var(--mono); font-size: 11px; color: var(--bench-muted); text-align: right; font-variant-numeric: tabular-nums; }
+  .d-contrib.up { color: var(--bench-text); }
+  @media (max-width: 900px) { .driver { grid-template-columns: 24px 1fr 90px; } .d-bar, .d-val { display: none; } }
+
+  /* narrative slot */
+  .narrative { margin: 20px 0; border: 1px dashed var(--bench-line); border-radius: 3px; padding: 16px 18px; }
+  .narr-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+  .narr-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--bench-muted); }
+  .narr-prov { font-family: var(--mono); font-size: 9.5px; color: var(--bench-muted); }
+  .narr-prov b { color: var(--bench-text); font-weight: 500; }
+  .narr-body { font-size: 13.5px; line-height: 1.75; color: var(--bench-text); max-width: 78ch; }
+  .narr-body .cited { border-bottom: 1px dotted var(--bench-muted); font-variant-numeric: tabular-nums; }
+  .narr-foot { margin-top: 10px; font-family: var(--mono); font-size: 9.5px; color: var(--bench-muted); display: flex; gap: 16px; }
+  .narr-foot span { cursor: default; }
+
+  /* action bar */
+  .actions { display: flex; justify-content: space-between; align-items: center; padding-top: 18px; gap: 20px; flex-wrap: wrap; }
+  .status-seg { display: flex; border: 1px solid var(--bench-line); border-radius: 3px; overflow: hidden; }
+  .status-seg span { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--bench-muted); padding: 6px 11px; border-right: 1px solid var(--bench-line); white-space: nowrap; }
+  .status-seg span:last-child { border-right: none; }
+  .status-seg span.active { background: var(--canvas-raised); color: var(--bench-text); box-shadow: inset 0 -2px 0 var(--bench-text); }
+  .action-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 3px; border: 1px solid var(--bench-line); color: var(--bench-text); background: transparent; white-space: nowrap; }
+  .btn.primary { background: var(--action); border-color: var(--action); color: #14100B; font-weight: 600; }
+
+  /* callouts reused */
+  .callouts { border-top: 1px solid var(--hairline); margin-top: 32px; }
+  .callout { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+  .callout-n { font-family: var(--mono); font-size: 11px; font-weight: 600; width: 22px; height: 22px; border: 1px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .callout h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .callout p { font-size: 13.5px; color: var(--ink-muted); max-width: 62ch; }
+  .callout p em { font-style: normal; color: var(--ink); font-weight: 500; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; } }
+
+  .oq { border-top: 1px solid var(--ink); padding-top: 20px; }
+  .oq li { margin: 0 0 12px 18px; font-size: 14px; color: var(--ink-muted); max-width: 70ch; }
+  .oq li b { color: var(--ink); font-weight: 600; }
+
+  .status-table { border-top: 1px solid var(--hairline); }
+  .status-row { display: grid; grid-template-columns: 190px 1fr; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+  .status-row .s-name { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .status-row .s-def { font-size: 13.5px; color: var(--ink-muted); max-width: 62ch; }
+  .status-row .s-def em { font-style: normal; color: var(--ink); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc">
+    <div class="meta">
+      <span>ConEd Steam Attrition · Redesign</span>
+      <span>Step 5 Seed · Spec 2 of the atom series</span>
+      <span>2026-07-06 · Draft 1</span>
+    </div>
+    <h1>The Case-File Header: the score cell at full width</h1>
+    <p class="lede">The Building Case File replaces the 400px drawer. Its header is the same atom from Spec 1, expanded: every abbreviation in the table cell becomes a full claim with its evidence attached. <strong>This is the surface the analyst reads for 3 to 5 minutes before a call, and the source every generated report cites.</strong> If a number appears in the emailed report, it appears here first, formatted the same way.</p>
+  </header>
+
+  <!-- LAWS -->
+  <section>
+    <div class="eyebrow">01 · Laws of the header</div>
+    <h2>Inherits L1 to L6. Adds five.</h2>
+    <div class="laws">
+      <div class="law">
+        <div class="law-n">H1</div>
+        <div class="law-name">A ledger, not a hero.</div>
+        <div class="law-body">No risk ring, no 96px number. The header is a <em>stack of claims, each with its evidence</em>: queue position with ties, rule tier with its threshold math, data coverage with its vintage. The anti-reference's "Risk Score: 82%" ring is exactly what this law forbids.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">H2</div>
+        <div class="law-name">Every claim shows its math.</div>
+        <div class="law-body">The rule tier shows the delta against the threshold it crossed. The percentile shows rank and tie count. The provenance line translates AUC into words a manager understands: <em>"ranks a true churner above a non-churner about 65% of the time."</em> Nothing asks to be taken on faith.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">H3</div>
+        <div class="law-name">Direction by position, not color.</div>
+        <div class="law-body">SHAP driver bars diverge around a center axis: right pushes risk up, left pushes it down. Bars are neutral. The severity ramp stays reserved for the tier claim (L2), so a screen full of drivers never competes with the one color that means danger.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">H4</div>
+        <div class="law-name">Values over abstractions.</div>
+        <div class="law-body">Every driver shows its <em>real-world value with unit</em>: dollars, MT CO&#8322;e, a score out of 100. This generalizes the inverted log formatters already working in BuildingPanel. "log_ghg: 6.66" never reaches the analyst's eyes.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">H5</div>
+        <div class="law-name">Generated text is labeled, cited, and editable.</div>
+        <div class="law-body">The narrative names its source and version, visually distinguishes itself from measured data (dashed frame), and <em>every number inside it is a citation back to a value on this page</em>. Drafted text is never visually identical to data. The analyst edits before anything leaves the building.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIMEN -->
+  <section>
+    <div class="eyebrow">02 · Anatomy</div>
+    <h2>The header, assembled</h2>
+    <div class="bench">
+      <div class="casefile">
+
+        <!-- identity -->
+        <div class="id-row">
+          <div class="id-left">
+            <h3>200 East 42nd St.</h3>
+            <div class="id-meta">
+              <span>BBL 1-01296-0021</span><span class="sep">|</span>
+              <span>Office · Built 1956 · 231,000 ft&sup2;</span><span class="sep">|</span>
+              <span>SC-5* (Negotiated · est.)</span><span class="sep">|</span>
+              <span class="cluster-chip">Low-Compliance Commercial · Quiet Attrition</span>
+            </div>
+          </div>
+          <div class="id-right">
+            Steam '24 <b>76.0 M kBtu</b> · GHG <b>6,184 MT CO&#8322;e</b><br>
+            Steam share of GHG <b>55%</b> · Energy Star <b>77 / 100</b><br>
+            Account owner <b>unmapped</b> · Data <b>LL84 2025-05</b>
+          </div>
+        </div>
+
+        <!-- claim ledger -->
+        <div class="ledger">
+          <div class="claim-col">
+            <div class="claim-label">Queue position · ML ranking</div>
+            <div class="claim-main"><span class="claim-big">99th</span><span class="claim-sub">#4 of 1,210 · tied w/ 2</span></div>
+            <div class="claim-sub">GBM v1 · <b>unvalidated</b> · AUC 0.645: ranks a true churner above a non-churner ~65% of the time. Trained on 57 late-stage churners.</div>
+          </div>
+          <div class="claim-col">
+            <div class="claim-label">Rule tier · Transparent diagnostic</div>
+            <div class="claim-main"><span class="tick-inline"></span><span class="claim-word high">High</span></div>
+            <div class="claim-sub">&Delta; '24 <b>&minus;66%</b> HDD-normalized, vs the <b>&minus;30%</b> high threshold. Weather-normalized per the method ConEd's own team uses. Vintage: 2024.</div>
+          </div>
+          <div class="claim-col">
+            <div class="claim-label">Coverage · What we can see</div>
+            <div class="claim-main"><span class="claim-big">3<span style="font-size:14px; color:var(--bench-muted);">&nbsp;yrs</span></span></div>
+            <div class="claim-sub">History <b>2022&ndash;2024</b> · fresh &Delta; present · EUI <b>54.7 kBtu/ft&sup2;</b> (+99% vs office median 27.5) · DOB permits <b>0</b> recent.</div>
+          </div>
+        </div>
+
+        <!-- drivers -->
+        <div class="drivers">
+          <div class="drivers-title"><span>Why this rank · SHAP contributions, GBM v1</span><span>&larr; pushes down &nbsp;&nbsp;&middot;&nbsp;&nbsp; pushes up &rarr;</span></div>
+
+          <div class="driver">
+            <span class="d-rank">1</span>
+            <span class="d-name">LL97 penalty at 2030 caps</span>
+            <span class="d-val"><b>$1,190,650</b> / yr est.</span>
+            <span class="d-bar"><span class="d-axis"></span><span class="d-fill up" style="width:46%"></span></span>
+            <span class="d-contrib up">+2.8</span>
+          </div>
+          <div class="driver">
+            <span class="d-rank">2</span>
+            <span class="d-name">Steam share of building emissions</span>
+            <span class="d-val"><b>55%</b> of GHG</span>
+            <span class="d-bar"><span class="d-axis"></span><span class="d-fill up" style="width:31%"></span></span>
+            <span class="d-contrib up">+1.9</span>
+          </div>
+          <div class="driver">
+            <span class="d-rank">3</span>
+            <span class="d-name">Energy Star score</span>
+            <span class="d-val"><b>77</b> / 100</span>
+            <span class="d-bar"><span class="d-axis"></span><span class="d-fill up" style="width:15%"></span></span>
+            <span class="d-contrib up">+0.9</span>
+          </div>
+          <div class="driver">
+            <span class="d-rank">4</span>
+            <span class="d-name">Steam demand size</span>
+            <span class="d-val"><b>76.0 M</b> kBtu</span>
+            <span class="d-bar"><span class="d-axis"></span><span class="d-fill down" style="width:20%"></span></span>
+            <span class="d-contrib">&minus;1.2</span>
+          </div>
+          <div class="driver">
+            <span class="d-rank">5</span>
+            <span class="d-name">Total emissions</span>
+            <span class="d-val"><b>6,184</b> MT CO&#8322;e</span>
+            <span class="d-bar"><span class="d-axis"></span><span class="d-fill down" style="width:10%"></span></span>
+            <span class="d-contrib">&minus;0.6</span>
+          </div>
+        </div>
+
+        <!-- narrative -->
+        <div class="narrative">
+          <div class="narr-head">
+            <span class="narr-label">Narrative · Drafted</span>
+            <span class="narr-prov">Source: <b>GBM v1 drivers + this page's values</b> · drafted 2026-07-06 · not yet reviewed</span>
+          </div>
+          <div class="narr-body">200 East 42nd St. ranks <span class="cited">4th of 1,210</span> buildings on attrition risk. The largest driver is carbon-law exposure: at current emissions the building faces an estimated <span class="cited">$1,190,650</span> annual LL97 penalty when the 2030 caps take effect, and steam accounts for <span class="cited">55%</span> of its reportable emissions, which makes leaving steam the owner's single largest lever against that penalty. Weather-normalized steam demand fell <span class="cited">66%</span> year over year, crossing the diagnostic rule's <span class="cited">&minus;30%</span> high-risk threshold. Recommended framing for outreach: efficiency-program conversation anchored on LL97 planning, before a disconnect permit is filed.</div>
+          <div class="narr-foot"><span>Edit draft</span><span>Regenerate</span><span>Every underlined value links to its source claim above</span></div>
+        </div>
+
+        <!-- actions -->
+        <div class="actions">
+          <div class="status-seg">
+            <span>Unreviewed</span><span class="active">In review</span><span>Contacted</span><span>Confirmed</span><span>False +</span><span>Dismissed</span>
+          </div>
+          <div class="action-btns">
+            <button class="btn">Watch</button>
+            <button class="btn">Export XLSX</button>
+            <button class="btn">Draft outreach email</button>
+            <button class="btn primary">Generate reasoning report</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="callouts">
+        <div class="callout"><div class="callout-n">1</div><div><h3>Identity row</h3><p>Address in display type, the only display-type moment on the page. The meta line carries the estimation caveat inline (SC-5* est.), and the right block anchors the four numbers every conversation starts from. <em>Account owner: unmapped</em> is a designed slot for the territory mapping that's still an open client question.</p></div></div>
+        <div class="callout"><div class="callout-n">2</div><div><h3>Claim ledger</h3><p>Three columns, three epistemically different claims (H2). The ML column carries the honest AUC translation in plain words. The rule column shows the threshold math and names the ConEd-aligned method, because that alignment is the tier's authority. The coverage column says what we can and can't see.</p></div></div>
+        <div class="callout"><div class="callout-n">3</div><div><h3>Driver band</h3><p>Rank, plain-language feature, real-world value (H4), diverging bar (H3), signed contribution. Down-bars render at lower opacity so the up-pressure story reads first without color. Energy Star at 77 pushing risk <em>up</em> is exactly the counterintuitive case that justifies showing values, not just directions.</p></div></div>
+      </div>
+      <div class="callouts">
+        <div class="callout"><div class="callout-n">4</div><div><h3>Narrative slot</h3><p>Dashed frame, provenance line, review status (H5). Every number in the draft is a dotted-underline citation resolving to a claim above it, which is what makes the generated report defensible rather than decorative. This is the Superhuman move: the AI drafts inside the object, not in a sidecar chat.</p></div></div>
+        <div class="callout"><div class="callout-n">5</div><div><h3>Action bar</h3><p>Workflow state as a segmented control, always visible, filterable from the table. The one orange in the entire view sits on the primary action, which is the artifact ConEd explicitly asked for. Status changes are the feedback loop: Confirmed and False positive become future training labels.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATUS VOCABULARY -->
+  <section>
+    <div class="eyebrow">03 · Workflow state vocabulary</div>
+    <h2>Six states, each with a consequence</h2>
+    <div class="status-table">
+      <div class="status-row"><span class="s-name">Unreviewed</span><span class="s-def">Default. Appears in the Monday queue until an analyst touches it.</span></div>
+      <div class="status-row"><span class="s-name">In review</span><span class="s-def">An analyst has the case file open or has claimed it. Prevents double work when the team grows.</span></div>
+      <div class="status-row"><span class="s-name">Contacted</span><span class="s-def">Outreach happened. Timestamp + optional note. <em>Suppresses re-alerting for a cooling-off window.</em></span></div>
+      <div class="status-row"><span class="s-name">Confirmed at-risk</span><span class="s-def">The customer conversation validated the signal. <em>Becomes a positive training label for GBM v2.</em></span></div>
+      <div class="status-row"><span class="s-name">False positive</span><span class="s-def">The conversation contradicted the signal. <em>Becomes a negative training label, and the most valuable feedback the model can get.</em></span></div>
+      <div class="status-row"><span class="s-name">Dismissed</span><span class="s-def">Not worth outreach for a stated reason (e.g., already negotiating, known closure). Reason is required; dismissals without reasons rot.</span></div>
+    </div>
+    <p class="note"><strong>Why this is in the header spec:</strong> status is part of the claim the header makes. "High risk, contacted 2026-06-30" and "High risk, unreviewed" are different Monday-morning facts, and the delta feed on the This Week landing is largely a query over these states.</p>
+  </section>
+
+  <!-- OPEN QUESTIONS -->
+  <section>
+    <div class="eyebrow">04 · Open questions before this ships</div>
+    <ul class="oq">
+      <li><b>Does "Critical" exist?</b> The diagnostic rule yields High / Medium / Low / Uncertain. Spec 1 rendered a Critical state. Either define it explicitly (proposal: High tier + fresh delta + top-decile percentile, i.e., concordant S1) or drop the word. An undefined severity level is precisely the kind of thing David's honest-framing instinct will catch.</li>
+      <li><b>Write path for workflow state.</b> Status, notes, and dismissal reasons need endpoints, persistence, and an audit trail. Currently the API is read-only plus watchlist. Scope with Pedro before promising the feedback loop in a demo.</li>
+      <li><b>Narrative generation mechanics.</b> /api/explain exists; decide whether drafts persist per building, regenerate on data refresh, and how citation anchors survive edits. A cited draft that drifts from its source values is worse than no draft.</li>
+      <li><b>Account-owner slot.</b> Territory mapping is an open question with David. The header reserves the slot and renders "unmapped" honestly until that answer arrives.</li>
+      <li><b>Tie display threshold.</b> "Tied w/ 2" is informative; "tied w/ 41" is a model-saturation confession. Decide the copy above a tie-count threshold, and confirm with Ismael how bad saturation actually is at the top of the ranking.</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>

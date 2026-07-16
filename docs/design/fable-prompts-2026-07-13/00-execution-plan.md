@@ -40,9 +40,9 @@ I will reply with one of: "proceed," "adjust these sections and re-emit, then pr
 
 **Step 3 — Run prompt 03 (build roadmap) once I confirm at Gate B.**
 
-Sequence milestones with owners per the ownership split principle, acceptance criteria pointing at specific `system-v1.1.md` laws, and the methodology alignment section folded in per its "required inclusion" wording. Return `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`.
+Sequence milestones with owners per the ownership split principle, acceptance criteria pointing at specific `system-v1.1.md` laws, and the methodology alignment section folded in per its "required inclusion" wording. Return `docs/ref/2026-07-16_fable-roadmap.md`.
 
-No gate after Step 3 — we go straight from your roadmap into per-person build briefs that quote from `system-v1.1.md` and `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`.
+No gate after Step 3 — we go straight from your roadmap into per-person build briefs that quote from `system-v1.1.md` and `docs/ref/2026-07-16_fable-roadmap.md`.
 
 ---
 

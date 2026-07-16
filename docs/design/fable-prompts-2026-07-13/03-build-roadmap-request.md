@@ -8,8 +8,8 @@
 
 **Attach:**
 - `system-v1.1.md` (from prompt 05) and any adjusted / added HTML specs from prompts 01, 02
-- `CONED_METHODOLOGY_ALIGNMENT.md` — the ConEd methodology gap analysis (Ildi + Johan asks, per-customer weather normalization, diagnostic metrics suite). This is the source for the methodology alignment section below.
-- `ISMAEL-RESPONSE-2026-07-13.md` — for Ismael's scoped backend milestones (Q6 events.json, Q7 status events endpoint, Q8 data-decoupling workaround)
+- `docs/ref/2026-07-16_methodology-alignment.md` — the ConEd methodology gap analysis (Ildi + Johan asks, per-customer weather normalization, diagnostic metrics suite). This is the source for the methodology alignment section below.
+- `docs/ref/2026-07-13_ismael-q1-q10-response.md` — for Ismael's scoped backend milestones (Q6 events.json, Q7 status events endpoint, Q8 data-decoupling workaround)
 
 ## Context
 
@@ -21,7 +21,7 @@ Three-person team, September ConEd session as the anchor deadline:
 
 ## What we're asking
 
-Produce a `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` that sequences the build.
+Produce a `docs/ref/2026-07-16_fable-roadmap.md` that sequences the build.
 
 **Format for each milestone:**
 
@@ -34,7 +34,7 @@ Produce a `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` that sequences the build
 
 **Ownership split principle** (informs owner assignment above):
 - **Pedro** — component-level atom implementations against a locked spec (score cell, case-file header ledger, workbench composition). Assign him the milestones with the tightest visual/interaction spec and least domain nuance, so he can move fast and push to GitHub without waiting on domain clarification.
-- **Ismael** — backend/pipeline: `model_meta` object rollout, `events.json` snapshot diffing (Q6), append-only status events endpoint + watchlist migration (Q7), data-decoupling workaround via `model_meta.run_date` (Q8), AUC rerun (Q4). Scopes already agreed in `ISMAEL-RESPONSE-2026-07-13.md`.
+- **Ismael** — backend/pipeline: `model_meta` object rollout, `events.json` snapshot diffing (Q6), append-only status events endpoint + watchlist migration (Q7), data-decoupling workaround via `model_meta.run_date` (Q8), AUC rerun (Q4). Scopes already agreed in `docs/ref/2026-07-13_ismael-q1-q10-response.md`.
 - **Edwin** — reasoning report content, methodology-page writing, David-facing follow-ups, portfolio-signals surface content (if verdict from 02 is Option 1 or 4), copy rules 7/8/9 templated strings.
 
 If a milestone doesn't fit cleanly under one owner, assign a pair with a lead — don't leave shared ownership implicit.
@@ -55,7 +55,7 @@ Use these as inputs, not answers. If your read of the dependency graph is differ
 
 ConEd (Ildi + Johan) asked us to demonstrate that the **core of their approach — careful weather normalization of usage data — is present in our build.** Johan's exact framing: *"a repeatable pattern-based approach that can be applied to current customers to identify potential lost business earlier."* This is not optional context — it must show up in the roadmap either as concrete milestones, as methodology-page content, or as explicitly deferred Round 2 items. Do not silently drop it.
 
-**The five methodology items** (source: `CONED_METHODOLOGY_ALIGNMENT.md` §3 and §7):
+**The five methodology items** (source: `docs/ref/2026-07-16_methodology-alignment.md` §3 and §7):
 
 1. **Per-customer weather-normalized usage regression** — HDD slope, CDD slope, intercept per building. Currently: citywide HDD multiplier only, no CDD anywhere. At yearly resolution this is statistically thin (2–3 df) but computable. At billing-day resolution it requires the ConEd billing data that has not landed.
 2. **Diagnostic metrics suite** — YoY % variance in normalized usage, current-vs-full-usage baseline, model fit (R²), HDD slope stability, synchronized slope-intercept changes, decline trend acceleration. Currently: 1 of 6 partially present (norm_delta_23_24 exists but normalized via citywide multiplier).

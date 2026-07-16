@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConEd Steam Attrition — Touchpoint · July 14, 2026</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — Style "Console"
+   ============================================================ */
+:root {
+  --stage-bg:   #05070a;
+  --slide-bg:   #0a0d12;
+  --panel:      #0f1319;
+  --panel-2:    #12171f;
+  --line:       #1a2029;
+  --line-strong:#2a3340;
+
+  --text:       #e6eaf0;
+  --text-dim:   #8a95a2;
+  --text-mute:  #4a545f;
+
+  --amber:      #ffb547;
+  --amber-glow: rgba(255,181,71,.15);
+  --cyan:       #6ee7d4;
+  --red:        #ff6b6b;
+
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Manrope', system-ui, sans-serif;
+}
+
+/* ============================================================
+   FIXED 16:9 STAGE
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:var(--stage-bg); }
+.deck-viewport { position:fixed; inset:0; overflow:hidden; background:var(--stage-bg); }
+.deck-stage { position:absolute; left:0; top:0; width:1920px; height:1080px; overflow:hidden; transform-origin:0 0; background:var(--slide-bg); }
+.slide {
+  position:absolute; inset:0; width:1920px; height:1080px;
+  overflow:hidden; display:block;
+  visibility:hidden; opacity:0; pointer-events:none;
+  background:var(--slide-bg);
+}
+.slide.active, .slide.visible { visibility:visible; opacity:1; pointer-events:auto; z-index:1; }
+img { max-width:100%; max-height:100%; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.2s !important; } }
+@media print {
+  html, body { width:1920px; height:auto; overflow:visible; background:#fff; }
+  .deck-viewport { position:static; overflow:visible; }
+  .deck-stage { position:static; width:auto; height:auto; transform:none !important; background:none; }
+  .slide { position:relative; display:block !important; visibility:visible !important; opacity:1 !important; width:1920px; height:1080px; break-after:page; }
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body { font-family: var(--font-mono); color: var(--text); }
+
+.slide::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index:0;
+}
+.slide::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(1400px 900px at 85% -10%, rgba(255,181,71,.05), transparent 55%),
+    radial-gradient(1000px 700px at 5% 105%, rgba(110,231,212,.03), transparent 55%);
+  z-index:0;
+}
+
+/* ============================================================
+   TOP + BOTTOM CHROME
+   ============================================================ */
+.status {
+  position:absolute; left:0; right:0; top:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: var(--text-dim);
+  background: rgba(5,7,10,.65);
+  backdrop-filter: blur(6px);
+  z-index: 5;
+}
+.status .l, .status .r { display:flex; gap: 28px; align-items:center; }
+.status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--amber); box-shadow: 0 0 12px var(--amber-glow); margin-right:8px; vertical-align:middle; animation: pulse 2s ease-in-out infinite; }
+.status .k { color: var(--text-mute); }
+.status .v { color: var(--text); }
+.status .v.amber { color: var(--amber); }
+.status .v.cyan { color: var(--cyan); }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
+
+.footbar {
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; justify-content: space-between; align-items:center;
+  padding: 18px 48px;
+  border-top: 1px solid var(--line);
+  background: rgba(5,7,10,.65);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .1em;
+  color: var(--text-mute);
+  z-index: 5;
+}
+.footbar .center { color: var(--text-dim); }
+.footbar .page { color: var(--text); letter-spacing: .16em; }
+.footbar .page b { color: var(--amber); font-weight: 500; }
+
+.body {
+  position: absolute; inset: 96px 96px 84px 96px;
+  z-index: 2;
+  display: flex; flex-direction: column;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--amber);
+  display:flex; align-items:center; gap: 14px;
+  margin-bottom: 24px;
+}
+.eyebrow::before { content:''; display:inline-block; width: 44px; height:1px; background: var(--amber); }
+
+h1.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 128px;
+  line-height: .92;
+  letter-spacing: -.045em;
+  margin: 0;
+  color: var(--text);
+}
+h1.display .amber { color: var(--amber); }
+h1.display .cursor {
+  display:inline-block; width: 12px; height: 92px; background: var(--amber);
+  vertical-align: -16px; margin-left: 6px;
+  animation: blink 1.1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+h2.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 80px;
+  line-height: 1;
+  letter-spacing: -.035em;
+  margin: 0 0 18px;
+  color: var(--text);
+}
+h2.display .amber { color: var(--amber); }
+
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+p.lead, .lead p, .lead {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.45;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin: 0;
+}
+p.lead .amber, .lead .amber { color: var(--amber); }
+p.lead .cyan, .lead .cyan { color: var(--cyan); }
+p.lead b, .lead b { color: var(--text); font-weight: 600; }
+
+/* ============================================================
+   REVEAL
+   ============================================================ */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal.d1 { transition-delay: .05s; }
+.slide.visible .reveal.d2 { transition-delay: .15s; }
+.slide.visible .reveal.d3 { transition-delay: .25s; }
+.slide.visible .reveal.d4 { transition-delay: .35s; }
+.slide.visible .reveal.d5 { transition-delay: .45s; }
+.slide.visible .reveal.d6 { transition-delay: .55s; }
+
+/* ============================================================
+   SLIDE 1 — TITLE
+   ============================================================ */
+.slide-title h1.display { font-size: 152px; }
+.slide-title h1.display .cursor { height: 108px; width: 14px; vertical-align: -18px; }
+
+.title-grid {
+  position:absolute; inset: 96px 96px 220px 96px;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 80px;
+  z-index: 2;
+}
+.title-grid .lead-txt { margin-top: 40px; font-family: var(--font-display); font-size: 22px; line-height: 1.5; color: var(--text-dim); max-width: 880px; }
+.title-grid .lead-txt .cyan { color: var(--cyan); }
+.title-grid .lead-txt .amber { color: var(--amber); }
+
+.title-panel {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.85));
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.title-panel .head {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .22em; color: var(--text-mute); text-transform: uppercase;
+  background: rgba(255,255,255,.015);
+}
+.title-panel .head .dots { display:flex; gap:6px; }
+.title-panel .head .dots i { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.title-panel .head .dots i:first-child { background: var(--red); opacity:.6; }
+.title-panel .head .dots i:nth-child(2) { background: var(--amber); opacity:.6; }
+.title-panel .head .dots i:last-child { background: var(--cyan); opacity:.6; }
+.title-panel .rows { padding: 8px 0; flex: 1; }
+.title-panel .row {
+  display:grid; grid-template-columns: 140px 1fr auto;
+  gap: 16px;
+  padding: 11px 22px;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  align-items: baseline;
+}
+.title-panel .row:last-child { border-bottom: none; }
+.title-panel .row .k { color: var(--text-mute); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+.title-panel .row .v { color: var(--text); }
+.title-panel .row .v small { display:block; color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+.title-panel .row .tag { color: var(--cyan); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.title-panel .row .tag.amber { color: var(--amber); }
+.title-panel .foot {
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:center;
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,181,71,.04);
+}
+.title-panel .foot b { color: var(--amber); font-weight: 500; }
+
+.title-people {
+  position:absolute; left: 96px; right: 96px; bottom: 96px;
+  display:grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  z-index: 2;
+}
+.title-people .cell {
+  padding: 22px 32px 4px 0;
+  border-right: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.title-people .cell:nth-child(4) { border-right: none; padding-right: 0; }
+.title-people .cell .name {
+  display:block;
+  color: var(--text);
+  font-family: var(--font-display);
+  letter-spacing: -.01em;
+  text-transform: none;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.title-people .cell .role {
+  display:block;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: none;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SLIDE 2 — WHAT SHIPPED  (plain english log)
+   ============================================================ */
+.slide-shipped .body { display:grid; grid-template-columns: 1fr 1.15fr; gap: 60px; }
+.slide-shipped h2.display { font-size: 78px; }
+.slide-shipped .lead { margin-top: 6px; max-width: 640px; }
+
+.shipped-panel {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.85));
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.shipped-panel .head {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .22em; color: var(--text-mute); text-transform: uppercase;
+  background: rgba(255,255,255,.015);
+}
+.shipped-panel .head .dots { display:flex; gap:6px; }
+.shipped-panel .head .dots i { width:8px; height:8px; border-radius:50%; display:inline-block; opacity:.6; }
+.shipped-panel .head .dots i:nth-child(1){ background: var(--red); }
+.shipped-panel .head .dots i:nth-child(2){ background: var(--amber); }
+.shipped-panel .head .dots i:nth-child(3){ background: var(--cyan); }
+.shipped-panel .rows { padding: 6px 0; flex: 1; }
+.shipped-panel .row {
+  display:grid; grid-template-columns: 118px 1fr;
+  gap: 22px;
+  padding: 20px 22px;
+  border-bottom: 1px dashed var(--line);
+  align-items: baseline;
+}
+.shipped-panel .row:last-child { border-bottom: none; }
+.shipped-panel .row .when {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--cyan);
+}
+.shipped-panel .row .what {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.25;
+}
+.shipped-panel .row .what small {
+  display:block;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-top: 6px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+/* ============================================================
+   SLIDE 3 — FRAME
+   ============================================================ */
+.slide-frame .body { justify-content: center; }
+.frame-grid {
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 44px;
+}
+.frame-card {
+  border: 1px solid var(--line-strong);
+  padding: 36px 32px;
+  background: linear-gradient(180deg, rgba(15,19,25,.85), rgba(10,13,18,.6));
+  border-radius: 4px;
+  position: relative;
+  min-height: 400px;
+  display:flex; flex-direction: column;
+}
+.frame-card .num {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .3em; color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.frame-card h3 { font-size: 32px; margin-bottom: 18px; line-height: 1.15; }
+.frame-card .desc {
+  font-family: var(--font-display);
+  font-size: 19px; line-height: 1.55; color: var(--text-dim);
+  flex: 1;
+  font-weight: 400;
+}
+.frame-card .desc .amber { color: var(--amber); font-weight: 500; }
+.frame-card .desc .cyan { color: var(--cyan); font-weight: 500; }
+.frame-card::before {
+  content:''; position:absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--amber);
+  transform: scaleX(0); transform-origin: left; transition: transform .8s cubic-bezier(.16,1,.3,1) .3s;
+}
+.slide.visible .frame-card::before { transform: scaleX(1); }
+
+/* ============================================================
+   ATOM SLIDES (with screengrab)
+   ============================================================ */
+.slide-atom .body { display:grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: stretch; }
+.atom-left { display:flex; flex-direction: column; }
+.atom-left h2.display { font-size: 64px; }
+.atom-left .lead { margin-top: 6px; margin-bottom: 24px; font-size: 21px; max-width: 780px; }
+
+.grab {
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: rgba(255,255,255,.02);
+  overflow: hidden;
+  flex: 1;
+  display: flex; flex-direction: column;
+}
+.grab .head {
+  padding: 12px 18px;
+  display:flex; justify-content: space-between; align-items:center;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.015);
+}
+.grab .head .dots { display:flex; gap: 6px; }
+.grab .head .dots i { width: 8px; height: 8px; border-radius:50%; display:inline-block; opacity:.6; }
+.grab .head .dots i:nth-child(1){ background: var(--red); }
+.grab .head .dots i:nth-child(2){ background: var(--amber); }
+.grab .head .dots i:nth-child(3){ background: var(--cyan); }
+.grab .img { flex: 1; display:flex; align-items: stretch; justify-content: center; padding: 12px; background: #fff; }
+.grab .img img { width: 100%; height: 100%; object-fit: contain; object-position: top; display: block; }
+.grab .foot {
+  padding: 10px 18px;
+  border-top: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.015);
+  display:flex; justify-content:space-between;
+}
+
+.callouts {
+  display:flex; flex-direction:column;
+  gap: 14px;
+  align-content: start;
+}
+.callout {
+  display:grid; grid-template-columns: 36px 1fr; gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: rgba(15,19,25,.7);
+}
+.callout .pin {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--amber); color: var(--slide-bg);
+  font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 3px rgba(255,181,71,.15);
+  margin-top: 2px;
+}
+.callout .txt {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--text);
+  font-weight: 600;
+}
+.callout .txt small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-top: 6px;
+  letter-spacing: 0;
+  line-height: 1.55;
+}
+.callout .txt .amber { color: var(--amber); font-weight: 500; }
+.callout .txt .cyan { color: var(--cyan); font-weight: 500; }
+
+/* ============================================================
+   SLIDE 5 — PRIORITY QUEUE (23 buildings)
+   ============================================================ */
+.slide-queue .body { display:grid; grid-template-columns: 1.1fr 1fr; gap: 56px; }
+.slide-queue h2.display { font-size: 72px; margin-bottom: 8px; }
+.slide-queue .lead { margin-bottom: 26px; max-width: 780px; font-size: 22px; }
+
+.filter-card {
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.8));
+  padding: 26px 28px 20px;
+  margin-bottom: 20px;
+}
+.filter-card .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+.filter-leg {
+  display:grid; grid-template-columns: 40px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--line);
+  align-items: baseline;
+}
+.filter-leg:last-child { border-bottom: none; }
+.filter-leg .n {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: transparent; color: var(--amber);
+  border: 1.5px solid var(--amber);
+  font-family: var(--font-mono); font-weight: 700; font-size: 13px;
+  display:flex; align-items:center; justify-content:center;
+}
+.filter-leg .desc {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.35;
+  font-weight: 600;
+}
+.filter-leg .desc small {
+  display:block;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 400;
+  margin-top: 4px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.filter-and {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--text-mute); text-align: center;
+  padding: 4px 0;
+}
+
+.queue-panel {
+  display:grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+.queue-panel .box {
+  border: 1px solid var(--line-strong);
+  padding: 22px 24px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.7);
+}
+.queue-panel .box .k {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 10px;
+}
+.queue-panel .box .v {
+  font-family: var(--font-display); font-weight: 800; font-size: 88px;
+  letter-spacing: -.03em; line-height: .95;
+  color: var(--amber);
+}
+.queue-panel .box .caption {
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+  margin-top: 10px; line-height: 1.5;
+}
+.queue-panel .box.top .v {
+  font-size: 32px; color: var(--text); letter-spacing: -.02em; line-height: 1.15;
+  font-weight: 700;
+}
+.queue-panel .box.top .v small { display:block; color: var(--text-dim); font-family: var(--font-mono); font-size: 12px; margin-top: 6px; font-weight: 400; letter-spacing: 0; }
+
+.ask-note {
+  border: 1px solid rgba(110,231,212,.35);
+  background: rgba(110,231,212,.05);
+  padding: 22px 24px;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.ask-note .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+.ask-note .v { font-family: var(--font-display); font-size: 20px; color: var(--text); line-height: 1.4; font-weight: 500; }
+.ask-note .v b { color: var(--cyan); font-weight: 600; }
+
+/* ============================================================
+   SLIDE — METHODOLOGY RESPONSE
+   ============================================================ */
+.slide-method .body { justify-content: flex-start; }
+.slide-method h2.display { font-size: 68px; margin-bottom: 10px; }
+.slide-method .lead { margin-bottom: 28px; max-width: 1400px; }
+
+.method-table {
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.8));
+}
+.method-table .th {
+  display: grid;
+  grid-template-columns: 60px 1.15fr 1.6fr 1.2fr;
+  gap: 24px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.02);
+}
+.method-table .tr {
+  display: grid;
+  grid-template-columns: 60px 1.15fr 1.6fr 1.2fr;
+  gap: 24px;
+  padding: 20px 24px;
+  border-bottom: 1px dashed var(--line);
+  align-items: start;
+}
+.method-table .tr:last-child { border-bottom: none; }
+.method-table .no {
+  color: var(--amber);
+  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+.method-table .item { color: var(--text); font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.35; }
+.method-table .ships { color: var(--text-dim); font-family: var(--font-mono); font-size: 13px; line-height: 1.55; }
+.method-table .ships b { color: var(--cyan); font-weight: 500; }
+.method-table .r2 { color: var(--text-mute); font-family: var(--font-mono); font-size: 13px; font-style: italic; line-height: 1.55; }
+
+/* ============================================================
+   SLIDE — WHAT WE NEED
+   ============================================================ */
+.slide-asks .body { display:grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: stretch; }
+.asks-head h2.display { font-size: 68px; margin-bottom: 16px; }
+.asks-head .lead { margin-bottom: 24px; font-size: 20px; max-width: 900px; }
+.asks-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  align-content: start;
+}
+.ask-card {
+  border: 1px solid var(--line-strong);
+  padding: 18px 20px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.6);
+  min-height: 168px;
+}
+.ask-card .no {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .22em; color: var(--amber);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.ask-card .q {
+  font-family: var(--font-display);
+  font-size: 17px; color: var(--text); font-weight: 600;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.ask-card .n {
+  font-family: var(--font-mono);
+  font-size: 13px; color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.asks-side { display:flex; flex-direction: column; gap: 20px; }
+.asks-side .box {
+  border: 1px solid var(--line-strong);
+  padding: 22px 24px;
+  border-radius: 4px;
+  background: rgba(255,181,71,.05);
+}
+.asks-side .box .k {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--amber);
+  margin-bottom: 10px;
+}
+.asks-side .box .v { font-family: var(--font-display); font-size: 19px; color: var(--text); line-height: 1.45; font-weight: 500; }
+.asks-side .box.cyan { background: rgba(110,231,212,.04); border-color: rgba(110,231,212,.35); }
+.asks-side .box.cyan .k { color: var(--cyan); }
+.asks-side .split { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.asks-side .stat-mini {
+  border: 1px solid var(--line-strong);
+  padding: 18px 20px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.6);
+}
+.asks-side .stat-mini .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-mute); }
+.asks-side .stat-mini .v { font-family: var(--font-display); font-weight: 800; font-size: 44px; letter-spacing: -.02em; line-height: 1; margin-top: 8px; color: var(--amber); }
+.asks-side .stat-mini .n { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 1.4; }
+
+/* ============================================================
+   SLIDE — CLOSE
+   ============================================================ */
+.slide-close .body { justify-content: center; align-items: center; }
+.close-wrap { max-width: 1600px; margin: 0 auto; text-align: left; width: 100%; }
+.close-wrap h2.display { font-size: 92px; margin-bottom: 12px; }
+.close-wrap .lead { font-size: 22px; margin-bottom: 44px; max-width: 1200px; }
+.close-cols { display:grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.close-panel {
+  border: 1px solid var(--line-strong);
+  padding: 28px 30px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.75);
+}
+.close-panel .head {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--amber);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+.close-panel .item {
+  display: grid; grid-template-columns: 110px 1fr;
+  gap: 14px; padding: 10px 0;
+  align-items: baseline;
+}
+.close-panel .item .k {
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+}
+.close-panel .item .v {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+}
+.close-panel .item .v small {
+  display:block; color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  margin-top: 2px;
+  letter-spacing: 0;
+}
+.close-panel .item .v a { color: var(--amber); text-decoration: none; font-family: var(--font-mono); font-weight: 400; font-size: 13px; }
+
+.nav-hint {
+  position: fixed;
+  right: 20px; bottom: 20px;
+  z-index: 20;
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(230,234,240,.35);
+  padding: 6px 10px;
+  border: 1px solid rgba(230,234,240,.12);
+  border-radius: 3px;
+  background: rgba(5,7,10,.6);
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+  <main class="deck-stage" id="deckStage">
+
+    <!-- =====================================================
+         SLIDE 1 — TITLE
+         ===================================================== -->
+    <section class="slide slide-title active visible">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Pipeline</span> <span class="k">ran</span> <span class="v">July 6, 2026 at 6:00 AM</span></span>
+          <span><span class="k">Buildings tracked</span> <span class="v">1,210</span></span>
+        </div>
+        <div class="r">
+          <span><span class="k">Model</span> <span class="v">XGBoost — awaiting validation</span></span>
+        </div>
+      </div>
+
+      <div class="title-grid">
+        <div>
+          <div class="eyebrow reveal d1">ConEd Steam Attrition · Redesign Touchpoint</div>
+          <h1 class="display reveal d2">The steam<br/>team's <span class="amber">week</span><span class="cursor"></span></h1>
+          <p class="lead-txt reveal d3">
+            A workflow-first redesign of the attrition dashboard.<br/>
+            <span class="cyan">Today's build is preserved</span> — the new build comes up alongside it, milestone by milestone.<br/>
+            Every number on screen shows where it came from and how confident we are.
+          </p>
+        </div>
+        <aside class="title-panel reveal d4">
+          <div class="head">
+            <span>What ships next</span>
+            <span class="dots"><i></i><i></i><i></i></span>
+          </div>
+          <div class="rows">
+            <div class="row"><span class="k">Shipped</span><span class="v">Compliance gauges<small>Local Law 97 · 2024 &amp; 2030</small></span><span class="tag">merged</span></div>
+            <div class="row"><span class="k">Shipped</span><span class="v">Model driver panel<small>Top 5 drivers per building</small></span><span class="tag">merged</span></div>
+            <div class="row"><span class="k">Shipped</span><span class="v">Predictions API<small>XGBoost model behind auth</small></span><span class="tag">live</span></div>
+            <div class="row"><span class="k">Next</span><span class="v">One truth for model version<small>Retire outdated references</small></span><span class="tag amber">Ismael</span></div>
+            <div class="row"><span class="k">Next</span><span class="v">Preserve today's dashboard<small>Route as /legacy</small></span><span class="tag amber">Pedro</span></div>
+          </div>
+          <div class="foot">
+            <span>Agenda</span>
+            <b>10 slides · ~20 min</b>
+          </div>
+        </aside>
+      </div>
+
+      <div class="title-people reveal d5">
+        <div class="cell">
+          Presenting
+          <span class="name">Ismael Caraballo</span>
+          <span class="role">Backend · models · pipeline</span>
+        </div>
+        <div class="cell">
+          <span class="name" style="margin-top: 22px;">Pedro Martins</span>
+          <span class="role">Project Management</span>
+        </div>
+        <div class="cell">
+          Design lead
+          <span class="name">Edwin Perez</span>
+          <span class="role">On Slack today</span>
+        </div>
+        <div class="cell">
+          Date
+          <span class="name">July 14, 2026</span>
+          <span class="role">ConEd</span>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>ConEd Steam Attrition</div>
+        <div class="center">Redesign Touchpoint</div>
+        <div class="page">Slide <b>01</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 2 — WHAT SHIPPED
+         ===================================================== -->
+    <section class="slide slide-shipped">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Update</span> <span class="k">·</span> <span class="v">what's shipped since last touchpoint</span></span>
+        </div>
+        <div class="r"><span><span class="k">Live at</span> <span class="v cyan">the current dashboard on Railway</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="eyebrow reveal d1">Since last touchpoint</div>
+          <h2 class="display reveal d2">Three engineering<br/>ships, one <span class="amber">design</span><br/>spec locked.</h2>
+          <p class="lead reveal d3">
+            Every ship is live on the current dashboard behind your login. The design spec is what shapes the rest of this walkthrough — a scoped plan, twelve milestones, each with acceptance criteria written down.
+          </p>
+        </div>
+
+        <div class="shipped-panel reveal d4">
+          <div class="head">
+            <span>Shipped since last touchpoint</span>
+            <span class="dots"><i></i><i></i><i></i></span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <span class="when">Early July</span>
+              <span class="what">Local Law 97 compliance gauges<small>Every building now shows emissions against both the 2024 cap and the 2030 cap — the compliance cliff is visible on one screen.</small></span>
+            </div>
+            <div class="row">
+              <span class="when">Early July</span>
+              <span class="what">Model driver panel<small>For each building, the top five features driving its risk score, with directional arrows. Replaces the old static tooltip.</small></span>
+            </div>
+            <div class="row">
+              <span class="when">Early July</span>
+              <span class="what">Predictions API<small>The XGBoost model is now served through our API behind authentication. Also: a diagnostic tier filter in the ranked table.</small></span>
+            </div>
+            <div class="row">
+              <span class="when">Ongoing</span>
+              <span class="what">Security hardening<small>Faster lookups, safer writes, guardrails on model fallback — nothing user-visible, everything more solid.</small></span>
+            </div>
+            <div class="row">
+              <span class="when">July 13</span>
+              <span class="what">Design system spec locked<small>Voice, tokens, rules, and a twelve-milestone roadmap with acceptance criteria for each. Shape of everything that follows.</small></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Ismael</div>
+        <div class="center">What shipped since last touchpoint</div>
+        <div class="page">Slide <b>02</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 3 — THE FRAME
+         ===================================================== -->
+    <section class="slide slide-frame">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">The redesign</span> <span class="k">·</span> <span class="v">what changes, in three moves</span></span>
+        </div>
+        <div class="r"><span><span class="k">Voice</span> <span class="v">"Bloomberg Terminal that explains itself"</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="eyebrow reveal d1">The redesign in one paragraph</div>
+        <h2 class="display reveal d2">The current build shows<br/>a portfolio. The redesign<br/>shows <span class="amber">the team's week</span>.</h2>
+
+        <div class="frame-grid">
+          <div class="frame-card reveal d3">
+            <div class="num">01 · The shift</div>
+            <h3>From "the portfolio" to "this week's work."</h3>
+            <p class="desc">The old dashboard opens on a ranked list of every building. The new one opens on <span class="cyan">what changed since Monday</span> and what needs a call this week. Same data — reorganized around the analyst's day.</p>
+          </div>
+
+          <div class="frame-card reveal d4">
+            <div class="num">02 · The rule</div>
+            <h3>Every number on screen shows its confidence.</h3>
+            <p class="desc">You see who trained the model, when the data was refreshed, how many buildings support the claim. Direct answer to the <span class="amber">"100% High"</span> problem you raised last time — the tool has to be honest about what it doesn't know.</p>
+          </div>
+
+          <div class="frame-card reveal d5">
+            <div class="num">03 · The tier</div>
+            <h3>The risk tier is a documented hybrid — not pure model, not pure rule.</h3>
+            <p class="desc">The model sets a starting tier. Three checkable modifiers (an outlier decline, an accelerating decline, an over-cap building) can shift it up or down. <span class="cyan">Every surface names it that way</span> so it's never presented as a black box.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Pedro</div>
+        <div class="center">The redesign frame · one shift, one rule, one structure</div>
+        <div class="page">Slide <b>03</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 4 — THIS WEEK LANDING (Atom 1) with screengrab
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Atom 1 of 4</span> <span class="k">·</span> <span class="v">"This Week" landing page</span></span>
+        </div>
+        <div class="r"><span><span class="k">Purpose</span> <span class="v">what an analyst opens Monday morning</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="atom-left">
+          <div class="eyebrow reveal d1">Atom 1 · Monday morning</div>
+          <h2 class="display reveal d2">This week,<br/>on <span class="amber">this queue</span>.</h2>
+          <p class="lead reveal d3">
+            The first page the steam team sees. Two dated anchors at the top (when the data ran, when you last reviewed), a feed of what changed and why it matters, and a priority queue the team can work through.
+          </p>
+          <div class="grab reveal d4">
+            <div class="head"><span>Design spec · this-week-landing</span><span class="dots"><i></i><i></i><i></i></span></div>
+            <div class="img"><img src="./touchpoint-assets/this-week-landing.png" alt="This Week landing page design spec"></div>
+            <div class="foot"><span>Fable · design partner</span><span>Ready to build</span></div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">Two anchors, no relative time.<small>Pipeline ran <span class="amber">July 6</span> · you reviewed June 30. Never "two hours ago" — always the actual date, so nobody wonders whether the number is fresh.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Every change names its trigger.<small>"New boiler permit filed at 660 Madison — check whether the emissions grade might drift." The feed tells the analyst what happened and what to do about it.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">The priority queue is workflow-scale.<small>Not "here are 1,210 buildings" — "here are the ones to look at this week." Portfolio-scale numbers live in one quiet corner. Explained in detail on the next slide.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Absence of fresh data is a designed state.<small>Most buildings only have 2023 data or older. The page treats stale as normal, not as a bug — it's flagged clearly instead of hidden.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Pedro</div>
+        <div class="center">"This Week" landing page — Monday morning</div>
+        <div class="page">Slide <b>04</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 5 — PRIORITY QUEUE (23 buildings)
+         ===================================================== -->
+    <section class="slide slide-queue">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Priority queue</span> <span class="k">·</span> <span class="v">proposed definition · needs sign-off</span></span>
+        </div>
+        <div class="r"><span><span class="k">As of</span> <span class="v">pipeline run July 6, 2026</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="eyebrow reveal d1">The priority queue — what's on it, and why</div>
+          <h2 class="display reveal d2">Three signals<br/>have to <span class="amber">agree</span>.</h2>
+          <p class="lead reveal d3">
+            The priority queue is what the steam team looks at first each week. A building lands on it only when all three signals fire — the model, the freshness of the data, and a trend flag. This is a proposed definition; we need your sign-off on the shape before we ship the weekly digest.
+          </p>
+
+          <div class="filter-card reveal d4">
+            <div class="k">A building is a priority when all three are true</div>
+            <div class="filter-leg">
+              <span class="n">1</span>
+              <span class="desc">The model is confident this building is in the higher-risk group.<small>XGBoost places it in its high-confidence set — the top ~57 buildings by score, cutoff 0.60.</small></span>
+            </div>
+            <div class="filter-and">AND</div>
+            <div class="filter-leg">
+              <span class="n">2</span>
+              <span class="desc">There's fresh 2024 steam data for the building.<small>Not a stale record. If the most recent number is from 2023 or older, the building sits in a different queue with a "stale" label.</small></span>
+            </div>
+            <div class="filter-and">AND</div>
+            <div class="filter-leg">
+              <span class="n">3</span>
+              <span class="desc">At least one trend signal has fired.<small>Either: the year-over-year decline is a statistical outlier (bigger than most buildings) — or the decline is accelerating (getting worse faster than it was).</small></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="queue-panel reveal d4">
+            <div class="box">
+              <div class="k">On the queue right now</div>
+              <div class="v">23</div>
+              <div class="caption">Buildings passing all three signals as of the July 6 pipeline run.</div>
+            </div>
+            <div class="box top">
+              <div class="k">Top of queue</div>
+              <div class="v">660 Madison Ave<small>200 East 42nd Street</small><small>58 West 58th Street</small></div>
+              <div class="caption">Verified against live data.</div>
+            </div>
+          </div>
+
+          <div class="ask-note reveal d5">
+            <div class="k">What we're asking</div>
+            <div class="v">Is this the right shape? If the ConEd steam team wants a wider cut (drop the fresh-data leg), a tighter cut (add over-cap as a fourth leg), or different thresholds, <b>the count changes with the definition</b>. Sign-off is on the definition, not the number.</div>
+          </div>
+
+          <div class="filter-card reveal d6" style="margin-top: 20px; padding: 20px 24px;">
+            <div class="k" style="margin-bottom: 6px; color: var(--text-mute);">Note on Local Law 97</div>
+            <div style="font-family: var(--font-display); font-size: 15px; color: var(--text-dim); line-height: 1.55;">The over-cap flag is deliberately not a fourth leg. The model already uses the LL97 dollar penalty as its top feature (20% of the model's importance). Adding the over-cap flag on top would double-count the same signal.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Ismael</div>
+        <div class="center">Priority queue · proposed definition · sign-off needed</div>
+        <div class="page">Slide <b>05</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 6 — SCORE CELL (Atom 2)
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Atom 2 of 4</span> <span class="k">·</span> <span class="v">how one building's risk is shown</span></span>
+        </div>
+        <div class="r"><span><span class="k">Purpose</span> <span class="v">retire the "100% High" wall</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="atom-left">
+          <div class="eyebrow reveal d1">Atom 2 · One building, one row</div>
+          <h2 class="display reveal d2">Rank, not <span class="amber">a percent sign</span>.</h2>
+          <p class="lead reveal d3">
+            In the current build, 45 buildings all show 100% risk — which reads as "the model can't tell them apart." The new cell shows a ranking ("96th percentile") or, for a tied top block, "among the top 52 by model score." Never a percent sign on the score itself.
+          </p>
+          <div class="grab reveal d4">
+            <div class="head"><span>Design spec · score-cell-anatomy</span><span class="dots"><i></i><i></i><i></i></span></div>
+            <div class="img"><img src="./touchpoint-assets/score-cell-anatomy.png" alt="Score cell design spec"></div>
+            <div class="foot"><span>Fable · design partner</span><span>Ready to build</span></div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">Rank in the distribution, never a percent.<small>"96th percentile" for most buildings — "among the top 52 by model score" for the tied top block. The number is a rank, not a probability.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">The provenance chip names the model.<small>Reads <span class="amber">"XGBoost, awaiting validation."</span> The model's ranking accuracy number lives only on the case file and the methodology page — not on the score cell itself.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">"Awaiting validation" until we back-test.<small>Against ConEd's actual disconnect records. That's your data — the label stays honest until we get access to it.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Four named freshness states.<small>Fresh 2024 delta · Latest 2023 only · No adjacent-year delta · Uncertain. Stale is the majority case — the design treats it that way.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Pedro</div>
+        <div class="center">Score cell · how one building's risk is shown</div>
+        <div class="page">Slide <b>06</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 7 — CASE FILE / REASONING REPORT (Atom 3)
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Atom 3 of 4</span> <span class="k">·</span> <span class="v">the case file &amp; the printable report</span></span>
+        </div>
+        <div class="r"><span><span class="k">Purpose</span> <span class="v">the deep dive on one building</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="atom-left">
+          <div class="eyebrow reveal d1">Atom 3 · Digging in on one building</div>
+          <h2 class="display reveal d2">Every claim<br/>shows its <span class="amber">math</span>.</h2>
+          <p class="lead reveal d3">
+            Click a priority-queue row and you get a case file — a ledger, not a splash screen. Three columns: where the building sits in the queue, why it's in the tier it's in, and how much data supports the claim. There's a printable version for sharing with operations.
+          </p>
+          <div class="grab reveal d4">
+            <div class="head"><span>Design spec · reasoning-report</span><span class="dots"><i></i><i></i><i></i></span></div>
+            <div class="img"><img src="./touchpoint-assets/reasoning-report.png" alt="Reasoning report design spec"></div>
+            <div class="foot"><span>Fable · design partner</span><span>Ready to build</span></div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">The model's driver breakdown, restructured as evidence.<small>Same top-5 drivers you see on the current dashboard — but with real-unit values (dollar penalty, decline percentage) and directional arrows on each.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Print-safe by construction.<small>Renders clean in grayscale — print it, scan it, still readable. The report is designed to leave the tool, not just live inside it.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">The tier chain is written out verbatim.<small>Not just "Critical" — but "Critical, because base tier from model = High, plus outlier decline (+1)." Full derivation, every time.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">A human signs it. The tool doesn't ship a report on its own.<small>Every reasoning report requires an analyst's name on it before it leaves the system. The strongest defensibility feature we have — the tool triages; the human confirms.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Pedro · Ismael on the tier chain</div>
+        <div class="center">Case file &amp; printable reasoning report</div>
+        <div class="page">Slide <b>07</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 8 — WEEKLY DIGEST (Atom 4)
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Atom 4 of 4</span> <span class="k">·</span> <span class="v">the weekly email</span></span>
+        </div>
+        <div class="r"><span><span class="k">Purpose</span> <span class="v">how the finding leaves the tool</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="atom-left">
+          <div class="eyebrow reveal d1">Atom 4 · The Monday email</div>
+          <h2 class="display reveal d2">Readable <span class="amber">without a click</span>.</h2>
+          <p class="lead reveal d3">
+            Every Monday, the digest arrives in the distribution list's inbox. The subject line carries the finding. The body is complete without opening the app. A plain-text version ships alongside every HTML draft, in case a recipient's client can't render it.
+          </p>
+          <div class="grab reveal d4">
+            <div class="head"><span>Design spec · weekly-digest-email</span><span class="dots"><i></i><i></i><i></i></span></div>
+            <div class="img"><img src="./touchpoint-assets/weekly-digest-email.png" alt="Weekly digest email design spec"></div>
+            <div class="foot"><span>Fable · design partner</span><span>Ready to build</span></div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">The subject line names the finding.<small>"23 buildings entered the priority queue this week — top: 660 Madison." The recipient can act on the inbox preview alone.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">The body is a complete finding, not a teaser.<small>No "log in to see more." The email carries the queue count, the top buildings, and the top three changes — everything the recipient needs to know without opening the tool.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">Numbers come from the data, never freehand.<small>The compose UI lets the analyst edit the copy — but the numbers are pulled from the pipeline. No one can type "24 buildings" if it was 23.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Sent from the analyst's own mail client.<small>The tool composes the draft and hands it off to the client (or the clipboard). Nothing goes out from us in this first version — the analyst is on the send button.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Pedro</div>
+        <div class="center">Weekly digest — how the finding leaves the tool</div>
+        <div class="page">Slide <b>08</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 9 — METHODOLOGY RESPONSE (was 8 in v1)
+         ===================================================== -->
+    <section class="slide slide-method">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">Response</span> <span class="k">·</span> <span class="v">to the methodology alignment doc, June 2026</span></span>
+        </div>
+        <div class="r"><span><span class="k">Full analysis</span> <span class="v cyan">in the repo</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="eyebrow reveal d1">Methodology response — item by item</div>
+        <h2 class="display reveal d2">Five items.<br/>Two ship now. Three are <span class="amber">next round</span>, with reasons.</h2>
+        <p class="lead reveal d3">
+          A written response to the alignment document the ConEd team sent in June. Full text is in the repo (<span class="amber">CONED_METHODOLOGY_ALIGNMENT.md</span>) and the handout summarizes it. The dedicated methodology page ships as part of the redesign.
+        </p>
+
+        <div class="method-table reveal d4">
+          <div class="th">
+            <span>#</span>
+            <span>Item</span>
+            <span>What ships now</span>
+            <span>Next round</span>
+          </div>
+          <div class="tr">
+            <span class="no">01</span>
+            <span class="item">Per-customer weather-normalized regression</span>
+            <span class="ships">The NYCHA regression across 24 developments — <b>shipped as the proof of method</b>. Portfolio-wide, we're using citywide heating degree days as a documented weakness.</span>
+            <span class="r2">Waits on billing-cycle data access from ConEd</span>
+          </div>
+          <div class="tr">
+            <span class="no">02</span>
+            <span class="item">A six-metric diagnostic suite</span>
+            <span class="ships">Two of the six are already surfacing in the case file (decline trend label, regression fit where present).</span>
+            <span class="r2">Waits on item 01</span>
+          </div>
+          <div class="tr">
+            <span class="no">03</span>
+            <span class="item">"Uncertain" tier aligned with regression fit</span>
+            <span class="ships">Partial: where the NYCHA regression exists, we use its fit as the gate. Elsewhere we use a years-of-data gate.</span>
+            <span class="r2">Extends portfolio-wide when item 01 lands</span>
+          </div>
+          <div class="tr">
+            <span class="no">04</span>
+            <span class="item">Rule-based tier assignment with empirical thresholds</span>
+            <span class="ships">Our version is a hybrid — the model sets the base, three checkable modifiers can shift it. <b>The chain is written verbatim on every surface</b>, so it's never presented as opaque.</span>
+            <span class="r2">A fully learned tier assignment explored</span>
+          </div>
+          <div class="tr">
+            <span class="no">05</span>
+            <span class="item">Position both approaches as complementary signals</span>
+            <span class="ships">Ships now — the methodology page and the report method footer both frame it this way.</span>
+            <span class="r2">Pattern-mining explored as a research track</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Ismael</div>
+        <div class="center">Methodology alignment · point-by-point</div>
+        <div class="page">Slide <b>09</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 10 — WHAT WE NEED
+         Note: I decided to keep it at 10 slides by merging asks+close.
+         ===================================================== -->
+    <section class="slide slide-asks">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">What we need from ConEd</span> <span class="k">·</span> <span class="v">answers async, this week</span></span>
+        </div>
+        <div class="r"><span><span class="k">Next touchpoint</span> <span class="v">[to schedule]</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="asks-head">
+          <div class="eyebrow reveal d1">What we need from ConEd · what ships next</div>
+          <h2 class="display reveal d2">Seven questions.<br/><span class="amber">Any answer</span> moves us forward.</h2>
+          <p class="lead reveal d3">
+            These are the decisions we need from the ConEd steam and methodology teams. All can be answered by email or Slack this week — no need to resolve them in the room.
+          </p>
+
+          <div class="asks-list">
+            <div class="ask-card reveal d3">
+              <div class="no">Question 1</div>
+              <div class="q">Sign-off on the priority queue definition — the three-signal filter behind the 23 buildings.</div>
+              <div class="n">Ismael signed internally. Ready when ConEd is.</div>
+            </div>
+            <div class="ask-card reveal d3">
+              <div class="no">Question 2</div>
+              <div class="q">Chip vocabulary — is "XGBoost, awaiting validation" the right phrasing?</div>
+              <div class="n">Or would the team prefer something else? "Not yet validated"? "Provisional"?</div>
+            </div>
+            <div class="ask-card reveal d4">
+              <div class="no">Question 3</div>
+              <div class="q">Weekly digest — cadence, recipient list, format.</div>
+              <div class="n">Weekly? Who receives? HTML plus plain-text, or plain-text only?</div>
+            </div>
+            <div class="ask-card reveal d4">
+              <div class="no">Question 4</div>
+              <div class="q">Cooling-off window — how long after "Contacted" before a building resurfaces?</div>
+              <div class="n">A week? A month? Different by building type?</div>
+            </div>
+            <div class="ask-card reveal d5">
+              <div class="no">Question 5</div>
+              <div class="q">Territory gating — do different recipients see different building subsets?</div>
+              <div class="n">Or does everyone on the list see the full portfolio?</div>
+            </div>
+            <div class="ask-card reveal d5">
+              <div class="no">Question 6</div>
+              <div class="q">Reports — a DRAFT watermark, or a hard gate?</div>
+              <div class="n">Watermark means drafts can be sent, marked as drafts. Hard gate means only reviewed reports leave the tool. We recommend the watermark.</div>
+            </div>
+            <div class="ask-card reveal d6">
+              <div class="no">Question 7 · Methodology</div>
+              <div class="q">Anything in the "next round" column that you'd want promoted to "now"?</div>
+              <div class="n">Named with the trade-off — if there's an item that matters more than the ordering suggests, we'd like to hear it.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="asks-side">
+          <div class="box reveal d4">
+            <div class="k">What ships between now and next touchpoint</div>
+            <div class="v">Today's dashboard preserved at <b>/legacy</b>. One truth for model version + validation status. The model's ranking accuracy rerun with proper statistics. The score cell atom, live on the ranked table.</div>
+          </div>
+          <div class="split reveal d5">
+            <div class="stat-mini">
+              <div class="k">On the priority queue</div>
+              <div class="v">23</div>
+              <div class="n">Buildings today · signed internally</div>
+            </div>
+            <div class="stat-mini">
+              <div class="k">Ships next</div>
+              <div class="v">4</div>
+              <div class="n">Milestones between now and next touchpoint</div>
+            </div>
+          </div>
+          <div class="box cyan reveal d6">
+            <div class="k">Contact</div>
+            <div class="v" style="font-family: var(--font-mono); font-size: 14px; line-height: 1.75;">
+              Edwin Perez <span style="color: var(--text-mute)">— design, methodology</span><br/>
+              <a href="mailto:edwin.perez@pursuit.org" style="color: var(--cyan); text-decoration: none;">edwin.perez@pursuit.org</a><br/><br/>
+              Ismael Caraballo <span style="color: var(--text-mute)">— backend, models</span><br/>
+              <a href="mailto:ismael.caraballo@pursuit.org" style="color: var(--cyan); text-decoration: none;">ismael.caraballo@pursuit.org</a><br/><br/>
+              Pedro Martins <span style="color: var(--text-mute)">— project management</span><br/>
+              <a href="mailto:pedro.martins@gmail.com" style="color: var(--cyan); text-decoration: none;">pedro.martins@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div>Ismael &amp; Pedro</div>
+        <div class="center">Thanks · questions?</div>
+        <div class="page">Slide <b>10</b> / 10</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="nav-hint">← / → · space · home / end</div>
+
+<script>
+class SlidePresentation {
+  constructor() {
+    this.slides = document.querySelectorAll('.slide');
+    this.stage = document.getElementById('deckStage');
+    this.current = 0;
+    this.fitStage = this.fitStage.bind(this);
+    this.fitStage();
+    window.addEventListener('resize', this.fitStage);
+    this.bindKeys();
+    this.bindTouch();
+    this.show(0);
+  }
+  fitStage() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    const x = (window.innerWidth - 1920 * s) / 2;
+    const y = (window.innerHeight - 1080 * s) / 2;
+    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+  }
+  show(i) {
+    this.current = Math.max(0, Math.min(i, this.slides.length - 1));
+    this.slides.forEach((sl, idx) => {
+      sl.classList.toggle('active', idx === this.current);
+      sl.classList.toggle('visible', idx === this.current);
+    });
+  }
+  next() { this.show(this.current + 1); }
+  prev() { this.show(this.current - 1); }
+  bindKeys() {
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+          e.preventDefault(); this.next(); break;
+        case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+          e.preventDefault(); this.prev(); break;
+        case 'Home': e.preventDefault(); this.show(0); break;
+        case 'End': e.preventDefault(); this.show(this.slides.length - 1); break;
+      }
+    });
+  }
+  bindTouch() {
+    let x0 = null;
+    document.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      if (x0 == null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) dx < 0 ? this.next() : this.prev();
+      x0 = null;
+    });
+  }
+}
+new SlidePresentation();
+</script>
+</body>
+</html>

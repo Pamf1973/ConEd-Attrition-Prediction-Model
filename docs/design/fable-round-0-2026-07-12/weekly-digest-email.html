@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Digest Email · ConEd Steam Attrition Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F8F8F6; --ink: #17181A; --ink-muted: #6C6F75; --hairline: #DDDDD8;
+    --high: #E05545; --crit: #C22B1F; --action: #E87722;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --body: 'Inter', system-ui, sans-serif;
+    --display: 'Space Grotesk', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 1040px; margin: 0 auto; padding: 56px 32px 96px; }
+
+  header.doc { border-bottom: 1px solid var(--ink); padding-bottom: 28px; margin-bottom: 48px; }
+  .meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-family: var(--display); font-weight: 600; font-size: 34px; line-height: 1.15; letter-spacing: -0.01em; max-width: 24ch; }
+  .lede { margin-top: 16px; max-width: 64ch; color: var(--ink-muted); font-size: 15.5px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  section { margin-bottom: 72px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 10px; }
+  h2 { font-family: var(--display); font-weight: 600; font-size: 22px; margin-bottom: 20px; }
+  p.note { max-width: 68ch; color: var(--ink-muted); font-size: 14px; margin-top: 14px; }
+  p.note strong { color: var(--ink); }
+
+  .laws { border-top: 1px solid var(--hairline); }
+  .law { display: grid; grid-template-columns: 56px 280px 1fr; gap: 20px; padding: 18px 0; border-bottom: 1px solid var(--hairline); }
+  .law-n { font-family: var(--mono); font-size: 13px; color: var(--ink-muted); padding-top: 2px; }
+  .law-name { font-weight: 600; font-size: 15px; }
+  .law-body { color: var(--ink-muted); font-size: 14px; max-width: 60ch; }
+  .law-body em { font-style: normal; color: var(--ink); font-weight: 500; }
+  @media (max-width: 720px) { .law { grid-template-columns: 40px 1fr; } .law-body { grid-column: 2; } }
+
+  /* ---------- email client frame ---------- */
+  .client { background: #E3E2DD; border-radius: 4px; padding: 40px 20px; display: flex; justify-content: center; }
+  .mail {
+    background: #FFFFFF; width: 100%; max-width: 640px;
+    box-shadow: 0 2px 24px rgba(20,20,20,0.14); border-radius: 3px; overflow: hidden;
+  }
+  .mail-chrome { padding: 16px 22px; border-bottom: 1px solid #E8E8E4; }
+  .mail-chrome .subj { font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; color: #1A1B1E; }
+  .mail-chrome .fromto { font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #75787E; margin-top: 5px; line-height: 1.7; }
+  .mail-chrome .fromto b { color: #1A1B1E; font-weight: 600; }
+
+  /* everything inside .mail-body simulates Outlook-legal construction:
+     system fonts only, table-like stacking, inline-style-equivalent rules, no images */
+  .mail-body { padding: 26px 22px 30px; font-family: Arial, Helvetica, sans-serif; color: #1A1B1E; }
+  .m-kicker { font-family: 'Courier New', Courier, monospace; font-size: 11px; letter-spacing: 1px; color: #75787E; text-transform: uppercase; margin-bottom: 14px; }
+  .m-finding { font-size: 14px; line-height: 1.65; margin-bottom: 20px; max-width: 60ch; }
+  .m-finding b { font-weight: 700; }
+  .m-sec { font-family: 'Courier New', Courier, monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #75787E; border-top: 1px solid #E0E0DB; padding-top: 14px; margin: 20px 0 10px; }
+  .m-item { padding: 8px 0; border-bottom: 1px solid #F0F0EB; }
+  .m-item .line1 { font-size: 13px; }
+  .m-item .line1 b { font-weight: 700; }
+  .m-item .line1 .tag { font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #B3261E; font-weight: 700; }
+  .m-item .line2 { font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #55585E; margin-top: 2px; }
+  .m-item .line2 a, .m-item .line2 .lnk { color: #1A56A0; text-decoration: underline; }
+  .m-pulse { font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #55585E; line-height: 1.9; }
+  .m-pulse b { color: #1A1B1E; }
+  .m-foot { margin-top: 22px; border-top: 1px solid #E0E0DB; padding-top: 12px; font-size: 10.5px; color: #75787E; line-height: 1.7; max-width: 64ch; }
+  .m-sign { font-size: 12px; color: #1A1B1E; margin-top: 14px; }
+
+  /* callouts */
+  .callouts { border-top: 1px solid var(--hairline); margin-top: 32px; }
+  .callout { display: grid; grid-template-columns: 30px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+  .callout-n { font-family: var(--mono); font-size: 11px; font-weight: 600; width: 22px; height: 22px; border: 1px solid var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .callout h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .callout p { font-size: 13.5px; color: var(--ink-muted); max-width: 62ch; }
+  .callout p em { font-style: normal; color: var(--ink); font-weight: 500; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width: 820px) { .two-col { grid-template-columns: 1fr; } }
+
+  .oq { border-top: 1px solid var(--ink); padding-top: 20px; }
+  .oq li { margin: 0 0 12px 18px; font-size: 14px; color: var(--ink-muted); max-width: 70ch; }
+  .oq li b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc">
+    <div class="meta">
+      <span>ConEd Steam Attrition · Redesign</span>
+      <span>Step 5 Seed · Spec 5 of the atom series</span>
+      <span>2026-07-06 · Draft 1</span>
+    </div>
+    <h1>The Weekly Digest: the landing page, mailed</h1>
+    <p class="lede">The digest is the This Week landing projected into the most hostile rendering environment in the product: <strong>Outlook, often on a phone, images blocked by default, dark mode inverting colors at random.</strong> So the digest is typographic only, built like it's 2004 on purpose, and complete without a single click. It is to the landing what the report is to the case file: a projection, never a second source.</p>
+  </header>
+
+  <!-- LAWS -->
+  <section>
+    <div class="eyebrow">01 · Laws of the digest</div>
+    <h2>Inherits everything upstream. Adds six.</h2>
+    <div class="laws">
+      <div class="law">
+        <div class="law-n">D1</div>
+        <div class="law-name">The subject line carries the finding.</div>
+        <div class="law-body">"Steam attrition · Week of Jul 6 · 3 new Critical · 15 to review." A manager triaging an inbox gets the week's answer <em>without opening the email</em>. Subject format is fixed so a mailbox search for "Steam attrition" returns a readable series.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">D2</div>
+        <div class="law-name">Complete without clicking.</div>
+        <div class="law-body">Recipients may not have dashboard access, and even those who do won't log in from a phone. Every finding, event, and queue entry reads whole in the email body. <em>Links deepen; they never complete.</em></div>
+      </div>
+      <div class="law">
+        <div class="law-n">D3</div>
+        <div class="law-name">Built like it's 2004.</div>
+        <div class="law-body">Single column, 600px, table-based stacking, inline styles, system fonts only (Arial for prose, Courier New for numbers, the email-safe cousins of Inter and Plex Mono). <em>No images at all</em>: Outlook blocks them by default, so a chart in email is a broken icon. If it needs a chart, it links to the case file.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">D4</div>
+        <div class="law-name">Color never carries meaning.</div>
+        <div class="law-body">Dark-mode clients invert colors unpredictably. Severity is carried by <em>words and weight</em> ("CRITICAL" in bold Courier); the single red accent is an enhancement that can vanish without losing a bit of information. Same principle as the report's grayscale rule (R3), one notch stricter.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">D5</div>
+        <div class="law-name">Drafted, then owned.</div>
+        <div class="law-body">The digest is composed from the same events.json the landing renders, then <em>the analyst edits before it sends</em>. Never auto-sent. Same principle as the report signature (R5): the model drafts, a person owns. The compose flow lives behind the landing's orange button.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">D6</div>
+        <div class="law-name">A plain-text twin always ships.</div>
+        <div class="law-body">Every digest generates a text/plain alternative with identical content. This is both email hygiene and the escape hatch if ConEd's answer to the open format question turns out to be "plain text, please." The twin costs nothing because the HTML is already typographic.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIMEN -->
+  <section>
+    <div class="eyebrow">02 · The specimen</div>
+    <h2>As it lands in Outlook</h2>
+    <div class="client">
+      <div class="mail">
+        <div class="mail-chrome">
+          <div class="subj">Steam attrition · Week of Jul 6 · 3 new Critical · 15 to review</div>
+          <div class="fromto">From: <b>E. Perez · Steam Ops Attrition</b> &nbsp;·&nbsp; To: <b>D. Caiafa; J. Tolosa</b> &nbsp;·&nbsp; Mon Jul 6, 2026, 9:12 AM</div>
+        </div>
+        <div class="mail-body">
+
+          <div class="m-kicker">Steam Attrition Weekly &nbsp;·&nbsp; data through run Jul 6, 06:00</div>
+
+          <div class="m-finding"><b>15 buildings need review this week.</b> 23 meet the Critical definition (rule tier High, fresh '24 delta, top-decile rank, all three holding), 6 are in active outreach, and 2 were dismissed with documented reasons. Three of the 23 are new since last Monday, and fresh-signal coverage rose from 35% to 45% as a new delta vintage landed for 118 buildings.</div>
+
+          <div class="m-sec">Top of the queue</div>
+          <div class="m-item">
+            <div class="line1"><b>200 East 42nd St.</b> &nbsp;<span class="tag">CRITICAL · NEW</span> &nbsp;99th pctile, rule tier High</div>
+            <div class="line2">Driver: LL97 2030 penalty $1,190,650/yr, steam is 55% of GHG. Normalized demand fell 66% YoY. <span class="lnk">Report RR-2026-0187</span></div>
+          </div>
+          <div class="m-item">
+            <div class="line1"><b>660 Madison Ave.</b> &nbsp;<span class="tag">CRITICAL</span> &nbsp;98th pctile, second week in queue</div>
+            <div class="line2">Driver: normalized demand &minus;41% YoY, Energy Star falling. <span class="lnk">Case file</span></div>
+          </div>
+          <div class="m-item">
+            <div class="line1"><b>17 West 54th Street</b> &nbsp;<span class="tag">CRITICAL · NEW</span> &nbsp;96th pctile</div>
+            <div class="line2">Driver: four neighboring buildings declining, delta &minus;38%. <span class="lnk">Case file</span></div>
+          </div>
+
+          <div class="m-sec">What changed since last Monday</div>
+          <div class="m-item"><div class="line1">3 buildings entered Critical; 1 left the queue (31 W 34 St, contacted Jun 30, cooling off until Jul 28).</div></div>
+          <div class="m-item"><div class="line1">415 E 68 St filed a DOB boiler-work permit Jul 2. Its cluster's churn signature is permit-driven.</div></div>
+          <div class="m-item"><div class="line1">75 Columbia Street confirmed at-risk after outreach. This becomes a training label for the next model version.</div></div>
+
+          <div class="m-sec">Portfolio</div>
+          <div class="m-pulse">High <b>233</b> (+3 WoW) · Med <b>483</b> (&minus;5) · Low <b>240</b> (+2) · Uncertain <b>254</b> (0)<br>Critical <b>23</b> · in outreach <b>6</b> · fresh-delta coverage <b>45%</b></div>
+
+          <div class="m-foot">Screening analysis for outreach prioritization, not a determination of customer intent. Ranking from GBM v1 (unvalidated, AUC 0.645: orders a true churner above a non-churner about 65% of the time). Tier from a transparent weather-normalized rule. Public data only: LL84 2025-05, steam 2024, DOB, PLUTO, ACRIS. Full methodology and per-building reasoning available in the dashboard.</div>
+          <div class="m-sign">Ed Perez<br><span style="color:#75787E; font-size:11px;">ML Research and Domain Lead · Steam Attrition · Pursuit x Con Edison</span></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="callouts">
+        <div class="callout"><div class="callout-n">1</div><div><h3>Subject and kicker</h3><p>Finding in the subject (D1), vintage in the kicker (W1 survives the medium: "data through run Jul 6," never "just now"). The series format makes six months of digests a searchable record of the program.</p></div></div>
+        <div class="callout"><div class="callout-n">2</div><div><h3>Finding paragraph</h3><p>The queue arithmetic from the landing (W4), written as prose because email is a reading medium. The Critical definition is restated inline in parentheses, since this reader may never see the methodology page. Written in the recap style the project already uses: specific, output-oriented, no filler.</p></div></div>
+        <div class="callout"><div class="callout-n">3</div><div><h3>Queue items</h3><p>Two lines each: identity and claim in Arial, evidence and link in Courier. The severity word is bold Courier, legible after any dark-mode inversion (D4). Only the top three ship; the digest is a briefing, not an export.</p></div></div>
+      </div>
+      <div class="callouts">
+        <div class="callout"><div class="callout-n">4</div><div><h3>Events in prose</h3><p>The same event grammar (W2), compressed. Aggregates stay aggregated: the vintage drop is one sentence here just as it was one line on the landing.</p></div></div>
+        <div class="callout"><div class="callout-n">5</div><div><h3>Method footer</h3><p>The honest-framing block travels with every artifact that leaves the tool (R4 applied to email). The AUC translation appears in the same words used on the case file and report, because consistency of the caveat is what makes it credible rather than boilerplate.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPOSE FLOW -->
+  <section>
+    <div class="eyebrow">03 · The compose flow</div>
+    <h2>Behind the orange button</h2>
+    <div class="laws">
+      <div class="law">
+        <div class="law-n">C1</div>
+        <div class="law-name">Draft.</div>
+        <div class="law-body">"Compose weekly digest" assembles the draft from events.json and the queue state: subject, finding, top three, events, pulse, footer. Generation is deterministic templating plus one LLM pass for the finding paragraph, with every number injected from data, never generated.</div>
+      </div>
+      <div class="law">
+        <div class="law-n">C2</div>
+        <div class="law-name">Edit.</div>
+        <div class="law-body">The draft opens in an editable view on the workbench. The analyst can reorder queue items, cut events, and rewrite prose. Injected numbers render as locked tokens; editing around them is free, editing them requires deliberately unlocking, which keeps the digest a projection (D5 meets R1).</div>
+      </div>
+      <div class="law">
+        <div class="law-n">C3</div>
+        <div class="law-name">Send, minimally.</div>
+        <div class="law-body">V1 sends nothing: it opens the draft in the analyst's own Outlook via mailto (plain-text twin) or copies rich HTML to the clipboard. This dodges SMTP integration, deliverability, and the territory-gating question entirely, and it means the email always genuinely comes from the analyst. Direct send is a later increment if ConEd asks.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN QUESTIONS -->
+  <section>
+    <div class="eyebrow">04 · Open questions before this ships</div>
+    <ul class="oq">
+      <li><b>Format preference, still open with David.</b> This spec's answer to "plain text or HTML" is "both, always" (D6), which makes the question low-stakes. But cadence (weekly? aligned to pipeline runs?) and the recipient list are genuinely his to answer, and they're already on the client-notes question list.</li>
+      <li><b>The finding paragraph's LLM pass.</b> One generated paragraph per week, numbers injected not generated, analyst-edited before send. Decide whether it routes through the existing /api/query infrastructure or a dedicated prompt, and pin the template so tone doesn't drift week to week.</li>
+      <li><b>Locked-token editing.</b> C2's locked numbers need a small editor behavior (contenteditable with token spans, or a structured form per section). Worth a spike before promising; the fallback is a plain textarea and trust, which is honest for a single-analyst v1.</li>
+      <li><b>Link durability.</b> Case-file and report links in a digest outlive container redeploys only if BBL-keyed routes are stable and reports persist (Spec 3's storage question). Emails are forever; make the URLs deserve it.</li>
+    </ul>
+  </section>
+
+</div>
+</body>
+</html>

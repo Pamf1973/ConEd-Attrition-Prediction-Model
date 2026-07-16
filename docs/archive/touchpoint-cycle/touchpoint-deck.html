@@ -1,0 +1,1436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConEd Steam Attrition — Touchpoint · 7/14/26</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — Style "Console"
+   dark canvas · amber accent · JetBrains Mono + Manrope
+   ============================================================ */
+:root {
+  --stage-bg:   #05070a;
+  --slide-bg:   #0a0d12;
+  --panel:      #0f1319;
+  --panel-2:    #12171f;
+  --line:       #1a2029;
+  --line-strong:#2a3340;
+
+  --text:       #e6eaf0;
+  --text-dim:   #8a95a2;
+  --text-mute:  #4a545f;
+
+  --amber:      #ffb547;
+  --amber-glow: rgba(255,181,71,.15);
+  --cyan:       #6ee7d4;
+  --red:        #ff6b6b;
+  --violet:     #a78bfa;
+
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Manrope', system-ui, sans-serif;
+}
+
+/* ============================================================
+   FIXED 16:9 STAGE (viewport-base.css)
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:var(--stage-bg); }
+.deck-viewport { position:fixed; inset:0; overflow:hidden; background:var(--stage-bg); }
+.deck-stage { position:absolute; left:0; top:0; width:1920px; height:1080px; overflow:hidden; transform-origin:0 0; background:var(--slide-bg); }
+.slide {
+  position:absolute; inset:0; width:1920px; height:1080px;
+  overflow:hidden; display:block;
+  visibility:hidden; opacity:0; pointer-events:none;
+  background:var(--slide-bg);
+}
+.slide.active, .slide.visible {
+  visibility:visible; opacity:1; pointer-events:auto; z-index:1;
+}
+img, video, canvas, svg { max-width:100%; max-height:100%; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.2s !important; } }
+@media print {
+  html, body { width:1920px; height:auto; overflow:visible; background:#fff; }
+  .deck-viewport { position:static; overflow:visible; }
+  .deck-stage { position:static; width:auto; height:auto; transform:none !important; background:none; }
+  .slide { position:relative; display:block !important; visibility:visible !important; opacity:1 !important; width:1920px; height:1080px; break-after:page; }
+}
+
+/* ============================================================
+   BASE TYPE
+   ============================================================ */
+body { font-family: var(--font-mono); color: var(--text); }
+
+/* faint grid on every slide */
+.slide::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 80px 80px;
+  z-index:0;
+}
+.slide::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(1400px 900px at 85% -10%, rgba(255,181,71,.05), transparent 55%),
+    radial-gradient(1000px 700px at 5% 105%, rgba(110,231,212,.03), transparent 55%);
+  z-index:0;
+}
+
+/* ============================================================
+   COMMON CHROME (status bar + footer bar)
+   ============================================================ */
+.status {
+  position:absolute; left:0; right:0; top:0;
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 20px 48px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  letter-spacing: .06em;
+  color: var(--text-dim);
+  background: rgba(5,7,10,.65);
+  backdrop-filter: blur(6px);
+  z-index: 5;
+}
+.status .l, .status .r { display:flex; gap: 28px; align-items:center; }
+.status .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background: var(--amber); box-shadow: 0 0 12px var(--amber-glow); margin-right:8px; vertical-align:middle; animation: pulse 2s ease-in-out infinite; }
+.status .k { color: var(--text-mute); }
+.status .v { color: var(--text); }
+.status .v.amber { color: var(--amber); }
+.status .v.cyan { color: var(--cyan); }
+@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.5;} }
+
+.footbar {
+  position:absolute; left:0; right:0; bottom:0;
+  display:flex; justify-content: space-between; align-items:center;
+  padding: 18px 48px;
+  border-top: 1px solid var(--line);
+  background: rgba(5,7,10,.65);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  z-index: 5;
+}
+.footbar .owner {
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  padding: 4px 12px;
+  border-radius: 3px;
+  background: rgba(255,181,71,.06);
+  color: var(--amber);
+  letter-spacing:.16em;
+}
+.footbar .center { color: var(--text-dim); }
+.footbar .page { color: var(--text); letter-spacing: .2em; }
+.footbar .page b { color: var(--amber); font-weight: 500; }
+
+/* Slide body region (inside chrome) */
+.body {
+  position: absolute; inset: 96px 96px 84px 96px;
+  z-index: 2;
+  display: flex; flex-direction: column;
+}
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  display:flex; align-items:center; gap: 14px;
+  margin-bottom: 32px;
+}
+.eyebrow::before { content:''; display:inline-block; width: 44px; height:1px; background: var(--amber); }
+
+h1.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 128px;
+  line-height: .92;
+  letter-spacing: -.045em;
+  margin: 0;
+  color: var(--text);
+}
+h1.display .amber { color: var(--amber); }
+h1.display .cursor {
+  display:inline-block; width: 12px; height: 92px; background: var(--amber);
+  vertical-align: -16px; margin-left: 6px;
+  animation: blink 1.1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+h2.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 88px;
+  line-height: 1;
+  letter-spacing: -.035em;
+  margin: 0 0 24px;
+  color: var(--text);
+}
+h2.display .amber { color: var(--amber); }
+
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -.015em;
+  color: var(--text);
+  margin: 0;
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.sub .tag { color: var(--cyan); }
+.sub .amber { color: var(--amber); }
+
+/* ============================================================
+   REUSABLE PANEL
+   ============================================================ */
+.panel {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.85));
+  border-radius: 4px;
+  overflow:hidden;
+  display:flex; flex-direction: column;
+}
+.panel .head {
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  background: rgba(255,255,255,.015);
+}
+.panel .head .dots { display:flex; gap:6px; }
+.panel .head .dots i { width:8px; height:8px; border-radius:50%; background: var(--line-strong); display:inline-block; }
+.panel .head .dots i:first-child { background: var(--red); opacity:.7; }
+.panel .head .dots i:nth-child(2) { background: var(--amber); opacity:.7; }
+.panel .head .dots i:last-child { background: var(--cyan); opacity:.7; }
+.panel .body-inner {
+  padding: 22px 24px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  flex: 1;
+}
+.panel .foot {
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  font-size: 11px; letter-spacing:.16em; text-transform:uppercase;
+  color: var(--text-mute);
+  background: rgba(255,181,71,.04);
+  display:flex; justify-content:space-between;
+}
+.panel .foot b { color: var(--amber); font-weight: 500; }
+
+/* ============================================================
+   ENTRANCE ANIMATION
+   ============================================================ */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal.d1 { transition-delay: .05s; }
+.slide.visible .reveal.d2 { transition-delay: .15s; }
+.slide.visible .reveal.d3 { transition-delay: .25s; }
+.slide.visible .reveal.d4 { transition-delay: .35s; }
+.slide.visible .reveal.d5 { transition-delay: .45s; }
+.slide.visible .reveal.d6 { transition-delay: .55s; }
+.slide.visible .reveal.d7 { transition-delay: .65s; }
+.slide.visible .reveal.d8 { transition-delay: .75s; }
+
+/* ============================================================
+   SLIDE 1 — TITLE
+   ============================================================ */
+.slide-title .body {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 80px;
+  align-items: stretch;
+}
+.slide-title h1.display { font-size: 152px; }
+.slide-title h1.display .cursor { height: 108px; width: 14px; vertical-align: -18px; }
+.slide-title .sub { font-size: 22px; margin-top: 40px; max-width: 900px; }
+
+.title-panel .body-inner .row {
+  display:grid; grid-template-columns: 90px 1fr auto; gap: 16px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 15px;
+}
+.title-panel .body-inner .row:last-child { border-bottom: none; }
+.title-panel .body-inner .k { color: var(--text-mute); letter-spacing: .08em; }
+.title-panel .body-inner .v { color: var(--text); }
+.title-panel .body-inner .stat { color: var(--amber); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; font-size: 12px; }
+.title-panel .body-inner .stat.ok { color: var(--cyan); }
+.title-panel .body-inner .stat.dim { color: var(--text-mute); }
+
+.title-people {
+  position:absolute; left: 96px; right: 96px; bottom: 96px;
+  display:grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  z-index: 2;
+}
+.title-people .cell {
+  padding: 22px 32px 4px 0;
+  border-right: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.title-people .cell:nth-child(4) { border-right: none; padding-right: 0; }
+.title-people .cell .name {
+  display:block;
+  color: var(--text);
+  font-family: var(--font-display);
+  letter-spacing: -.01em;
+  text-transform: none;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.title-people .cell .role {
+  display:block;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: none;
+  margin-top: 2px;
+}
+
+/* ============================================================
+   SLIDE 2 — WHAT SHIPPED (build log)
+   ============================================================ */
+.slide-shipped .body { display:grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+.slide-shipped .left { display:flex; flex-direction: column; }
+.log {
+  border: 1px solid var(--line-strong);
+  background: rgba(15,19,25,.75);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+  flex: 1;
+}
+.log .head {
+  display:flex; justify-content: space-between; align-items:center;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.015);
+}
+.log .body-inner { padding: 8px 0; font-family: var(--font-mono); font-size: 15px; }
+.log .row {
+  display: grid;
+  grid-template-columns: 110px 90px 1fr auto;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px dashed var(--line);
+  align-items: baseline;
+}
+.log .row:last-child { border-bottom: none; }
+.log .stamp { color: var(--text-mute); font-size: 12px; letter-spacing: .08em; }
+.log .kind { color: var(--cyan); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 500; }
+.log .kind.next { color: var(--amber); }
+.log .txt { color: var(--text); font-size: 15px; }
+.log .txt small { color: var(--text-dim); font-size: 13px; display:block; margin-top: 2px; letter-spacing: 0; }
+.log .badge { color: var(--amber); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+.log .badge.ok { color: var(--cyan); }
+
+.stat-grid {
+  display:grid; grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 40px;
+}
+.stat-card {
+  border: 1px solid var(--line-strong);
+  padding: 22px 24px;
+  background: rgba(15,19,25,.6);
+  border-radius: 4px;
+}
+.stat-card .k { font-family: var(--font-mono); font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--text-mute); }
+.stat-card .v { font-family: var(--font-display); font-weight: 800; font-size: 64px; letter-spacing: -.03em; line-height: 1; margin-top: 12px; color: var(--text); }
+.stat-card .v.amber { color: var(--amber); }
+.stat-card .v.cyan { color: var(--cyan); }
+.stat-card .caption { font-family: var(--font-mono); font-size: 13px; color: var(--text-dim); margin-top: 10px; line-height: 1.5; }
+
+/* ============================================================
+   SLIDE 3 — FRAME
+   ============================================================ */
+.slide-frame .body { justify-content: center; }
+.frame-grid {
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 60px;
+}
+.frame-card {
+  border: 1px solid var(--line-strong);
+  padding: 38px 32px;
+  background: linear-gradient(180deg, rgba(15,19,25,.85), rgba(10,13,18,.6));
+  border-radius: 4px;
+  position: relative;
+  min-height: 380px;
+  display:flex; flex-direction: column;
+}
+.frame-card .num {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .3em; color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.frame-card .kind {
+  font-family: var(--font-mono);
+  font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 14px;
+}
+.frame-card h3 { font-size: 32px; margin-bottom: 20px; }
+.frame-card .desc {
+  font-family: var(--font-mono);
+  font-size: 15px; line-height: 1.7; color: var(--text-dim);
+  flex: 1;
+}
+.frame-card .desc .amber { color: var(--amber); }
+.frame-card .desc .cyan { color: var(--cyan); }
+.frame-card::before {
+  content:''; position:absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--amber);
+  transform: scaleX(0); transform-origin: left; transition: transform .8s cubic-bezier(.16,1,.3,1) .3s;
+}
+.slide.visible .frame-card::before { transform: scaleX(1); }
+
+/* ============================================================
+   ATOM SLIDES 4–7
+   ============================================================ */
+.slide-atom .body { display:grid; grid-template-columns: 1.15fr 1fr; gap: 60px; align-items: stretch; }
+.atom-head { margin-bottom: 20px; }
+.atom-head .eyebrow { margin-bottom: 16px; }
+.atom-head h2.display { font-size: 68px; }
+.atom-head .sub { margin-top: 16px; font-size: 18px; }
+
+.atom-mock {
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, rgba(18,23,31,.9), rgba(10,13,18,.85));
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.atom-mock .head {
+  padding: 14px 20px;
+  display:flex; justify-content: space-between; align-items:center;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.015);
+}
+.atom-mock .head .dots { display:flex; gap: 6px; }
+.atom-mock .head .dots i { width: 8px; height: 8px; border-radius:50%; background: var(--line-strong); display:inline-block; }
+.atom-mock .head .dots i:first-child { background: var(--red); opacity:.6; }
+.atom-mock .head .dots i:nth-child(2) { background: var(--amber); opacity:.6; }
+.atom-mock .head .dots i:last-child { background: var(--cyan); opacity:.6; }
+.atom-mock .mock-body { padding: 18px 20px; flex: 1; display:flex; flex-direction:column; gap: 12px; font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+.mock-row {
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.015);
+  position: relative;
+}
+.mock-row.filled { background: rgba(255,181,71,.05); border-style: solid; border-color: var(--line-strong); }
+.mock-row .lbl { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--text-mute); margin-bottom: 6px; }
+.mock-row .cnt { color: var(--text); font-size: 14px; }
+.mock-row .cnt .amber { color: var(--amber); }
+.mock-row .pin {
+  position: absolute; top: -10px; right: -10px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--amber); color: var(--slide-bg);
+  font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 4px rgba(255,181,71,.15);
+}
+
+.callouts {
+  display:flex; flex-direction:column;
+  gap: 14px;
+  margin-top: 8px;
+}
+.callout {
+  display:grid; grid-template-columns: 34px 1fr; gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: rgba(15,19,25,.6);
+  align-items: start;
+}
+.callout .pin {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--amber); color: var(--slide-bg);
+  font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 0 0 3px rgba(255,181,71,.15);
+  margin-top: 2px;
+}
+.callout .txt { font-family: var(--font-mono); font-size: 15px; line-height: 1.55; color: var(--text); }
+.callout .txt small { color: var(--text-dim); font-size: 13px; display:block; margin-top: 4px; letter-spacing: 0; }
+.callout .txt .code { color: var(--amber); background: rgba(255,181,71,.08); padding: 1px 6px; border-radius: 3px; font-size: 13px; }
+
+/* ============================================================
+   SLIDE 8 — METHODOLOGY RESPONSE
+   ============================================================ */
+.slide-methodology .body { justify-content: flex-start; }
+.slide-methodology h2.display { font-size: 68px; margin-bottom: 10px; }
+.slide-methodology .lead {
+  font-family: var(--font-mono); font-size: 16px; color: var(--text-dim);
+  margin-bottom: 28px;
+  max-width: 1400px;
+  line-height: 1.55;
+}
+.slide-methodology .lead .amber { color: var(--amber); }
+
+.method-table {
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(15,19,25,.9), rgba(10,13,18,.8));
+}
+.method-table .th {
+  display: grid;
+  grid-template-columns: 60px 1.15fr 1.6fr 1.2fr;
+  gap: 24px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(255,255,255,.02);
+}
+.method-table .tr {
+  display: grid;
+  grid-template-columns: 60px 1.15fr 1.6fr 1.2fr;
+  gap: 24px;
+  padding: 18px 24px;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.55;
+  align-items: start;
+}
+.method-table .tr:last-child { border-bottom: none; }
+.method-table .no {
+  color: var(--amber);
+  font-weight: 500;
+  letter-spacing: .05em;
+}
+.method-table .item { color: var(--text); font-size: 14px; }
+.method-table .ships { color: var(--text-dim); font-size: 13px; }
+.method-table .ships b { color: var(--cyan); font-weight: 500; }
+.method-table .r2 { color: var(--text-mute); font-size: 13px; font-style: italic; }
+
+/* ============================================================
+   SLIDE 9 — WHAT WE NEED
+   ============================================================ */
+.slide-asks .body { display:grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: stretch; }
+.asks-head h2.display { font-size: 68px; margin-bottom: 20px; }
+.asks-head .sub { font-size: 16px; margin-bottom: 28px; }
+
+.asks-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  align-content: start;
+}
+.ask-card {
+  border: 1px solid var(--line-strong);
+  padding: 16px 18px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.6);
+  min-height: 148px;
+}
+.ask-card .no {
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: .22em; color: var(--amber);
+  margin-bottom: 8px;
+}
+.ask-card .q {
+  font-family: var(--font-mono);
+  font-size: 14px; color: var(--text); font-weight: 500;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.ask-card .n {
+  font-family: var(--font-mono);
+  font-size: 12px; color: var(--text-dim);
+  line-height: 1.5;
+}
+.ask-card.ildi { border-color: var(--cyan); background: rgba(110,231,212,.04); grid-column: span 3; min-height: auto; }
+.ask-card.ildi .no { color: var(--cyan); }
+
+.asks-side { display:flex; flex-direction: column; gap: 20px; }
+.asks-side .callout-panel {
+  border: 1px solid var(--line-strong);
+  padding: 22px 24px;
+  border-radius: 4px;
+  background: rgba(255,181,71,.05);
+}
+.asks-side .callout-panel .k {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--amber);
+  margin-bottom: 10px;
+}
+.asks-side .callout-panel .v { font-family: var(--font-mono); font-size: 14px; color: var(--text); line-height: 1.55; }
+.asks-side .callout-panel .v b { color: var(--amber); font-weight: 500; }
+.asks-side .split { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.asks-side .stat-mini {
+  border: 1px solid var(--line-strong);
+  padding: 16px 18px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.6);
+}
+.asks-side .stat-mini .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--text-mute); }
+.asks-side .stat-mini .v { font-family: var(--font-display); font-weight: 800; font-size: 40px; letter-spacing: -.02em; line-height: 1; margin-top: 8px; color: var(--amber); }
+.asks-side .stat-mini .n { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.4; }
+
+/* ============================================================
+   SLIDE 10 — CLOSE
+   ============================================================ */
+.slide-close .body { justify-content: center; align-items: center; }
+.close-wrap { max-width: 1600px; margin: 0 auto; text-align: left; width: 100%; }
+.close-wrap h2.display { font-size: 96px; margin-bottom: 8px; }
+.close-wrap .sub { font-size: 22px; margin-bottom: 48px; max-width: 1100px; }
+.close-cols { display:grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.close-panel {
+  border: 1px solid var(--line-strong);
+  padding: 28px 30px;
+  border-radius: 4px;
+  background: rgba(15,19,25,.75);
+}
+.close-panel .head {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--amber);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.close-panel .item {
+  display: grid; grid-template-columns: 60px 1fr;
+  gap: 14px; padding: 8px 0;
+  font-family: var(--font-mono); font-size: 15px;
+  align-items: baseline;
+}
+.close-panel .item .k { color: var(--text-mute); font-size: 12px; letter-spacing: .12em; }
+.close-panel .item .v { color: var(--text); }
+.close-panel .item .v small { display:block; color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+.close-panel .item .v a { color: var(--amber); text-decoration: none; }
+
+/* Nav hint */
+.nav-hint {
+  position: fixed;
+  right: 20px; bottom: 20px;
+  z-index: 20;
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(230,234,240,.35);
+  padding: 6px 10px;
+  border: 1px solid rgba(230,234,240,.12);
+  border-radius: 3px;
+  background: rgba(5,7,10,.6);
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+  <main class="deck-stage" id="deckStage">
+
+    <!-- =====================================================
+         SLIDE 1 — TITLE
+         ===================================================== -->
+    <section class="slide slide-title active visible">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">PIPELINE</span> <span class="k">·</span> <span class="v">run 2026-07-06 06:00</span></span>
+          <span><span class="k">buildings</span> <span class="v">1,210</span></span>
+          <span><span class="k">critical v1.1</span> <span class="v amber">23</span></span>
+        </div>
+        <div class="r">
+          <span><span class="k">model</span> <span class="v">XGB v1 · UNVAL</span></span>
+          <span><span class="k">system</span> <span class="v">v1.1</span></span>
+        </div>
+      </div>
+
+      <div class="body" style="padding: 0; margin: 0; position: absolute; inset: 96px 96px 220px 96px;">
+        <div>
+          <div class="eyebrow reveal d1">ConEd Steam Attrition · Redesign Touchpoint</div>
+          <h1 class="display reveal d2">The steam<br/>team's <span class="amber">week</span><span class="cursor"></span></h1>
+          <p class="sub reveal d3">
+            Workflow-first redesign of the attrition dashboard.<br/>
+            12 milestones scoped <span class="tag">// M0 preserves today's build at /legacy</span><br/>
+            Every number wears its confidence.
+          </p>
+        </div>
+        <aside class="panel title-panel reveal d4">
+          <div class="head">
+            <span>build_status.log</span>
+            <span class="dots"><i></i><i></i><i></i></span>
+          </div>
+          <div class="body-inner">
+            <div class="row"><span class="k">SHIPPED</span><span class="v">LL97 dual-period gauges</span><span class="stat ok">PR #7</span></div>
+            <div class="row"><span class="k">SHIPPED</span><span class="v">SHAP driver panel · top-5</span><span class="stat ok">merged</span></div>
+            <div class="row"><span class="k">SHIPPED</span><span class="v">XGBoost predict endpoints</span><span class="stat ok">live</span></div>
+            <div class="row"><span class="k">NEXT</span><span class="v">M1 · model_meta.json</span><span class="stat">Ismael</span></div>
+            <div class="row"><span class="k">NEXT</span><span class="v">M0 · legacy routing</span><span class="stat">Pedro</span></div>
+            <div class="row"><span class="k">QUEUE</span><span class="v">M2 → M3 → M4 → M5</span><span class="stat dim">2026-Q3</span></div>
+          </div>
+          <div class="foot">
+            <span>agenda</span>
+            <b>10 slides · ~20 min</b>
+          </div>
+        </aside>
+      </div>
+
+      <div class="title-people reveal d5">
+        <div class="cell">
+          Presenting
+          <span class="name">Ismael Caraballo</span>
+          <span class="role">Backend · models · pipeline</span>
+        </div>
+        <div class="cell">
+          <span class="name" style="margin-top: 22px;">Pedro Martins</span>
+          <span class="role">Project Management</span>
+        </div>
+        <div class="cell">
+          Design lead
+          <span class="name">Edwin Perez</span>
+          <span class="role">On Slack today</span>
+        </div>
+        <div class="cell">
+          Date
+          <span class="name">7 / 14 / 26</span>
+          <span class="role">ConEd HQ</span>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">TITLE</div>
+        <div class="center">ConEd Steam Attrition · Redesign Touchpoint</div>
+        <div class="page">Slide <b>01</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 2 — WHAT SHIPPED
+         ===================================================== -->
+    <section class="slide slide-shipped">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">SHIPPED</span> <span class="k">·</span> <span class="v">3 engineering, 1 design</span></span>
+          <span><span class="k">since</span> <span class="v">last touchpoint</span></span>
+        </div>
+        <div class="r"><span><span class="k">live</span> <span class="v cyan">railway</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="left">
+          <div class="eyebrow reveal d1">What shipped</div>
+          <h2 class="display reveal d2">Three ships,<br/>one <span class="amber">system spec</span>.</h2>
+          <div class="stat-grid reveal d3">
+            <div class="stat-card">
+              <div class="k">System doc</div>
+              <div class="v amber">v1.1</div>
+              <div class="caption">Voice, tokens, laws — locked. 12-milestone roadmap scoped.</div>
+            </div>
+            <div class="stat-card">
+              <div class="k">Merged to main</div>
+              <div class="v cyan">3 PRs</div>
+              <div class="caption">LL97 gauges, SHAP drivers, XGBoost predict endpoints.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="log reveal d4">
+          <div class="head">
+            <span>engineering_ship.log</span>
+            <span>4 entries</span>
+          </div>
+          <div class="body-inner">
+            <div class="row">
+              <span class="stamp">2026-07-02</span>
+              <span class="kind">MERGED</span>
+              <span class="txt">LL97 dual-period gauges<small>2024 + 2030 emissions vs cap on BuildingPanel</small></span>
+              <span class="badge ok">PR #7</span>
+            </div>
+            <div class="row">
+              <span class="stamp">2026-07-02</span>
+              <span class="kind">MERGED</span>
+              <span class="txt">SHAP driver panel<small>Top-5 features per building with directional arrows</small></span>
+              <span class="badge ok">PR #7</span>
+            </div>
+            <div class="row">
+              <span class="stamp">2026-07-06</span>
+              <span class="kind">LIVE</span>
+              <span class="txt">XGBoost predict endpoints<small>Behind auth · diagnostic tier filter in RiskTable</small></span>
+              <span class="badge ok">✓</span>
+            </div>
+            <div class="row">
+              <span class="stamp">2026-07-06</span>
+              <span class="kind">LIVE</span>
+              <span class="txt">Security hardening<small>O(1) enrichment lookup, atomic writes, fallback guard</small></span>
+              <span class="badge ok">✓</span>
+            </div>
+            <div class="row">
+              <span class="stamp">2026-07-13</span>
+              <span class="kind">LOCKED</span>
+              <span class="txt">system-v1.1.md<small>12 milestones · acceptance criteria written for each</small></span>
+              <span class="badge">design</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">ISMAEL</div>
+        <div class="center">What shipped since last touchpoint</div>
+        <div class="page">Slide <b>02</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 3 — THE FRAME
+         ===================================================== -->
+    <section class="slide slide-frame">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">FRAME</span> <span class="k">·</span> <span class="v">the redesign in three moves</span></span>
+        </div>
+        <div class="r"><span><span class="k">voice</span> <span class="v">Bloomberg Terminal that explains itself</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="eyebrow reveal d1">The redesign frame</div>
+        <h2 class="display reveal d2">Portfolio view →<br/>the team's <span class="amber">week</span>.</h2>
+
+        <div class="frame-grid">
+          <div class="frame-card reveal d3">
+            <div class="num">01 · shift</div>
+            <div class="kind">Center of gravity</div>
+            <h3>Portfolio-scale dashboard becomes a workflow-focused workbench.</h3>
+            <p class="desc">Same data. Different center of gravity — the analyst opens on <span class="cyan">Monday</span>, not on a map. Portfolio-scale numbers live in exactly one place; everything else is workflow-scale.</p>
+          </div>
+
+          <div class="frame-card reveal d4">
+            <div class="num">02 · law</div>
+            <div class="kind">Honest confidence</div>
+            <h3>Every number wears its confidence.</h3>
+            <p class="desc">Provenance chip · validation status · freshness state · coverage. Direct answer to the <span class="amber">'100% High'</span> problem you raised last time — the tool must be honest about what it doesn't know.</p>
+          </div>
+
+          <div class="frame-card reveal d5">
+            <div class="num">03 · structure</div>
+            <div class="kind">Documented hybrid tier</div>
+            <h3>ML sets the base. Three checkable modifiers shift it up or down.</h3>
+            <p class="desc">Not pure ML. Not pure rule. A hybrid — and every surface <span class="cyan">names it that way</span>. No silent reconciliation between our method and yours.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">PEDRO</div>
+        <div class="center">The redesign frame · voice, law, structure</div>
+        <div class="page">Slide <b>03</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 4 — ATOM 1: THIS WEEK LANDING
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">ATOM 01</span> <span class="k">·</span> <span class="v">this-week-landing.html</span></span>
+          <span><span class="k">spec</span> <span class="v">§4</span></span>
+        </div>
+        <div class="r"><span><span class="k">law</span> <span class="v">W1 · W2 · L5</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="atom-head">
+            <div class="eyebrow reveal d1">Atom 01 · Monday morning</div>
+            <h2 class="display reveal d2">This week,<br/>on <span class="amber">this queue</span>.</h2>
+            <p class="sub reveal d3">What an analyst opens on Monday. Two time anchors, a delta feed that names its triggers, and a queue that reads <span class="amber">23 Critical</span> — ML confidence plus fresh 2024 delta plus at least one trend modifier.</p>
+          </div>
+          <div class="atom-mock reveal d4">
+            <div class="head">
+              <span>this-week-landing</span>
+              <span class="dots"><i></i><i></i><i></i></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-row filled">
+                <span class="pin">1</span>
+                <div class="lbl">Topbar · anchors</div>
+                <div class="cnt">Pipeline ran <span class="amber">Jul 6, 06:00</span> · You reviewed Jun 30</div>
+              </div>
+              <div class="mock-row" style="min-height: 90px;">
+                <span class="pin">2</span>
+                <div class="lbl">Delta feed</div>
+                <div class="cnt">PERMIT · 660 Madison · +2 boiler jobs<br/>TIER ↑ · 200 E 42nd St · High → Critical<br/>DATA · 58 W 58th St · fresh Δ '24 posted</div>
+              </div>
+              <div class="mock-row filled" style="min-height: 60px;">
+                <span class="pin">3</span>
+                <div class="lbl">Queue · workflow-scale</div>
+                <div class="cnt"><span class="amber">23 Critical</span> · 84 High · 312 Watch · 791 stable</div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">4</span>
+                <div class="lbl">Portfolio pulse (bottom-right)</div>
+                <div class="cnt">Only aggregation on the page. Quietest treatment.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">Two anchors, never relative time.<small>Vintage stamps — never "two hours ago." Law <span class="code">W1</span></small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Every event names its trigger + consequence.<small>PERMIT · TIER↑ · DATA. Law <span class="code">W2</span></small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">Critical v1.1 = 23 buildings today.<small>Top of queue: 660 Madison · 200 E 42nd · 58 W 58th. Ismael verified vs. live data.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Portfolio pulse is the only portfolio number.<small>Everything else is workflow-scale by design.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">PEDRO</div>
+        <div class="center">Atom 01 · This Week landing (Spec 4)</div>
+        <div class="page">Slide <b>04</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 5 — ATOM 2: SCORE CELL
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">ATOM 02</span> <span class="k">·</span> <span class="v">score-cell-anatomy.html</span></span>
+          <span><span class="k">spec</span> <span class="v">§1</span></span>
+        </div>
+        <div class="r"><span><span class="k">law</span> <span class="v">L1 · L5</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="atom-head">
+            <div class="eyebrow reveal d1">Atom 02 · Kills the "100% High" wall</div>
+            <h2 class="display reveal d2">Rank ordinal.<br/><span class="amber">Never a percent sign.</span></h2>
+            <p class="sub reveal d3">The current build shows 45 buildings at 100% — a tied top block that reads as "the model can't tell them apart." This cell replaces it with tie-block wording and percentile ordinal. AUC never sits on the chip.</p>
+          </div>
+
+          <div class="atom-mock reveal d4">
+            <div class="head">
+              <span>score-cell-anatomy</span>
+              <span class="dots"><i></i><i></i><i></i></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-row filled">
+                <span class="pin">1</span>
+                <div class="lbl">Ordinal</div>
+                <div class="cnt"><span class="amber">96th</span> percentile · among the top 52 by model score (tie block)</div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">2</span>
+                <div class="lbl">Provenance chip</div>
+                <div class="cnt">[ XGB v1 · UNVAL ]  — no numeric AUC anywhere near the score</div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">3</span>
+                <div class="lbl">Freshness chip · 4 states</div>
+                <div class="cnt">Fresh Δ '24 · Latest Δ '23 · No adjacent Δ · Uncertain</div>
+              </div>
+              <div class="mock-row filled">
+                <span class="pin">4</span>
+                <div class="lbl">Tier tick + word</div>
+                <div class="cnt">▮▮▮▯ · <span class="amber">Critical</span> · hybrid base + modifiers</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">Tie block wording for the top 52.<small>Percentile ordinal for the rest. Law <span class="code">L1</span> — never a % on the model score.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Chip never carries a numeric AUC.<small>AUC lives in only two places: the case file, and the methodology page.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">Says <span class="code">UNVAL</span> until we back-test.<small>Against your disconnect records. You tell us when that data is available.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Absence of fresh signal is a designed state.<small>Stale is the majority case — the design treats it that way. Law <span class="code">L5</span></small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">PEDRO</div>
+        <div class="center">Atom 02 · Score cell (Spec 1)</div>
+        <div class="page">Slide <b>05</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 6 — ATOM 3: CASE FILE + REASONING REPORT
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">ATOM 03</span> <span class="k">·</span> <span class="v">reasoning-report.html</span></span>
+          <span><span class="k">spec</span> <span class="v">§2 · §3</span></span>
+        </div>
+        <div class="r"><span><span class="k">law</span> <span class="v">H1 · R1 · R4 · R5</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="atom-head">
+            <div class="eyebrow reveal d1">Atom 03 · Case file + printable report</div>
+            <h2 class="display reveal d2">Ledger, not hero.<br/><span class="amber">A human signs it.</span></h2>
+            <p class="sub reveal d3">Click a Critical row — get a case file. Three columns, every claim shows its math. Print version is grayscale-safe and one-page argument, one-page exhibits. The tool doesn't ship anything without an analyst's signature.</p>
+          </div>
+
+          <div class="atom-mock reveal d4">
+            <div class="head">
+              <span>case-file · reasoning-report</span>
+              <span class="dots"><i></i><i></i><i></i></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-row filled">
+                <span class="pin">1</span>
+                <div class="lbl">Claim ledger · middle column</div>
+                <div class="cnt">Tier · <span class="amber">ML base + trend/statute modifiers</span></div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">2</span>
+                <div class="lbl">Driver band · 5 rows</div>
+                <div class="cnt">ll97_penalty_2024_log 0.2074 ↑ · steam_yoy_norm 0.148 ↑ · ll33_grade 0.09 ↓ …</div>
+              </div>
+              <div class="mock-row filled">
+                <span class="pin">3</span>
+                <div class="lbl">Exhibit D · §4.1 hybrid chain</div>
+                <div class="cnt">Base tier from ML cutoffs → modifiers → clamp → written verbatim</div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">4</span>
+                <div class="lbl">Signature + DRAFT watermark</div>
+                <div class="cnt">Signed by _________________ · draft until reviewed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">SHAP drivers restructured as evidence.<small>Same data as the current panel — with real-unit values and directional arrows.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Grayscale-safe by construction.<small>Print it, scan it, still readable. Law <span class="code">R4</span></small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">Exhibit D · tier chain verbatim.<small><span class="code">ll97_penalty_2024_log</span> feature #1 at 20% importance. Over-cap boolean carries zero — model gets the dollar penalty, boolean is a ±1 modifier. No double count.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">A human signs it.<small>Law <span class="code">R5</span> — strongest defensibility feature we have.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">PEDRO · ISMAEL on Exhibit D</div>
+        <div class="center">Atom 03 · Case file + reasoning report (Spec 2, 3)</div>
+        <div class="page">Slide <b>06</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 7 — ATOM 4: WEEKLY DIGEST
+         ===================================================== -->
+    <section class="slide slide-atom">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">ATOM 04</span> <span class="k">·</span> <span class="v">weekly-digest-email.html</span></span>
+          <span><span class="k">spec</span> <span class="v">§5</span></span>
+        </div>
+        <div class="r"><span><span class="k">law</span> <span class="v">D1 · D2 · D6 · C1</span></span></div>
+      </div>
+
+      <div class="body">
+        <div>
+          <div class="atom-head">
+            <div class="eyebrow reveal d1">Atom 04 · Monday morning email</div>
+            <h2 class="display reveal d2">Complete <span class="amber">without a click</span>.</h2>
+            <p class="sub reveal d3">Every Monday, arrives in the distribution list's inbox. Subject carries the finding. Body is complete without opening the app. Plain-text twin ships with every draft — no HTML-only sends.</p>
+          </div>
+
+          <div class="atom-mock reveal d4">
+            <div class="head">
+              <span>weekly-digest-email · subject line</span>
+              <span class="dots"><i></i><i></i><i></i></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-row filled">
+                <span class="pin">1</span>
+                <div class="lbl">Subject line</div>
+                <div class="cnt">23 buildings entered Critical this week · <span class="amber">top: 660 Madison Ave</span></div>
+              </div>
+              <div class="mock-row" style="min-height: 90px;">
+                <span class="pin">2</span>
+                <div class="lbl">Finding paragraph · inline definition</div>
+                <div class="cnt">Between Jun 30 and Jul 6, the queue added 23 buildings meeting Critical v1.1 — ML risk ≥ 0.6 + fresh Δ '24 + at least one trend modifier…</div>
+              </div>
+              <div class="mock-row">
+                <span class="pin">3</span>
+                <div class="lbl">Delta feed excerpt · top 5</div>
+                <div class="cnt">PERMIT · 660 Madison · +2 boiler jobs · consequence: check LL33 grade drift</div>
+              </div>
+              <div class="mock-row filled">
+                <span class="pin">4</span>
+                <div class="lbl">Footer · plain-text twin ships with every draft</div>
+                <div class="cnt">Model: XGB v1 · UNVAL · methodology: /methodology · <span class="amber">D6</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callouts">
+          <div class="callout reveal d3">
+            <span class="pin">1</span>
+            <span class="txt">Subject line carries the finding.<small>Law <span class="code">D1</span> — recipient acts from the inbox preview.</small></span>
+          </div>
+          <div class="callout reveal d4">
+            <span class="pin">2</span>
+            <span class="txt">Body is complete without clicking.<small>Law <span class="code">D2</span> — email is not a teaser.</small></span>
+          </div>
+          <div class="callout reveal d5">
+            <span class="pin">3</span>
+            <span class="txt">Numbers injected from data, never freehand.<small>Law <span class="code">C1</span>. Compose UI edits copy, not stats.</small></span>
+          </div>
+          <div class="callout reveal d6">
+            <span class="pin">4</span>
+            <span class="txt">Send via mailto or clipboard — no SMTP in v1.<small>Analyst reviews, sends from their own client.</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">PEDRO</div>
+        <div class="center">Atom 04 · Weekly digest (Spec 5)</div>
+        <div class="page">Slide <b>07</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 8 — METHODOLOGY RESPONSE
+         ===================================================== -->
+    <section class="slide slide-methodology">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">RESPONSE</span> <span class="k">·</span> <span class="v">to methodology alignment (2026-06-17)</span></span>
+        </div>
+        <div class="r"><span><span class="k">for</span> <span class="v cyan">Ildi</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="eyebrow reveal d1">Methodology response</div>
+        <h2 class="display reveal d2">Five items.<br/>Two ship now. Three <span class="amber">Round 2</span>, with reasons.</h2>
+        <p class="lead reveal d3">Your team's alignment doc from June — our response, item by item. <span class="amber">CONED_METHODOLOGY_ALIGNMENT.md</span> in the repo has the full analysis; the handout carries the summary. Full methodology page ships in M10.</p>
+
+        <div class="method-table reveal d4">
+          <div class="th">
+            <span>#</span>
+            <span>Item</span>
+            <span>What ships now</span>
+            <span>Round 2</span>
+          </div>
+          <div class="tr">
+            <span class="no">01</span>
+            <span class="item">Per-customer weather-normalized regression</span>
+            <span class="ships">NYCHA 24-development regression <b>(shipped exemplar)</b>; citywide HDD documented as known weakness</span>
+            <span class="r2">Blocked on billing-cycle data access</span>
+          </div>
+          <div class="tr">
+            <span class="no">02</span>
+            <span class="item">Diagnostic metrics suite (6 metrics)</span>
+            <span class="ships">2 of 6 partially in case file (decline trend, R² where present)</span>
+            <span class="r2">Blocked on item 01</span>
+          </div>
+          <div class="tr">
+            <span class="no">03</span>
+            <span class="item">Uncertain tier aligned with regression fit</span>
+            <span class="ships">Partial: fit-based gate where NYCHA regression exists; years-based gate elsewhere</span>
+            <span class="r2">Portfolio-wide extension when item 01 lands</span>
+          </div>
+          <div class="tr">
+            <span class="no">04</span>
+            <span class="item">Rule-based tier assignment</span>
+            <span class="ships">Hybrid tier with the chain named on every surface <b>(§4.1 case file · Exhibit D report)</b></span>
+            <span class="r2">Fully learned tier explored</span>
+          </div>
+          <div class="tr">
+            <span class="no">05</span>
+            <span class="item">Positioning as complementary signals</span>
+            <span class="ships">Ships now in methodology page §8 and report method footer</span>
+            <span class="r2">Pattern-mining research track named</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">ISMAEL</div>
+        <div class="center">Methodology alignment · item by item</div>
+        <div class="page">Slide <b>08</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 9 — WHAT WE NEED
+         ===================================================== -->
+    <section class="slide slide-asks">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">ASKS</span> <span class="k">·</span> <span class="v">unblocks M7 · M12 · R5</span></span>
+        </div>
+        <div class="r"><span><span class="k">answers ok</span> <span class="v">async · this week</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="asks-head">
+          <div class="eyebrow reveal d1">What we need from you</div>
+          <h2 class="display reveal d2">Six for David.<br/>One for <span class="amber">Ildi</span>.</h2>
+          <p class="sub reveal d3">Any answer moves us forward. These unblock the digest send framing, the event suppression window, and the report finalize flow.</p>
+
+          <div class="asks-list">
+            <div class="ask-card reveal d3">
+              <div class="no">Q1 · David</div>
+              <div class="q">Critical v1.1 sign-off — the 23 buildings.</div>
+              <div class="n">Ismael has signed internally. Yes/no?</div>
+            </div>
+            <div class="ask-card reveal d4">
+              <div class="no">Q2 · David</div>
+              <div class="q">Chip vocabulary — <span style="color:var(--amber)">XGB v1 · UNVAL</span></div>
+              <div class="n">Readable to your team, or spell out "Unvalidated"?</div>
+            </div>
+            <div class="ask-card reveal d4">
+              <div class="no">Q3 · David</div>
+              <div class="q">Digest cadence, recipients, format.</div>
+              <div class="n">Weekly? Who receives? HTML + text, or text-only?</div>
+            </div>
+            <div class="ask-card reveal d5">
+              <div class="no">Q4 · David</div>
+              <div class="q">Cooling-off window after <code style="color:var(--amber)">Contacted</code>.</div>
+              <div class="n">How many days before that building can re-surface?</div>
+            </div>
+            <div class="ask-card reveal d5">
+              <div class="no">Q5 · David</div>
+              <div class="q">Territory gating.</div>
+              <div class="n">Subsets per recipient, or everyone sees the full portfolio?</div>
+            </div>
+            <div class="ask-card reveal d6">
+              <div class="no">Q6 · David</div>
+              <div class="q">DRAFT watermark vs hard gate on reports.</div>
+              <div class="n">Recommend watermark (drafts are legal to send, just marked).</div>
+            </div>
+            <div class="ask-card ildi reveal d7">
+              <div class="no">Q7 · Ildi</div>
+              <div class="q">Anything on the previous slide you'd want reordered?</div>
+              <div class="n">Round 2 items you'd rather see now — trade-off named.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="asks-side">
+          <div class="callout-panel reveal d4">
+            <div class="k">Unblocks</div>
+            <div class="v">Q3–Q5 gate <b>M12</b> weekly digest send framing.<br/>Q4 gates <b>M7</b> TIER-down suppression window.<br/>Q6 gates <b>R5</b> report finalize flow.</div>
+          </div>
+          <div class="split">
+            <div class="stat-mini reveal d5">
+              <div class="k">Critical v1.1</div>
+              <div class="v">23</div>
+              <div class="n">buildings today · signed internally</div>
+            </div>
+            <div class="stat-mini reveal d5">
+              <div class="k">Ships now</div>
+              <div class="v">M0–M2</div>
+              <div class="n">before next touchpoint</div>
+            </div>
+          </div>
+          <div class="callout-panel reveal d6" style="background: rgba(110,231,212,.04); border-color: rgba(110,231,212,.35);">
+            <div class="k" style="color: var(--cyan);">Reference</div>
+            <div class="v">Item numbers correspond to <b style="color:var(--cyan)">system-v1.1.md §10</b> open questions ledger items #5–10.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">ISMAEL · PEDRO on Q2</div>
+        <div class="center">What we need from you · answers async ok</div>
+        <div class="page">Slide <b>09</b> / 10</div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         SLIDE 10 — CLOSE
+         ===================================================== -->
+    <section class="slide slide-close">
+      <div class="status">
+        <div class="l">
+          <span><span class="dot"></span><span class="v amber">NEXT</span> <span class="k">·</span> <span class="v">M0 → M1 → M2 → M3</span></span>
+        </div>
+        <div class="r"><span><span class="k">next touchpoint</span> <span class="v">[FILL IN]</span></span></div>
+      </div>
+
+      <div class="body">
+        <div class="close-wrap">
+          <div class="eyebrow reveal d1">Thanks</div>
+          <h2 class="display reveal d2">Four milestones<br/>land <span class="amber">between now</span> and next.</h2>
+          <p class="sub reveal d3">Legacy preserved. One source of truth for model version + AUC. AUC rerun with proper std. Score cell atom in production. Handout has the deeper detail — questions anytime, async ok.</p>
+
+          <div class="close-cols">
+            <div class="close-panel reveal d4">
+              <div class="head">Ships between now & next touchpoint</div>
+              <div class="item"><span class="k">M0</span><span class="v">Legacy separation<small>Preserve today's build at /legacy · Pedro</small></span></div>
+              <div class="item"><span class="k">M1</span><span class="v">model_meta.json<small>Retire stale strings · one truth for model version · Ismael</small></span></div>
+              <div class="item"><span class="k">M2</span><span class="v">AUC rerun<small>5-fold CV mean ± std on locked config · Ismael</small></span></div>
+              <div class="item"><span class="k">M3</span><span class="v">Score cell atom into Rankings<small>First atom to land in production · Pedro</small></span></div>
+            </div>
+
+            <div class="close-panel reveal d5">
+              <div class="head">Contact</div>
+              <div class="item"><span class="k">Design</span><span class="v">Edwin Perez<small><a href="mailto:edwin.perez@pursuit.org">edwin.perez@pursuit.org</a></small></span></div>
+              <div class="item"><span class="k">Backend</span><span class="v">Ismael Caraballo<small><a href="mailto:ismael.caraballo@pursuit.org">ismael.caraballo@pursuit.org</a></small></span></div>
+              <div class="item"><span class="k">PM</span><span class="v">Pedro Martins<small><a href="mailto:pedro.martins@gmail.com">pedro.martins@gmail.com</a></small></span></div>
+              <div class="item"><span class="k">Repo</span><span class="v">github.com/ismaelcaraballo-afk/coned-dashboard<small>Handout: TOUCHPOINT-ONEPAGER.md</small></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="owner">EITHER</div>
+        <div class="center">Thanks · questions?</div>
+        <div class="page">Slide <b>10</b> / 10</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="nav-hint">← / → · space · home / end</div>
+
+<script>
+/* ============================================================
+   SLIDE PRESENTATION CONTROLLER
+   Fixed 16:9 stage scaling + keyboard + touch navigation.
+   ============================================================ */
+class SlidePresentation {
+  constructor() {
+    this.slides = document.querySelectorAll('.slide');
+    this.stage = document.getElementById('deckStage');
+    this.current = 0;
+    this.fitStage = this.fitStage.bind(this);
+    this.fitStage();
+    window.addEventListener('resize', this.fitStage);
+    this.bindKeys();
+    this.bindTouch();
+    this.show(0);
+  }
+
+  fitStage() {
+    const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    const x = (window.innerWidth - 1920 * s) / 2;
+    const y = (window.innerHeight - 1080 * s) / 2;
+    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+  }
+
+  show(i) {
+    this.current = Math.max(0, Math.min(i, this.slides.length - 1));
+    this.slides.forEach((sl, idx) => {
+      sl.classList.toggle('active', idx === this.current);
+      sl.classList.toggle('visible', idx === this.current);
+    });
+  }
+
+  next() { this.show(this.current + 1); }
+  prev() { this.show(this.current - 1); }
+
+  bindKeys() {
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowDown':
+        case ' ':
+        case 'PageDown':
+          e.preventDefault(); this.next(); break;
+        case 'ArrowLeft':
+        case 'ArrowUp':
+        case 'PageUp':
+          e.preventDefault(); this.prev(); break;
+        case 'Home': e.preventDefault(); this.show(0); break;
+        case 'End':  e.preventDefault(); this.show(this.slides.length - 1); break;
+      }
+    });
+  }
+
+  bindTouch() {
+    let x0 = null;
+    document.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      if (x0 == null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) dx < 0 ? this.next() : this.prev();
+      x0 = null;
+    });
+  }
+}
+
+new SlidePresentation();
+</script>
+</body>
+</html>
