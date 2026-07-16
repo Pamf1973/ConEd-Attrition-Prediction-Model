@@ -32,3 +32,8 @@ smoke_test_report.md
 
 # Local analysis scratch
 analysis/
+
+# Build-ops machinery and personal files (stay local, not shared with team)
+.claude/
+SESSION_JOURNAL.md
+HANDOFF.md

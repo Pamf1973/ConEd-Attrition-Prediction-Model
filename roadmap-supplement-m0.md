@@ -1,13 +1,13 @@
 # Roadmap Supplement — M0: Legacy separation + routing
 
 **Emitted:** 2026-07-14
-**Supplements:** `roadmap.md` (Fable, 2026-07-13)
+**Supplements:** `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` (Fable, 2026-07-13)
 **Scope:** Pre-work not in Fable's roadmap. Establishes the boundary between the current build (kept as a demo hedge and archived reference) and the new workflow-focused build. Must land before M3 (Score cell into Rankings table) begins.
 **Owner:** Pedro (frontend), coordination Edwin.
 
 ## Why this exists
 
-Fable's `roadmap.md` sequences new-build milestones (M1–M12). It does not scope preserving the existing build. That preservation is intentional operational discipline, not a design decision — the old dashboard travels with us as an unlinked hedge in case demo audiences (David, ConEd) expect a traditional portfolio view we haven't yet built the workflow-focused equivalent for. This supplement scopes that preservation as M0 so ownership, acceptance, and file discipline are explicit before Pedro starts M3.
+Fable's `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` sequences new-build milestones (M1–M12). It does not scope preserving the existing build. That preservation is intentional operational discipline, not a design decision — the old dashboard travels with us as an unlinked hedge in case demo audiences (David, ConEd) expect a traditional portfolio view we haven't yet built the workflow-focused equivalent for. This supplement scopes that preservation as M0 so ownership, acceptance, and file discipline are explicit before Pedro starts M3.
 
 ## M0: Legacy separation + routing
 
@@ -48,10 +48,10 @@ A future "ask about this building" contextual affordance inside the case-file (S
 
 ## Sequencing note
 
-M0 is the first roadmap step. Nothing in `roadmap.md` depends on M0 by name, but M3 (Score cell into Rankings table) is where the new build begins to replace the current dashboard's components. Without M0, M3 would overwrite the current dashboard in place and lose the hedge. Do M0 first.
+M0 is the first roadmap step. Nothing in `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` depends on M0 by name, but M3 (Score cell into Rankings table) is where the new build begins to replace the current dashboard's components. Without M0, M3 would overwrite the current dashboard in place and lose the hedge. Do M0 first.
 
 ## What this supplement does not do
 
-- It does not modify `roadmap.md`. Fable's milestones stand as written.
+- It does not modify `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`. Fable's milestones stand as written.
 - It does not require Fable involvement. This is an operational decision documented for team alignment.
 - It does not change the Voice, Registers, or Laws in `system-v1.1.md`. The legacy dashboard is an archive, not a register.

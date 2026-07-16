@@ -1,6 +1,10 @@
 # CLAUDE.md — ConEd Steam Attrition Dashboard
 
-**Purpose:** Engineering reference for anyone (human or AI-assisted) working in this repo. Companion to `system-v1.1.md` (design system, Fable) and `roadmap.md` + `roadmap-supplement-m0.md` (sequenced build plan). If a spec disagrees with this file about how to implement something, this file wins; if a spec disagrees with `system-v1.1.md` about *what* to implement, that file wins.
+**Purpose:** Engineering reference for anyone (human or AI-assisted) working in this repo. Companion to `system-v1.1.md` (design system, Fable) and `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` + `roadmap-supplement-m0.md` (sequenced build plan). If a spec disagrees with this file about how to implement something, this file wins; if a spec disagrees with `system-v1.1.md` about *what* to implement, that file wins.
+
+**Roadmap sources:** `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` is Fable's narrative M0–M12 milestone plan (the "why + shape"). `ROADMAP.md` at the repo root is the derived dependency graph the build-ops skills consume (R-items reference their covering milestone as "covers M#"). Keep the two reconcilable; when a milestone changes, update both.
+
+**Active design profile:** data-workbench.
 
 **Emitted:** 2026-07-14 · **Applies to:** the redesign integration cycle.
 
@@ -9,7 +13,7 @@
 ## Canonical references
 
 - `system-v1.1.md` — voice, tokens, vocabulary, laws (L, H, R, W, D, C, M), copy rules, architecture notes the design depends on. Single source of truth for design.
-- `roadmap.md` (Fable, 2026-07-13) — M1–M12 sequenced build milestones.
+- `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` (Fable, 2026-07-13; intaken 2026-07-16) — M1–M12 sequenced build milestones. Narrative source of truth. Formerly `roadmap.md` at repo root.
 - `roadmap-supplement-m0.md` — M0 (Legacy separation + routing), boundary rules, chatbot situation.
 - `ISMAEL-RESPONSE-2026-07-13.md` — Q1–Q10 backend scopes.
 - `CONED_METHODOLOGY_ALIGNMENT.md` — Johan/Ildi methodology gap analysis, source for M10 section 8.
@@ -293,7 +297,7 @@ The current build is preserved after M0 as an unlinked demo hedge. Durable rules
 - **Branch naming:** `<owner>/M<n>-<slug>` for milestone work (`pedro/M3-score-cell`, `ismael/M1-model-meta`, `edwin/M10-methodology-page`).
 - **One PR per milestone** where possible. If a milestone splits (e.g., M4 build vs M4 copy strings), the PRs should be tagged with the shared milestone number in titles.
 - **PR description should list:**
-  - Which acceptance criteria from `roadmap.md` are met (quote the criterion or ✓ each)
+  - Which acceptance criteria from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` are met (quote the criterion or ✓ each)
   - Which `system-v1.1.md` laws the change respects (L1, W3, M2, etc.)
   - Any deviations from the spec with justification
 - **Do not skip hooks** (`--no-verify`). If a pre-commit hook fails, investigate and fix.
@@ -313,7 +317,7 @@ The current build is preserved after M0 as an unlinked demo hedge. Durable rules
 | Where's the AUC copy template? | `system-v1.1.md` §7 rule 8 |
 | Where's the legacy dashboard boundary rule? | `roadmap-supplement-m0.md`; this file §Legacy |
 | What did Ismael scope for pipeline work? | `ISMAEL-RESPONSE-2026-07-13.md` Q6/Q7/Q8 |
-| What methodology alignment content lands where? | `roadmap.md` §Methodology alignment; `CONED_METHODOLOGY_ALIGNMENT.md` §3 |
+| What methodology alignment content lands where? | `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` §Methodology alignment; `CONED_METHODOLOGY_ALIGNMENT.md` §3 |
 
 ---
 

@@ -280,7 +280,7 @@ Please respond in whatever format is easiest. If you're feeding this to your LLM
 - `'22→'24` delta (Q9) is scope-planning only; doesn't gate the build.
 - Server.js fixes (Q10) is a coordination question so we don't double-commit.
 
-Once you send the answers back, Edwin will fold them into Fable's roadmap prompt (prompt 03 in the `fable-prompts-2026-07-13/` folder), and Fable will emit `roadmap.md` with sequenced milestones, dependencies, and acceptance criteria. That is the document Pedro builds from.
+Once you send the answers back, Edwin will fold them into Fable's roadmap prompt (prompt 03 in the `fable-prompts-2026-07-13/` folder), and Fable will emit `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` with sequenced milestones, dependencies, and acceptance criteria. That is the document Pedro builds from.
 
 ---
 

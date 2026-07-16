@@ -2,12 +2,12 @@
 
 **From:** Edwin
 **Date:** 2026-07-14
-**Purpose:** Your milestone-by-milestone build brief for the ConEd Steam Attrition redesign integration. This file is the shim between your Q1–Q10 sign-offs (`ISMAEL-RESPONSE-2026-07-13.md`), the design system (`system-v1.1.md`), the roadmap (`roadmap.md` + `roadmap-supplement-m0.md`), and the codebase (`CLAUDE.md`). If you find a conflict between this brief and any of those docs, the canonical docs win — flag it in Slack and I'll fix this brief.
+**Purpose:** Your milestone-by-milestone build brief for the ConEd Steam Attrition redesign integration. This file is the shim between your Q1–Q10 sign-offs (`ISMAEL-RESPONSE-2026-07-13.md`), the design system (`system-v1.1.md`), the roadmap (`docs/ref/2026-07-16_ed_ref_fable-roadmap.md` + `roadmap-supplement-m0.md`), and the codebase (`CLAUDE.md`). If you find a conflict between this brief and any of those docs, the canonical docs win — flag it in Slack and I'll fix this brief.
 
 **Read first, before touching code:**
 - `CLAUDE.md` — repo layout, dev commands, API contract, data pipeline, environment vars
 - `system-v1.1.md` — §4.1 (hybrid chain), §4.4/§4.5 (chips), §9 (architecture notes), M-family laws
-- `roadmap.md` — full milestone list with dependencies
+- `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` — full milestone list with dependencies
 - `roadmap-supplement-m0.md` — M0 sets up the routing split; you do not own M0 but M1/M6/M7 endpoints must stay compatible with both `/` and `/legacy` per its rules
 - `ISMAEL-RESPONSE-2026-07-13.md` — your own Q1–Q10 answers; the roadmap's acceptance criteria assume these
 
@@ -30,7 +30,7 @@ Do them roughly in this order. **M1 is the cross-cutting first move** — it unb
 
 ## M1: `model_meta` rollout + stale-string retirement
 
-**Spec sources:** `system-v1.1.md` §9 (fields), §7 rules 8/9 (consumers), §4.4 (provenance chips); `ISMAEL-RESPONSE-2026-07-13.md` Q5 + Q10; `roadmap.md` M1.
+**Spec sources:** `system-v1.1.md` §9 (fields), §7 rules 8/9 (consumers), §4.4 (provenance chips); `ISMAEL-RESPONSE-2026-07-13.md` Q5 + Q10; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M1.
 
 ### What ships
 
@@ -40,7 +40,7 @@ Three things in one milestone, deliberately bundled per your Q10:
 2. **`/api/meta` reads model info from `model_meta.json`**, not from a hardcoded string. This retires the drift class that produced the stale "GBM" reference at `api/server.js:585`.
 3. **`/api/explain` FAQ answer at `api/server.js:867` fully rewritten** (not string-swapped) to remove the L1-violating probability phrasing for `ml_risk`. Edwin owns the copy. You wire it.
 
-### Acceptance criteria (from `roadmap.md` M1, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M1, verbatim)
 
 - `model_meta.json` contains the twelve §9 fields in snake_case, written by `train_xgboost.py` and `update_enrichment_risk.py` (params-unchanged runs refresh `run_date` only).
 - No hardcoded model-name or AUC string remains in `server.js` (§7 rule 9: "model version copy sources from `model_meta.model_version`, never hardcoded").
@@ -100,7 +100,7 @@ Snake_case matches your existing API response style (per your Q5). `cv_auc` / `c
 ```
 Ships M1: model_meta rollout + stale-string retirement.
 
-Acceptance criteria met (roadmap.md M1):
+Acceptance criteria met (docs/ref/2026-07-16_ed_ref_fable-roadmap.md M1):
 - [x] model_meta.json contains 12 §9 fields, snake_case, written by both pipeline scripts
 - [x] server.js:585 sources model version from model_meta (no hardcoded string)
 - [x] server.js:867 chatbot answer rewritten (Edwin copy pasted verbatim); no L1 violation
@@ -119,7 +119,7 @@ Deviations: <none / or list>
 
 ## M2: AUC rerun + freshness residual naming
 
-**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q4 + Q9 (freshness residual is #22); `roadmap.md` M2; `system-v1.1.md` §4.5, §7 rule 8, ledger #22.
+**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q4 + Q9 (freshness residual is #22); `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M2; `system-v1.1.md` §4.5, §7 rule 8, ledger #22.
 
 ### What ships
 
@@ -128,7 +128,7 @@ Two things:
 1. **Clean 5-fold CV AUC** with std on the locked XGBoost config, written into `model_meta.cv_auc` and `cv_std`.
 2. **The ~5-row freshness edge state named** (ledger #22). This is the residual between the four freshness states (Δ '24 fresh: 422; Δ '23 only: 321; no adjacent-yr Δ: ~208; Uncertain: 254) and the total 1,210. They currently sum to 1,205; five rows are in an unnamed edge state. Look at what those rows have in common and name the state honestly.
 
-### Acceptance criteria (from `roadmap.md` M2, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M2, verbatim)
 
 - `cv_auc` and `cv_std` populated from `cross_val_score` on the chosen config, not a GridSearchCV best.
 - §7 rule 8 template renders end-to-end: `"ranks a true churner above a non-churner about {auc_pct}% of the time ({cv_kfold}-fold CV, {n_positive} positive labels)."`
@@ -170,7 +170,7 @@ Dataset: **1,003 labeled, 54 positive (5.4%).** Use `sklearn.model_selection.cro
 
 ## M6: Status events endpoint + watchlist migration
 
-**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q7; `system-v1.1.md` §9 (write path), §4.2 (workflow states); `roadmap.md` M6.
+**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q7; `system-v1.1.md` §9 (write path), §4.2 (workflow states); `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M6.
 
 ### What ships
 
@@ -180,7 +180,7 @@ Append-only status events keyed by BBL, on **Railway Postgres** (per your Q7 rec
 2. **`GET /api/buildings/:bbl/status`** — hydrate; current state = latest event.
 3. **`/api/watchlist/save` and `/api/watchlist/load` migrate to the same table.** The in-memory `watchlistStore` Map at `api/server.js:314` retires.
 
-### Acceptance criteria (from `roadmap.md` M6, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M6, verbatim)
 
 - Schema per §9 (`bbl`, `status`, `actor`, `note`, `timestamp`; current state = latest event).
 - `actor` = session token with a documented alias path to names.
@@ -248,13 +248,13 @@ Cooling-off window length (post-Contacted) is TBD from David (open ledger #8). D
 
 ## M7: Snapshot diffing → `events.json`
 
-**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q6; `system-v1.1.md` §4.3 (event kinds), §9 (snapshot diffing); `roadmap.md` M7.
+**Spec sources:** `ISMAEL-RESPONSE-2026-07-13.md` Q6; `system-v1.1.md` §4.3 (event kinds), §9 (snapshot diffing); `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M7.
 
 ### What ships
 
 Prev-file copy on the Railway volume, end-of-run diff, `events.json` emitted in the §4.3 grammar. DIVERGE derives inline from the current run (no diffing needed for it).
 
-### Acceptance criteria (from `roadmap.md` M7, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M7, verbatim)
 
 - Every event carries subject, verb, evidence, consequence fields (W2: "no event without a named trigger").
 - Batch kinds (`DATA`, `DIVERGE`) aggregate to one entry with counts.

@@ -2,12 +2,12 @@
 
 **From:** Edwin
 **Date:** 2026-07-14
-**Purpose:** Your milestone-by-milestone build brief for the ConEd Steam Attrition redesign integration. This file is the shim between the design system (`system-v1.1.md`), the roadmap (`roadmap.md` + `roadmap-supplement-m0.md`), and the codebase (`CLAUDE.md`). If you find a conflict between this brief and any of those three, the canonical docs win — flag it in Slack and I'll fix this brief.
+**Purpose:** Your milestone-by-milestone build brief for the ConEd Steam Attrition redesign integration. This file is the shim between the design system (`system-v1.1.md`), the roadmap (`docs/ref/2026-07-16_ed_ref_fable-roadmap.md` + `roadmap-supplement-m0.md`), and the codebase (`CLAUDE.md`). If you find a conflict between this brief and any of those three, the canonical docs win — flag it in Slack and I'll fix this brief.
 
 **Read first, before touching code:**
 - `CLAUDE.md` — repo layout, dev commands, API contract, file map, legacy discipline
 - `system-v1.1.md` — laws (L, H, R, W, D, C, M), copy rules, components table
-- `roadmap.md` — full milestone list with dependencies
+- `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` — full milestone list with dependencies
 - `roadmap-supplement-m0.md` — M0 pre-work you own
 
 Everything below quotes acceptance criteria verbatim from those docs. Where a rule number appears (L1, W3, §7 rule 8, etc.), the canonical text is in `system-v1.1.md` — do not paraphrase.
@@ -87,7 +87,7 @@ M1 is Ismael's + Edwin's. It ships `model_meta.json` and rewires `server.js:585`
 ### What ships
 The Spec 1 atom replaces the current score column in the Rankings table. Binding migrates from `risk`/`riskTier()` (in `src/data/useBuildings.js`) to `percentile-of-ml_risk` + `diagnostic_risk`. The "100% High" wall dies here. All percent signs on the model score die here.
 
-### Acceptance criteria (from `roadmap.md` M3, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M3, verbatim)
 
 - **L1** (no percent sign on the score, percentile ordinal).
 - **L2 as amended** (tick and tier word from `diagnostic_risk`; ML percentile never colors).
@@ -136,7 +136,7 @@ The cell has six states, all of which the component must handle:
 ```
 Ships M3: Score cell into the Rankings table.
 
-Acceptance criteria met (roadmap.md M3):
+Acceptance criteria met (docs/ref/2026-07-16_ed_ref_fable-roadmap.md M3):
 - [x] L1 — no percent sign on model score; percentile ordinal
 - [x] L2 amended — tick/tier from diagnostic_risk; percentile never colors
 - [x] L3 amended — DIVERGE marker on two-tier promotions only
@@ -167,7 +167,7 @@ Replaces `src/components/BuildingPanel.jsx` in the new-build routes. Case-file h
 - Narrative slot (dashed frame; static in M4, drafting arrives in M5)
 - Read-only status segment (six workflow states visible but not interactive until M6)
 
-### Acceptance criteria (from `roadmap.md` M4, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M4, verbatim)
 
 - **H1** — a ledger, not a hero. No giant score treatment.
 - **H2** — every claim shows its math. Ledger middle column labeled **"Tier · ML base + trend/statute modifiers"** with the §4.1 chain summarized underneath.
@@ -240,7 +240,7 @@ The reasoning report as a printable HTML page + PDF. One layout, two outputs (br
 ### What ships
 The Spec 4 queue as a component on the Rankings surface. Critical v1.1 membership computed from existing fields (client-side is fine; can move to API later). Counted filter chips per §4.6.
 
-### Acceptance criteria (from `roadmap.md` M8, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M8, verbatim)
 
 - **Critical membership** matches Ismael's Q3 filter exactly:
   ```
@@ -273,7 +273,7 @@ All of M3's fields plus modifier flags (already listed).
 ### What ships
 Spec 4 assembled: topbar (with `model_meta.run_date` anchor and last-review marker), delta feed from `events.json`, the M8 queue, portfolio pulse (only portfolio-scale aggregation), empty state.
 
-### Acceptance criteria (from `roadmap.md` M9, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M9, verbatim)
 
 - **W1** — both time anchors from `model_meta.run_date` and the last-review marker. No relative time.
 - **W2** — feed renders the event grammar (kind tag, subject, verb, evidence, action link).
@@ -283,7 +283,7 @@ Spec 4 assembled: topbar (with `model_meta.run_date` anchor and last-review mark
 - **Pulse ships without WoW parentheticals** until a second diffed run exists. Explicit placeholder ("First diffed run: awaiting second snapshot" or similar).
 
 ### Empty state
-The landing must read honestly without `events.json`. If M7 slips, render the designed placeholder per `roadmap.md` M7 graceful degradation.
+The landing must read honestly without `events.json`. If M7 slips, render the designed placeholder per `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M7 graceful degradation.
 
 ### Files you touch
 - New: `src/pages/ThisWeek.jsx`
@@ -302,7 +302,7 @@ The landing must read honestly without `events.json`. If M7 slips, render the de
 ### What ships
 List | Aggregate toggle on the queue. When Aggregate is selected, the queue renders as count tiles, modifier co-occurrence pairs, and LL97 penalty-magnitude bands — **all computed over the currently filtered rowset**, never the population.
 
-### Acceptance criteria (from `roadmap.md` M11 + `system-v1.1.md` §5)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M11 + `system-v1.1.md` §5)
 
 - **W3 as amended:** every figure derives from exactly the visible rows.
 - **Header states** filter expression, row count, run stamp.

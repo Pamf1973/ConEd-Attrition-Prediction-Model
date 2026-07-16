@@ -2,11 +2,11 @@
 
 **From:** Edwin (for future-me and anyone reading over my shoulder)
 **Date:** 2026-07-14
-**Purpose:** My milestone-by-milestone brief. Ismael owns backend; Pedro owns frontend. I own domain content, copy, the report, the methodology page, the digest, and the David packet. This file is the shim between my head, `system-v1.1.md`, `roadmap.md`, and the codebase (`CLAUDE.md`).
+**Purpose:** My milestone-by-milestone brief. Ismael owns backend; Pedro owns frontend. I own domain content, copy, the report, the methodology page, the digest, and the David packet. This file is the shim between my head, `system-v1.1.md`, `docs/ref/2026-07-16_ed_ref_fable-roadmap.md`, and the codebase (`CLAUDE.md`).
 
 **Read first, before writing anything:**
 - `system-v1.1.md` — voice, laws, copy rules (§7 rules 8/9 especially), §4.1 hybrid chain, §5 components table
-- `roadmap.md` — full milestone list; my ownership is M1 (paired), M4 (paired, Pedro leads), M5 (I lead), M10 (I own), M12 (I lead), plus the David packet
+- `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` — full milestone list; my ownership is M1 (paired), M4 (paired, Pedro leads), M5 (I lead), M10 (I own), M12 (I lead), plus the David packet
 - `CONED_METHODOLOGY_ALIGNMENT.md` — Johan/Ildi five items, feeds M10 §8
 - `ISMAEL-RESPONSE-2026-07-13.md` — Q1–Q10, the ground truth for numbers
 - `CLAUDE.md` — repo layout, file map, legacy discipline
@@ -64,7 +64,7 @@ The chatbot is legacy per `roadmap-supplement-m0.md` — but the endpoint is sha
 
 ## M4 (paired, Pedro leads): ledger + caveat copy
 
-**Spec source:** `system-v1.1.md` §5 (claim ledger, driver row, narrative slot), §4.1, §7 rules 8/9; `roadmap.md` M4.
+**Spec source:** `system-v1.1.md` §5 (claim ledger, driver row, narrative slot), §4.1, §7 rules 8/9; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M4.
 
 ### What I ship
 
@@ -138,7 +138,7 @@ Per §4.2 vocabulary: `Unreviewed`, `In review`, `Contacted`, `Confirmed at-risk
 
 ## M5 (I lead): reasoning report
 
-**Spec source:** `system-v1.1.md` §5 report sheet row, Spec 3 HTML atom, §7 rules 8/9, §4.1, R1-R5 laws; `roadmap.md` M5.
+**Spec source:** `system-v1.1.md` §5 report sheet row, Spec 3 HTML atom, §7 rules 8/9, §4.1, R1-R5 laws; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M5.
 
 ### What I ship (content lead)
 
@@ -151,7 +151,7 @@ Everything that renders on the report page. Pedro owns the print stylesheet and 
 - Method footer
 - Signature block with DRAFT watermark
 
-### Acceptance criteria (from `roadmap.md` M5, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M5, verbatim)
 
 - **R1** — every value matches the case file to the digit. If the case file says `Δ '24 -34%`, the report says `Δ '24 -34%`. Not "roughly 34%," not "about a third."
 - **R2** — page one is the argument, page two is exhibits only. Pedro's print stylesheet enforces the break; I structure the content so it naturally lands that way.
@@ -243,13 +243,13 @@ Ledger #10 open: DRAFT watermark vs hard gate. **Recommendation:** watermark, no
 
 ## M10 (I own): methodology page
 
-**Spec source:** `system-v1.1.md` §5 methodology page row, M1-M5 laws (portfolio-scale), §4.1, §4.5, §4.6, §7, `CONED_METHODOLOGY_ALIGNMENT.md` §4; `roadmap.md` M10.
+**Spec source:** `system-v1.1.md` §5 methodology page row, M1-M5 laws (portfolio-scale), §4.1, §4.5, §4.6, §7, `CONED_METHODOLOGY_ALIGNMENT.md` §4; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M10.
 
 ### What I ship
 
 Nine-section page, Report register, editorial and printable. Linked from the landing footer, provenance chips, and report method footer. **No one else touches this.** I author the content; Pedro drops it into a component (or MDX file — pick a format and stick with it).
 
-### Acceptance criteria (from `roadmap.md` M10, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M10, verbatim)
 
 - M1 to M5 laws hold: named populations with snapshots, dual stamps for model-version vs run-date facts, no causal verbs, explicit "research pending" placeholders in §8, definitions live here and surfaces link.
 - §3 is the §4.1 chain verbatim.
@@ -346,13 +346,13 @@ Regenerates per pipeline run. Run stamp: `model_meta.run_date`.
 
 ## M12 (I lead): weekly digest
 
-**Spec source:** `system-v1.1.md` §5 digest email row, Spec 5 HTML atom, D1-D6 laws, C1-C3 compose laws, §7 copy rules; `roadmap.md` M12.
+**Spec source:** `system-v1.1.md` §5 digest email row, Spec 5 HTML atom, D1-D6 laws, C1-C3 compose laws, §7 copy rules; `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M12.
 
 ### What I ship (content lead)
 
 Everything that renders in the digest. Pedro owns the compose UI. I own the templates, the finding paragraph, and the send framing.
 
-### Acceptance criteria (from `roadmap.md` M12, verbatim)
+### Acceptance criteria (from `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` M12, verbatim)
 
 - D1 to D6 as specced.
 - C1 numbers injected, never generated.
@@ -433,7 +433,7 @@ If Pedro's locked-token spike fails, plain textarea with trust is acceptable for
 
 ## Parallel non-build track: the David packet
 
-**Spec source:** `roadmap.md` §Parallel non-build track; `system-v1.1.md` §10 (open questions ledger).
+**Spec source:** `docs/ref/2026-07-16_ed_ref_fable-roadmap.md` §Parallel non-build track; `system-v1.1.md` §10 (open questions ledger).
 
 Runs alongside M1–M5. One email or sync with David covering **open ledger items #5–10.** None of these block starting any milestone above; but #7 gates M12 send framing and #8 gates M7/M9 TIER-down suppression copy.
 
