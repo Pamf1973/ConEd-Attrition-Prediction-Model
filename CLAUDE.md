@@ -6,6 +6,8 @@
 
 **Active design profile:** data-workbench.
 
+**Vault pointer:** cross-project standing rules live at `~/vault/`. Before re-asking Ed about a preference, working style, identity framing, or design-language rule, `grep ~/vault` for it. Notes under `~/vault/design-language/` are standing instructions on this project, not suggestions; the `data-workbench` profile (above) applies on top of the core rules.
+
 **Emitted:** 2026-07-14 · **Applies to:** the redesign integration cycle.
 
 ---
