@@ -226,7 +226,9 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const criticalAll   = buildings.filter(b => b.risk > 0.7).length;
   const contactedAll  = buildings.filter(b => contacted.has(b.address)).length;
   const dismissedAll  = buildings.filter(b => dismissed.has(b.address)).length;
-  const toReview      = Math.max(0, criticalAll - contactedAll - dismissedAll);
+  // Use union so buildings in both sets are not double-counted
+  const handledAll    = buildings.filter(b => contacted.has(b.address) || dismissed.has(b.address)).length;
+  const toReview      = Math.max(0, criticalAll - handledAll);
 
   async function downloadPortfolioCSV() {
     if (!token) return;
