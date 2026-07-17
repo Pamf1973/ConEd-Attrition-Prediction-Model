@@ -9,6 +9,8 @@ Line format:
 
 Naming convention: see `docs/ref/CONVENTIONS.md`. Origin omitted when Ed authored; type omitted when folder implies it.
 
+Length: entries are one line, typically ~200 chars in the summary field. Longer summaries are allowed when a doc is a grep target for multiple distinct concerns; those lines carry an inline "intentional grep double-duty" marker and cite the decision ID that forced them. Do not shorten these on cleanup passes without checking the referenced decision.
+
 Folders: docs/ref, docs/briefs, docs/design, docs/decks, docs/research, docs/notes, docs/data, docs/archive
 
 ---
@@ -21,6 +23,7 @@ Folders: docs/ref, docs/briefs, docs/design, docs/decks, docs/research, docs/not
 - 2026-07-16 | ed | ref | methodology alignment | docs/ref/2026-07-16_methodology-alignment.md | orig: CONED_METHODOLOGY_ALIGNMENT.md | Johan/Ildi methodology gap analysis. Source for M10 section 8 (complementary signals positioning).
 - 2026-07-13 | ismael | ref | q1-q10 response | docs/ref/2026-07-13_ismael-q1-q10-response.md | orig: ISMAEL-RESPONSE-2026-07-13.md | Ismael's Q1–Q10 backend scoping answers. Ground truth for model_meta schema, XGBoost config, snapshot diffing scope.
 - 2026-07-06 | ed | ref | client notes | docs/ref/2026-07-06_client-notes.md | orig: coned-dashboard-CLIENT-NOTES.md | ConEd/David verbatim quotes plus contact map. Design anchor; used to constrain quote usage in decks. Sensitive — team-repo only, not for onward sharing.
+- 2026-05-04 | coned | ref | steam customer drop-off predictor intake | docs/ref/2026-05-04_coned-intake-form.md | orig: ConEd_intake_form.md | ConEd's founding scope doc, narrowed from the original Gas & Steam brief to steam-only in David Caiafa's May 4 email. Anchors the ≥70% back-tested recall benchmark that model deepening will return to, and the client's "high-probability drop-off" phrasing that system-v1.1 reframed as ranking. Intentional grep double-duty; see D7.
 
 ## briefs/ — per-person Fable-cycle briefs
 
