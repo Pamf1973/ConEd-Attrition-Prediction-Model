@@ -192,6 +192,7 @@ function TrendChart({ building, allBuildings }) {
   );
 }
 
+
 function LL97Gauge({ emissions, cap, periodLabel }) {
   if (emissions == null || cap == null || cap <= 0) return null;
   const ratio   = emissions / cap;
