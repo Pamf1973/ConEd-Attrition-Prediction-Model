@@ -1029,6 +1029,17 @@ app.get("/api/health", requireAuth, (_req, res) => {
   });
 });
 
+// SPA fallback for React Router. express.static above serves dist/index.html
+// only for `/` and matching static files; deep links like /legacy 404 without
+// this. Any GET that isn't an /api/ route and didn't match a static file gets
+// index.html, so the client-side router can pick up the path.
+app.use((req, res, next) => {
+  if (req.method !== "GET") return next();
+  if (req.path.startsWith("/api/")) return next();
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(resolve(process.cwd(), "dist", "index.html"));
+});
+
 // Terminal error handler — catches anything that reaches next(err) and isn't
 // already handled above; prevents Express default from leaking stack traces.
 // eslint-disable-next-line no-unused-vars
