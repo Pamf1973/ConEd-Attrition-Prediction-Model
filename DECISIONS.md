@@ -37,3 +37,9 @@ Context: Session produced a workflow-layer note capturing patterns that generate
 Decided: Split. Design notes go to ~/vault/workflow/ (choreography-layer, pr-review-skill, teammate-brief-skill, work-commitments-tracker) and snapshot to atelier for git preservation. ConEd-specific case study stays as docs/notes/2026-07-16_workflow-layer-ideas.md, untracked in the coned repo (local file only).
 Rejected: Push case study to coned repo (unnecessary team-facing surface). Delete case study entirely (loses "organized files are only half the job" lesson anchored to the incident that produced it).
 Affects: Future PR reviews and teammate briefs across projects; atelier vault snapshot.
+
+## D5 | 2026-07-16 | R1 contingency (D3) triggered — Edwin absorbs M0 legacy separation
+Context: D3 set end-of-2026-07-16 as the deadline for Pedro to start R1. As of 21:49 sync, no Pedro branch exists on any remote and no commits since 2026-07-14. Waiting further compounds delay on every downstream Fable milestone (R4–R13) and on the PR-9c rebase. Pedro is not off the arc — he stays owner of R4 through R13, where his frontend depth is needed.
+Decided: Fire D3. Edwin opens branch `edwin/M0-legacy-separation` and executes R1 per `roadmap-supplement-m0.md`. Pedro's checkpoint brief marked SUPERSEDED with a header note pointing him at R4 for his next entry point. Slack message to Pedro/team is Edwin's manual follow-up (not automated). Pedro remains owner of R4–R13.
+Rejected: Extend Pedro's deadline (delays entire downstream Fable arc). Reassign R1+R4+R5 to Edwin wholesale (overload; loses Pedro's frontend depth on the design implementation milestones).
+Affects: R1 (owner: Pedro → Edwin), R4–R13 (owner still Pedro, unblock timing now depends on Edwin's R1 pace), PR-9c rebase (still waits on R1, source now different).
