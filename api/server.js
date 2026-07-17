@@ -580,17 +580,42 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
 });
 
 // ── /api/model_meta — model provenance object (written by train_xgboost.py) ──
-const MODEL_META_PATH = join(__dirname, "../public/model_meta.json");
+// Stored in data/ (not public/) so it is NOT served as a static file.
+// The requireAuth gate on this endpoint would be bypassed if the file were in public/.
+const MODEL_META_PATH = join(__dirname, "../data/model_meta.json");
 let _modelMeta = null;
+let _modelMetaLoadedAt = 0;
+const MODEL_META_TTL_MS = 60_000; // re-read from disk at most once per minute
+
+function validateModelMeta(m) {
+  return {
+    ...m,
+    cv_auc:     typeof m.cv_auc     === "number" ? m.cv_auc     : 0.68,
+    cv_std:     typeof m.cv_std     === "number" ? m.cv_std     : null,
+    cv_kfold:   typeof m.cv_kfold   === "number" ? m.cv_kfold   : 5,
+    n_positive: typeof m.n_positive === "number" ? m.n_positive : 54,
+    n_labeled:  typeof m.n_labeled  === "number" ? m.n_labeled  : null,
+  };
+}
+
 function getModelMeta() {
-  if (!_modelMeta) {
-    try { _modelMeta = JSON.parse(readFileSync(MODEL_META_PATH, "utf8")); }
-    catch { _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1", validation_status: "unvalidated" }; }
+  const now = Date.now();
+  if (!_modelMeta || now - _modelMetaLoadedAt > MODEL_META_TTL_MS) {
+    try {
+      _modelMeta = validateModelMeta(JSON.parse(readFileSync(MODEL_META_PATH, "utf8")));
+      _modelMetaLoadedAt = now;
+    } catch (err) {
+      console.error("[model_meta] Failed to load %s: %s", MODEL_META_PATH, err.message);
+      if (!_modelMeta) {
+        _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1",
+                       cv_auc: 0.68, cv_kfold: 5, n_positive: 54, validation_status: "unvalidated" };
+      }
+    }
   }
   return _modelMeta;
 }
 app.get("/api/model_meta", requireAuth, (_req, res) => {
-  res.setHeader("Cache-Control", "private, max-age=3600");
+  res.setHeader("Cache-Control", "private, max-age=60");
   res.json(getModelMeta());
 });
 
@@ -882,7 +907,10 @@ const FAQ = [
   },
   {
     keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
-    answer: `The attrition risk score (ml_risk) is an XGBoost classifier prediction (0–1) that ranks a building's likelihood of significant steam demand decline relative to peers. It ranks a true churner above a non-churner about ${Math.round((getModelMeta().cv_auc ?? 0.68) * 100)}% of the time (${getModelMeta().cv_kfold ?? 5}-fold CV, ${getModelMeta().n_positive ?? 54} positive labels). Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster.`
+    getAnswer: () => {
+      const m = getModelMeta();
+      return `The attrition risk score (ml_risk) is an XGBoost classifier prediction (0–1) that ranks a building's likelihood of significant steam demand decline relative to peers. It ranks a true churner above a non-churner about ${Math.round((m.cv_auc ?? 0.68) * 100)}% of the time (${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster.`;
+    }
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
@@ -909,7 +937,7 @@ function matchFAQ(question) {
   const q = question.toLowerCase();
   for (const entry of FAQ) {
     const hits = entry.keywords.filter(k => q.includes(k)).length;
-    if (hits >= 2) return entry.answer;
+    if (hits >= 2) return entry.getAnswer ? entry.getAnswer() : entry.answer;
   }
   return null;
 }
