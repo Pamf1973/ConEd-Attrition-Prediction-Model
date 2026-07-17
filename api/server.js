@@ -4,7 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve, join, dirname } from "path";
-import { randomBytes, timingSafeEqual, createHash } from "crypto";
+import { randomBytes, timingSafeEqual, createHash, createHmac } from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -75,8 +75,11 @@ app.use(helmet({
 // ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and cannot identify clients for rate limiting.
 // If a CDN is ever placed in front of Railway, increment this count to match
 // the total number of trusted proxy hops.
-// Trust proxy whenever deployed (DATABASE_URL present = Railway), not just NODE_ENV=production
-if (process.env.DATABASE_URL || process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+// Trust proxy only in production — Railway sets NODE_ENV=production at deploy time.
+// Do NOT key on DATABASE_URL: local dev often sets it, which would allow any caller
+// to spoof X-Forwarded-For and bypass all rate limiters.
+// If a non-production Railway environment needs this, set TRUST_PROXY=1 explicitly.
+if (process.env.NODE_ENV === "production" || process.env.TRUST_PROXY === "1") app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "16kb" }));
 app.use((err, req, res, next) => {
@@ -119,6 +122,14 @@ const statusBulkLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Bulk status rate limit — max 20 per minute" },
+});
+
+const statusReadLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Status read rate limit — max 60 per minute" },
 });
 
 // ── Authentication & Sessions ──────────────────────────────────────────────────
@@ -602,20 +613,27 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
 // IMPORTANT: bulk route must be registered before :bbl to prevent Express
 // matching the literal string "status" as a BBL parameter value.
 
-// NYC BBLs are always exactly 10 digits (1 borough + 5 block + 4 lot, zero-padded)
-const BBL_RE = /^\d{10}$/;
+// NYC BBLs: 1 borough digit (1–5) + 5 block digits + 4 lot digits = 10 digits total
+const BBL_RE = /^[1-5]\d{9}$/;
 
-// Stable per-session pseudonym for actor attribution — hashes the bearer token
-// so the raw token is never written to the DB or returned in read responses
+// Per-deployment HMAC secret for actor pseudonyms — prevents cross-deployment correlation.
+// Falls back to a random secret per process (still pseudonymous, breaks replay correlation).
+const ACTOR_HMAC_SECRET = process.env.ACTOR_HMAC_SECRET ?? randomBytes(32).toString("hex");
+
+// Stable per-deployment pseudonym for actor attribution — HMAC so raw token is never
+// stored and actors cannot be correlated across different deployments
 function actorTag(token) {
-  return createHash("sha256").update(token).digest("hex").slice(0, 16);
+  return createHmac("sha256", ACTOR_HMAC_SECRET).update(token).digest("hex").slice(0, 16);
 }
 
-// Strip null bytes and Unicode bidi-override/isolate control characters from note text
+// Strip C0/C1 controls and all Unicode bidi-override/isolate/mark characters.
+// Covers: U+202A–U+202E (bidi overrides), U+2066–U+2069 (bidi isolates),
+// U+200E (LRM), U+200F (RLM), U+061C (ALM), U+200B (ZWSP), U+FEFF (BOM),
+// U+2028 (LS), U+2029 (PS). Tabs/newlines intentionally kept.
 function sanitizeNote(raw) {
   return raw
     .normalize("NFC")
-    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f‪-‮⁦-⁩]/g, "");
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f​‎‏؜﻿  ‪-‮⁦-⁩]/g, "");
 }
 
 // Bulk current status — registered before :bbl route to avoid param shadowing
@@ -659,14 +677,16 @@ app.post("/api/buildings/:bbl/status", requireAuth, statusWriteLimiter, async (r
   }
 });
 
-app.get("/api/buildings/:bbl/status", requireAuth, async (req, res) => {
+app.get("/api/buildings/:bbl/status", requireAuth, statusReadLimiter, async (req, res) => {
   const { bbl } = req.params;
   if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
 
+  const limit  = Math.min(parseInt(req.query.limit  ?? "100", 10) || 100, 500);
+  const offset = Math.max(parseInt(req.query.offset ?? "0",   10) || 0,   0);
+
   try {
-    // Single query — current is just history[0]
-    const history = await getStatusHistory(bbl);
-    res.json({ current: history[0] ?? null, history });
+    const history = await getStatusHistory(bbl, limit, offset);
+    res.json({ current: history[0] ?? null, history, limit, offset });
   } catch (err) {
     console.error("[status] read failed:", err?.message ?? String(err));
     res.status(500).json({ error: "Failed to read status" });

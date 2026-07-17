@@ -7,11 +7,14 @@ if (!process.env.DATABASE_URL && process.env.NODE_ENV === "production") {
   throw new Error("FATAL: DATABASE_URL must be set in production");
 }
 
+const _rawPoolMax = parseInt(process.env.DB_POOL_MAX ?? "5", 10);
+const _poolMax = Number.isFinite(_rawPoolMax) && _rawPoolMax > 0 ? _rawPoolMax : 5;
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL ?? "postgresql://localhost:5432/coned_dashboard",
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
   // Tune via DB_POOL_MAX env var; default 5 works for single-dyno Railway deployments
-  max: parseInt(process.env.DB_POOL_MAX ?? "5", 10),
+  max: _poolMax,
   idleTimeoutMillis: 30_000,
   connectionTimeoutMillis: 5_000,
 });
@@ -73,14 +76,15 @@ export async function getCurrentStatus(bbl) {
   return rows[0] ?? null;
 }
 
-// Full history for a BBL, newest first
-export async function getStatusHistory(bbl) {
+// Full history for a BBL, newest first — paginated (default 100, max 500)
+export async function getStatusHistory(bbl, limit = 100, offset = 0) {
   const { rows } = await pool.query(
     `SELECT id, status, note, actor, created_at
      FROM building_status_events
      WHERE bbl = $1
-     ORDER BY created_at DESC, id DESC`,
-    [bbl]
+     ORDER BY created_at DESC, id DESC
+     LIMIT $2 OFFSET $3`,
+    [bbl, limit, offset]
   );
   return rows;
 }
