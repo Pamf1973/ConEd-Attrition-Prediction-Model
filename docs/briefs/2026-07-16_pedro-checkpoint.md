@@ -1,5 +1,9 @@
 # Pedro — checkpoint (2026-07-16)
 
+> **⚠️ SUPERSEDED — 2026-07-16 21:59** · R1 contingency (D3) triggered. Edwin is absorbing **R1 (M0 legacy separation)** solo. **You remain owner of R4–R13** (score cell, case-file header, report, queue, landing, methodology page, digest — the entire Fable UI arc). Pick up at **R4 (M3 score cell)** once Edwin's R1 branch lands; that unblocks your work without waiting on Ismael's PR-11 merge. Watch for a fresh checkpoint from Edwin with the R4 kickoff notes. The section below is preserved for context — ignore the "start R1 now" line.
+
+---
+
 **From:** Edwin · **Date:** 2026-07-16
 **Purpose:** Quick delta on top of your full milestone brief (`docs/briefs/2026-07-13_pedro-frontend-build.md`). Read that first if it's been a while; this note is what's changed and what to do next.
 
