@@ -83,6 +83,20 @@ export async function initSchema() {
   console.log("[db] schema ready");
 }
 
+// Current status for a BBL — fetched independently from history so paginated
+// reads with offset>0 still return an accurate current field (not history[0]).
+export async function getCurrentStatus(bbl) {
+  const { rows } = await pool.query(
+    `SELECT status, note, actor, created_at
+     FROM building_status_events
+     WHERE bbl = $1
+     ORDER BY created_at DESC, id DESC
+     LIMIT 1`,
+    [bbl]
+  );
+  return rows[0] ?? null;
+}
+
 // Full history for a BBL, newest first — paginated (default 100, max 500)
 export async function getStatusHistory(bbl, limit = 100, offset = 0) {
   const { rows } = await pool.query(

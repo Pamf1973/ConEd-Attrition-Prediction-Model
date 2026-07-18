@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
-import { initSchema, appendStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
+import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -617,7 +617,11 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
 const BBL_RE = /^[1-5]\d{9}$/;
 
 // Per-deployment HMAC secret for actor pseudonyms — prevents cross-deployment correlation.
-// Falls back to a random secret per process (still pseudonymous, breaks replay correlation).
+// MUST be set in production: a random fallback is re-generated on every restart, silently
+// destroying the audit trail's actor attribution across deploys.
+if (!process.env.ACTOR_HMAC_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("FATAL: ACTOR_HMAC_SECRET must be set in production (see Railway env vars)");
+}
 const ACTOR_HMAC_SECRET = process.env.ACTOR_HMAC_SECRET ?? randomBytes(32).toString("hex");
 
 // Stable per-deployment pseudonym for actor attribution — HMAC so raw token is never
@@ -687,11 +691,14 @@ app.get("/api/buildings/:bbl/status", requireAuth, statusReadLimiter, async (req
   const rawLimit  = parseInt(req.query.limit  ?? "100", 10);
   const rawOffset = parseInt(req.query.offset ?? "0",   10);
   const limit  = Math.min(Number.isFinite(rawLimit)  && rawLimit  >= 1 ? rawLimit  : 100, 500);
-  const offset =           Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0;
+  const offset = Math.min(Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0, 100_000);
 
   try {
-    const history = await getStatusHistory(bbl, limit, offset);
-    res.json({ current: history[0] ?? null, history, limit, offset });
+    const [current, history] = await Promise.all([
+      getCurrentStatus(bbl),
+      getStatusHistory(bbl, limit, offset),
+    ]);
+    res.json({ current, history, limit, offset });
   } catch (err) {
     console.error("[status] read failed:", err?.message ?? String(err));
     res.status(500).json({ error: "Failed to read status" });
