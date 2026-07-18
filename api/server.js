@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
-import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
+import { initSchema, appendStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -623,24 +623,27 @@ const ACTOR_HMAC_SECRET = process.env.ACTOR_HMAC_SECRET ?? randomBytes(32).toStr
 // Stable per-deployment pseudonym for actor attribution — HMAC so raw token is never
 // stored and actors cannot be correlated across different deployments
 function actorTag(token) {
+  if (!token || typeof token !== "string") throw new Error("actorTag: missing session token");
   return createHmac("sha256", ACTOR_HMAC_SECRET).update(token).digest("hex").slice(0, 16);
 }
 
-// Strip C0/C1 controls and all Unicode bidi-override/isolate/mark characters.
-// Covers: U+202A–U+202E (bidi overrides), U+2066–U+2069 (bidi isolates),
-// U+200E (LRM), U+200F (RLM), U+061C (ALM), U+200B (ZWSP), U+FEFF (BOM),
-// U+2028 (LS), U+2029 (PS). Tabs/newlines intentionally kept.
+// Strip C0/C1 controls and all Unicode problematic characters.
+// Explicitly covers: C0 (\x00-\x1f excl tab/LF), DEL (\x7f), CR (\x0d),
+// NEL (\x85), soft hyphen (\xad), zero-width chars (U+200B–U+200D),
+// bidi marks (U+200E/U+200F), ALM (U+061C), bidi overrides (U+202A–U+202E),
+// bidi isolates (U+2066–U+2069), line terminators (U+2028/U+2029), BOM (U+FEFF).
+// Tab (\x09) and LF (\x0a) intentionally kept for multiline notes.
 function sanitizeNote(raw) {
   return raw
     .normalize("NFC")
-    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f​‎‏؜﻿  ‪-‮⁦-⁩]/g, "");
+    .replace(/[\x00-\x08\x0b-\x0d\x0e-\x1f\x7f\x85\xad؜​-‏  ‪-‮⁠-⁩﻿]/g, "");
 }
 
 // Bulk current status — registered before :bbl route to avoid param shadowing
 app.post("/api/buildings/status/bulk", requireAuth, statusBulkLimiter, async (req, res) => {
   const { bbls } = req.body ?? {};
-  if (!Array.isArray(bbls) || bbls.length > 2000) {
-    return res.status(400).json({ error: "bbls must be an array of ≤ 2000 strings" });
+  if (!Array.isArray(bbls) || bbls.length > 500) {
+    return res.status(400).json({ error: "bbls must be an array of ≤ 500 strings" });
   }
   const clean = bbls.filter((b) => typeof b === "string" && BBL_RE.test(b));
   if (clean.length === 0 && bbls.length > 0) {
@@ -681,8 +684,10 @@ app.get("/api/buildings/:bbl/status", requireAuth, statusReadLimiter, async (req
   const { bbl } = req.params;
   if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
 
-  const limit  = Math.min(parseInt(req.query.limit  ?? "100", 10) || 100, 500);
-  const offset = Math.max(parseInt(req.query.offset ?? "0",   10) || 0,   0);
+  const rawLimit  = parseInt(req.query.limit  ?? "100", 10);
+  const rawOffset = parseInt(req.query.offset ?? "0",   10);
+  const limit  = Math.min(Number.isFinite(rawLimit)  && rawLimit  >= 1 ? rawLimit  : 100, 500);
+  const offset =           Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0;
 
   try {
     const history = await getStatusHistory(bbl, limit, offset);
