@@ -47,12 +47,16 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   }, []);
 
   const handleQuickFilter = useCallback((f) => {
+    // Apply all filter values from the quick filter payload, then reset page/selection.
+    // DO NOT call resetFilters() here — React 19 batches all state updates in a single
+    // flush, so resetFilters() would overwrite the values just set above, making W6 a no-op.
     if (f.tierFilter   !== undefined) setTierFilter(f.tierFilter);
     if (f.signalFilter !== undefined) setSignalFilter(f.signalFilter);
     if (f.ll97Filter   !== undefined) setLl97Filter(f.ll97Filter);
     if (f.demandMin    !== undefined) setDemandMin(f.demandMin ?? "");
-    resetFilters();
-  }, [resetFilters]);
+    setPage(1);
+    setSelectedSet(new Set());
+  }, []);
 
   // Sync cluster filter driven by YoY Scatter chart click
   useEffect(() => {
