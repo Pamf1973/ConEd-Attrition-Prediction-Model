@@ -4,6 +4,7 @@ import { useKeyboard } from "./hooks/useKeyboard";
 import Login from "./components/Login";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useWatchlist } from "./components/Watchlist";
+import { useWorkflow, formatLastReview } from "./hooks/useWorkflow";
 import { RiskTableSkeleton, BuildingPanelSkeleton, ChartSkeleton, AgentSkeleton, SlimSkeleton } from "./components/Skeletons";
 
 // When Railway redeploys, old chunk filenames disappear. Any cached HTML that
@@ -47,6 +48,7 @@ export default function App() {
   const [selected,    setSelected]    = useState(null);
   const [activeTab,   setActiveTab]   = useState("rankings");
   const { watchlist, toggle: toggleWatch, clear: clearWatch } = useWatchlist(token);
+  const { contacted, dismissed, lastReview, toggleContacted, toggleDismissed, clearWorkflow } = useWorkflow(token);
   const [clusterFilter, setClusterFilter] = useState("All");
   const [riskMin, setRiskMin] = useState(null);
   const [riskMax, setRiskMax] = useState(null);
@@ -271,10 +273,12 @@ export default function App() {
           {meta ? (
             <span className="text-xs text-slate-500/70" title={`Model: ${meta.model_version}`}>
               Data: {meta.dataset_date} · Steam: {meta.steam_year} · LL84: {meta.ll84_date}
+              {lastReview && <span className="text-slate-600"> · last review: {formatLastReview(lastReview)}</span>}
             </span>
           ) : (
             <span className="text-xs text-slate-500/70">
               Data: Jun 2026 · Steam: 2024 · LL84: May 2025
+              {lastReview && <span className="text-slate-600"> · last review: {formatLastReview(lastReview)}</span>}
             </span>
           )}
           {/* Alert bell badge */}
@@ -376,6 +380,10 @@ export default function App() {
                 riskMin={riskMin}
                 riskMax={riskMax}
                 searchInputRef={searchInputRef}
+                contacted={contacted}
+                dismissed={dismissed}
+                onContact={toggleContacted}
+                onDismiss={toggleDismissed}
               />
             </div>
             {selected && (
