@@ -1,6 +1,6 @@
 ---
-last_synced_sha: 669c27be050c67d042b7080a89b7cd62300be1aa
-last_synced_at: 2026-07-17 22:50
+last_synced_sha: 45caea3e52b85a00123d2bd4f1c6ddd81911ff7e
+last_synced_at: 2026-07-17 23:43
 ---
 
 # Project State
@@ -18,8 +18,10 @@ Current snapshot only. Rewritten by /sync. History lives in STATE_LOG.md. Hard c
 - YoY deltas + LL97 + SHAP drivers in enrichment (PR #7 merged, now legacy)
 - XGBoost predict endpoints + diagnostic tier filter in RiskTable (523597d)
 - Security hardening: Helmet, rate-limit, input sanitization (36844c2)
-- Build-ops scaffold: ROADMAP (R1–R14), DECISIONS (D1–D8), STATE_LOG, PROJECT_STATE, DISTILLED_GOALS, docs/ library
+- Build-ops scaffold: ROADMAP (R1–R14), DECISIONS (D1–D9), STATE_LOG, PROJECT_STATE, DISTILLED_GOALS, docs/ library
 - Fable design system landed: system-v1.1.md, five spec HTML atoms, per-person build briefs (184f23c)
+- Spec v1.1.1 §4.4 UNVAL→BT clarifier merged (PR #14, 25aa8a4) — back-testing against ConEd disconnect records, not CV completion
+- ConEd intake form (2026-05-04) indexed as founding scope doc; DOCS_INDEX Length rule added (91e3e39)
 - Docs tree reorganized + backfilled; CONVENTIONS refined (817058b, 0cd8c73)
 - QUESTIONS.md scaffold + CLAUDE.md vault pointer landed (d707fc2)
 - PR-9 review, D2/D3/D4/D5 filed (59585a8, eb90849, f04cf25, dc0cfb4, 1c8a197)
@@ -27,18 +29,15 @@ Current snapshot only. Rewritten by /sync. History lives in STATE_LOG.md. Hard c
 
 ## In Flight
 <!-- Actively being worked. Owner + roadmap ID per line. -->
-- Edwin: v1.1.1 spec clarifier + D7 session on branch `edwin/system-v1.1.1-unval-clarifier`; PR #14 open. §4.4 UNVAL→BT gate paragraph (back-testing against ConEd disconnect records, not CV completion). D7 files "ranking not likelihood" reframe. Also indexes ConEd intake form + DOCS_INDEX length rule for grep-double-duty. Working-tree: unstaged mods to DECISIONS.md + PROJECT_STATE.md; untracked docs/notes/2026-07-17_pr-10-review.md (PR #10 approve verdict artifact).
 - PR #10 open (Ismael, PR-9b, branch ismael/pr-9b-status-events). Q7 append-only building_status_events (Postgres api/db.js). Approved by Edwin 2026-07-18 02:41 UTC via review body (D8 verdict: approve with six follow-ups filed). Mergeable now, no deps. Advances R7 backbone. R7 watchlist migration still deferred.
 - PR #11 open (Ismael, PR-9a, branch ismael/pr-9a-model-meta). model_meta.json + GET /api/model_meta + FAQ ml_risk answer rewritten. Edwin commented 2026-07-17 with three coupled fixes: (a) validation_status "validated" → "unvalidated" (b) model_version "XGB v1" → "XGB v1 · UNVAL" (c) FAQ getAnswer rewrite per §7 rule 8/9 + §8 rule 1/2. Blocks on Ismael applying fixes. Advances R2, R3.
-- PR #12 draft (Ismael, PR-9c, branch ismael/pr-9c-frontend-workflow). W1/W4/W6 frontend on legacy files. Mergeable=CONFLICTING after main advanced. Ismael rebases against new-build components once he's ready. R1 dependency now cleared.
-- spike/threshold-proximity branch: status unknown — investigate before merge or discard.
+- PR #12 draft (Ismael, PR-9c, branch ismael/pr-9c-frontend-workflow). W1/W4/W6 frontend on legacy files. Mergeable=UNKNOWN after main advanced. Ismael rebases against new-build components once he's ready. R1 dependency now cleared.
 
 ## PRs awaiting review
 <!-- Open PRs where the user is a requested or implied reviewer. -->
 - PR #10 (Ismael, PR-9b). Edwin APPROVED 2026-07-18 02:41 UTC. Six post-merge follow-ups filed (see D8 + docs/notes/2026-07-17_pr-10-review.md). Ismael merges when ready.
 - PR #11 (Ismael, PR-9a). Awaiting Ismael to apply Edwin's three coupled fixes (validation_status, model_version suffix, FAQ getAnswer rewrite). Unblocks Pedro's M3 provenance chip. PR body still references `public/model_meta.json` but file moved to `data/`.
 - PR #12 (Ismael, PR-9c, DRAFT). Parked; rebase against new-build components needed. R1 has landed (44dd42c) so dependency is now resolved; ball is in Ismael's court.
-- PR #14 (Edwin, v1.1.1 clarifier). Open on branch `edwin/system-v1.1.1-unval-clarifier`, mergeable. No formal reviewer requested. Docs+spec only.
 
 ## Blocked
 <!-- What is stuck and on what. -->
@@ -53,7 +52,6 @@ Current snapshot only. Rewritten by /sync. History lives in STATE_LOG.md. Hard c
 <!-- Verbal agreements not yet confirmed by landed code. -->
 - 2026-07-16 | Ismael: R7 watchlist migration (in-memory `watchlistStore` Map → Postgres). Second half of M6, not in PR #10 diff. Unconfirmed.
 - 2026-07-16 | Edwin: R14 David packet item #5 external sign-off (Critical v1.1 with n=23). Ismael internally signed. Unconfirmed.
-- 2026-07-16 | Edwin: reconcile FAQ line-number pointers in `CLAUDE.md` and `HANDOFF.md` — replace bare line numbers with symbolic references (`getAnswer('ml_risk')`, `/api/meta` handler). Note: CLAUDE.md already updated in 44dd42c per §Frontend architecture; HANDOFF.md still owed. Partially confirmed.
 - 2026-07-16 | Ismael (implied, via Slack): `plans/ai_model_config.md` — 5-model panel review, config-out-of-public/, BullMQ job queue, structured form UI for v1. Zero git footprint. Push or send doc so it can be intaken. Unconfirmed.
 - 2026-07-17 | Ismael: diagnose why Railway auto-deploy has been silently failing since 2026-06-30 13:17 ET (bundle last-modified matches commit `9319eb3`; nothing since shipped). Trigger a manual redeploy to ship the 18-day backlog (523597d XGBoost predicts, 36844c2 security hardening, 44dd42c PR #13 M0 routing). Post-redeploy verify split by ownership per D8: Ismael verifies XGBoost + security surfaces; Edwin verifies M0 (/ stub, /legacy, deep-link refresh, login round-trip). Unconfirmed.
 - 2026-07-17 | Ismael: address six PR #10 review follow-ups per D8 approve-with-follow-ups verdict. Full list at `docs/notes/2026-07-17_pr-10-review.md` §Suggested follow-ups (CHECK constraint drift, smoke tests, SERIAL → BIGSERIAL, ACTOR_HMAC_SECRET required in prod, bulk/single shape parity, DB_POOL_MAX ceiling). Non-blocking, no correctness bugs; batched for a follow-up PR. Unconfirmed.
@@ -61,11 +59,11 @@ Current snapshot only. Rewritten by /sync. History lives in STATE_LOG.md. Hard c
 
 ## Current Risks
 <!-- Max 5. -->
-1. **Railway auto-deploy stalled since 2026-06-30 13:17 ET.** Prod bundle `last-modified` header matches commit `9319eb3` (LL97 cap fix); nothing since has shipped. 18+ days of unshipped work: `523597d` (XGBoost predict endpoints), `36844c2` (security hardening — Helmet CSP, rate-limit, input sanitization), `44dd42c` (M0 legacy separation + routing), `669c27b` (M3 kickoff doc). `/legacy` returns 404 in prod; `/` still serves pre-M0 build. Ismael owns Railway integration. Needs redeploy trigger + root-cause on why auto-deploy silently broke. Ownership-split verify per D8.
+1. **Railway auto-deploy stalled since 2026-06-30 13:17 ET.** Prod bundle `last-modified` header matches commit `9319eb3` (LL97 cap fix); nothing since has shipped. 18+ days of unshipped work: `523597d` (XGBoost predict endpoints), `36844c2` (security hardening — Helmet CSP, rate-limit, input sanitization), `44dd42c` (M0 legacy separation + routing), `669c27b` (M3 kickoff doc), `25aa8a4` (spec v1.1.1 clarifier — docs-only, no prod surface impact). `/legacy` returns 404 in prod; `/` still serves pre-M0 build. Ismael owns Railway integration. Needs redeploy trigger + root-cause on why auto-deploy silently broke. Ownership-split verify per D8.
 2. PR-9c rebase debt: draft PR held open as placeholder. R1 has now landed on main (44dd42c) so the last dependency is cleared; every day this stays deferred, rebase debt grows against a moving new-build root.
 3. PR #11 body drift: description says `public/model_meta.json` but commit moved it to `data/`. Confuses reviewers; not a merge blocker. Ask Ismael to update body when applying the three coupled fixes.
 4. Off-git commitments (Ismael Slack `plans/ai_model_config.md`): infrastructure track described in Slack with no repo footprint. If Ismael starts building against it without pushing the plan, we lose auditability. Prompt him to push.
-5. Edwin working-tree carries unstaged mods to DECISIONS.md and PROJECT_STATE.md plus untracked PR #10 review notes. Not lost — sitting on `edwin/system-v1.1.1-unval-clarifier`. Ship or park before switching branches.
+5. State-log two-writers pattern (~/vault/workflow/state-log-two-writers.md): /sync commit-scoped writes and mid-session manual event-scoped writes can drift silently. Skip-lists mitigate but don't solve. Open problem, worth guardrails in a future ops cycle.
 
 ## Team Updates (append here)
 <!-- Ismael, Pedro: when you push, or when something happens off-git,
