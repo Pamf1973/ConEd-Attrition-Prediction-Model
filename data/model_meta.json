@@ -1,6 +1,6 @@
 {
   "model_name": "XGBoost Classifier",
-  "model_version": "XGB v1",
+  "model_version": "XGB v1 · UNVAL",
   "params_hash": "d4b0279a7ba6",
   "commit": "9afa92b",
   "cv_auc": 0.6833,
@@ -10,5 +10,5 @@
   "n_positive": 54,
   "label_definition": ">=50% weather-normalized steam demand decline in LL84 CY2022 or CY2023",
   "run_date": "2026-07-15T20:41:52Z",
-  "validation_status": "validated"
+  "validation_status": "unvalidated"
 }

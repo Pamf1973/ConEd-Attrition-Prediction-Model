@@ -587,14 +587,27 @@ let _modelMeta = null;
 let _modelMetaLoadedAt = 0;
 const MODEL_META_TTL_MS = 60_000; // re-read from disk at most once per minute
 
+const safeNum = (v, fallback) => typeof v === "number" && isFinite(v) ? v : fallback;
+const safeStr = (v, fallback, maxLen = 128) =>
+  typeof v === "string" && v.length > 0 && v.length <= maxLen ? v : fallback;
+
 function validateModelMeta(m) {
+  // Explicit allowlist — no spread. Prevents arbitrary JSON keys (including XSS
+  // payloads in string fields) from reaching API responses or FAQ interpolation.
+  // safeNum rejects Infinity/NaN which typeof==="number" passes but renders as "Infinity%".
   return {
-    ...m,
-    cv_auc:     typeof m.cv_auc     === "number" ? m.cv_auc     : 0.68,
-    cv_std:     typeof m.cv_std     === "number" ? m.cv_std     : null,
-    cv_kfold:   typeof m.cv_kfold   === "number" ? m.cv_kfold   : 5,
-    n_positive: typeof m.n_positive === "number" ? m.n_positive : 54,
-    n_labeled:  typeof m.n_labeled  === "number" ? m.n_labeled  : null,
+    model_name:       safeStr(m.model_name,       "XGBoost Classifier"),
+    model_version:    safeStr(m.model_version,    "XGB v1 · UNVAL"),
+    params_hash:      safeStr(m.params_hash,       ""),
+    commit:           safeStr(m.commit,            ""),
+    cv_auc:           safeNum(m.cv_auc,            0.68),
+    cv_std:           typeof m.cv_std === "number" && isFinite(m.cv_std) ? m.cv_std : null,
+    cv_kfold:         safeNum(m.cv_kfold,          5),
+    n_labeled:        typeof m.n_labeled  === "number" && isFinite(m.n_labeled)  ? m.n_labeled  : null,
+    n_positive:       safeNum(m.n_positive,        54),
+    run_date:         safeStr(m.run_date,           ""),
+    label_definition: safeStr(m.label_definition,  "", 512),
+    validation_status: safeStr(m.validation_status, "unvalidated"),
   };
 }
 
@@ -607,9 +620,13 @@ function getModelMeta() {
     } catch (err) {
       console.error("[model_meta] Failed to load %s: %s", MODEL_META_PATH, err.message);
       if (!_modelMeta) {
-        _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1",
+        _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1 · UNVAL",
                        cv_auc: 0.68, cv_kfold: 5, n_positive: 54, validation_status: "unvalidated" };
       }
+    } finally {
+      // Always update timestamp — prevents unbounded sync readFileSync on every
+      // request when the file is transiently corrupt or missing.
+      _modelMetaLoadedAt = now;
     }
   }
   return _modelMeta;
@@ -620,7 +637,7 @@ app.get("/api/model_meta", requireAuth, (_req, res) => {
 });
 
 // ── /api/meta — dataset freshness metadata ────────────────────────────────────
-app.get("/api/meta", (_req, res) => {
+app.get("/api/meta", requireAuth, (_req, res) => {
   const meta = {
     dataset_date: "2026-06",
     steam_year: "2024",
@@ -906,10 +923,23 @@ const FAQ = [
     answer: `There are currently ${_hrCount} high-risk buildings (ml_risk > 0.70) in the portfolio, representing ${_hrPct}% of the ${_bldTotal.toLocaleString()} active steam customers tracked in this dashboard.`
   },
   {
-    keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
+    keywords: ["what is", "ml_risk", "risk score", "attrition risk"],
     getAnswer: () => {
       const m = getModelMeta();
-      return `The attrition risk score (ml_risk) is an XGBoost classifier prediction (0–1) that ranks a building's likelihood of significant steam demand decline relative to peers. It ranks a true churner above a non-churner about ${Math.round((m.cv_auc ?? 0.68) * 100)}% of the time (${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster.`;
+      const auc = Math.round((m.cv_auc ?? 0.68) * 100);
+      const validated = (m.validation_status ?? "unvalidated") !== "unvalidated";
+      // §7 rule 8: AUC copy templated from model_meta.
+      // §7 rule 9: model version from model_meta.model_version, never hardcoded.
+      // §8 rule 1: ml_risk is a ranking, not a likelihood — no "(0–1)", no "likelihood".
+      // §8 rule 2: render validation_status explicitly.
+      // §8 rule 3: tier is the defensible claim — ML base plus named modifiers.
+      return `ml_risk is a ranking score from model ${m.model_version ?? "XGB v1 · UNVAL"} ` +
+        `(${validated ? "back-tested" : "unvalidated"}). ` +
+        `It ranks buildings by steam attrition signal: ML base score modified by LL97 penalty exposure, ` +
+        `steam GHG share, Energy Star score, and peer cluster rates. ` +
+        `The model ranks a true churner above a non-churner about ${auc}% of the time ` +
+        `(${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). ` +
+        `Use percentile position, not the raw score, to compare buildings.`;
     }
   },
   {
