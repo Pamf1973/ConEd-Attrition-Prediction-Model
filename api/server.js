@@ -4,7 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve, join, dirname } from "path";
-import { randomBytes, timingSafeEqual } from "crypto";
+import { randomBytes, timingSafeEqual, createHmac } from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -108,6 +108,7 @@ const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
 if (!DASHBOARD_PASSWORD) {
   throw new Error("FATAL: DASHBOARD_PASSWORD must be set in .env");
 }
+const AUTH_HMAC_KEY = randomBytes(32);
 
 const activeSessions = new Map(); // token → expiresAt
 const SESSION_TTL  = 8 * 60 * 60 * 1000; // 8 hours
@@ -152,7 +153,7 @@ function requireAuth(req, res, next) {
 // ── Auth Endpoints ────────────────────────────────────────────────────────────
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many login attempts — try again in 15 minutes" },
@@ -163,10 +164,10 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
-  const pwdBuf  = Buffer.from(password);
-  const hashBuf = Buffer.from(DASHBOARD_PASSWORD);
-  const match   = pwdBuf.length === hashBuf.length &&
-                  timingSafeEqual(pwdBuf, hashBuf);
+  const match = timingSafeEqual(
+    createHmac("sha256", AUTH_HMAC_KEY).update(String(password)).digest(),
+    createHmac("sha256", AUTH_HMAC_KEY).update(DASHBOARD_PASSWORD).digest()
+  );
   if (match) {
     // Enforce hard cap inline: if at limit, reject new sessions immediately
     if (activeSessions.size >= MAX_SESSIONS) {
