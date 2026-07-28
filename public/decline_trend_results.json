@@ -7,17 +7,17 @@
     "stable": "acceleration between -5% and 5%"
   },
   "summary": {
-    "total_buildings": 1210,
-    "buildings_3yr": 422,
-    "buildings_2yr": 531
+    "total_buildings": 1224,
+    "buildings_3yr": 690,
+    "buildings_2yr": 439
   },
   "buildings": {
     "1 BEEKMAN PL": {
       "norm_delta_22_23": 2.25,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.12,
+      "acceleration": -3.37,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "1 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": -0.88,
@@ -70,17 +70,17 @@
     },
     "1 IRVING PLACE": {
       "norm_delta_22_23": 0.95,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -10.98,
+      "acceleration": -11.93,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1 NEW YORK PLAZA": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1 PACE PLAZA": {
       "norm_delta_22_23": -5.3,
@@ -108,7 +108,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1 ROCKEFELLER PLAZA": {
       "norm_delta_22_23": 272.44,
@@ -182,10 +182,10 @@
     },
     "10 E 38TH STREET": {
       "norm_delta_22_23": -30.54,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -50.03,
+      "acceleration": -19.49,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "10 E 70TH ST": {
       "norm_delta_22_23": -35.18,
@@ -213,7 +213,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "10 ROCKEFELLER PLAZA": {
       "norm_delta_22_23": -19.34,
@@ -241,7 +241,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "100 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": -20.57,
@@ -262,7 +262,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "100 JOHN STREET": {
       "norm_delta_22_23": null,
@@ -308,10 +308,10 @@
     },
     "100 WEST 33RD STREET": {
       "norm_delta_22_23": -39.43,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 25.74,
+      "acceleration": 65.17,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "100 WEST 57TH STREET": {
       "norm_delta_22_23": -6.55,
@@ -357,31 +357,31 @@
     },
     "1001 6 AVE": {
       "norm_delta_22_23": -30.75,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.67,
+      "acceleration": 29.08,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "101 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -3.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.37,
+      "acceleration": 2.44,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "101 EAST 69TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "101 EAST 77TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "101 GREENWICH STREET": {
       "norm_delta_22_23": null,
@@ -399,10 +399,10 @@
     },
     "1011 1ST AVE": {
       "norm_delta_22_23": -36.23,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 48.35,
+      "acceleration": 84.58,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1025 FIFTH AVENUE": {
       "norm_delta_22_23": -11.88,
@@ -427,10 +427,10 @@
     },
     "1040 FIFTH AVENUE": {
       "norm_delta_22_23": 9.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 3.45,
+      "acceleration": -6.52,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1045 FIFTH AVE": {
       "norm_delta_22_23": -8.85,
@@ -448,10 +448,10 @@
     },
     "1050 FIFTH AVE": {
       "norm_delta_22_23": -9.88,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -5.95,
+      "acceleration": 3.93,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "106 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": -9.58,
@@ -462,10 +462,10 @@
     },
     "1071 FIFTH AVENUE": {
       "norm_delta_22_23": -29.1,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 12.19,
+      "acceleration": 41.29,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "108 WEST 39TH STREET": {
       "norm_delta_22_23": -16.19,
@@ -476,10 +476,10 @@
     },
     "1080 FIFTH AVE": {
       "norm_delta_22_23": -3.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -6.13,
+      "acceleration": -2.32,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "109 E 42ND ST": {
       "norm_delta_22_23": null,
@@ -521,7 +521,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "11 EAST 44TH STREET": {
       "norm_delta_22_23": null,
@@ -542,14 +542,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "11 WALL ST": {
       "norm_delta_22_23": -25.14,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.49,
+      "acceleration": 33.63,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "11 WEST 53RD STREET": {
       "norm_delta_22_23": null,
@@ -560,31 +560,31 @@
     },
     "110 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": -8.64,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -12.2,
+      "acceleration": -3.56,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "110 EAST 42ND": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "110 EAST 57TH ST": {
       "norm_delta_22_23": -41.92,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 53.4,
+      "acceleration": 95.32,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "110 EAST 71ST STREET": {
       "norm_delta_22_23": -14.51,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.29,
+      "acceleration": 10.22,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "110 THIRD AVENUE": {
       "norm_delta_22_23": -3.21,
@@ -605,28 +605,28 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "110 WEST END AVE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "110 WILLIAM STREET": {
       "norm_delta_22_23": -4.73,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.95,
+      "acceleration": 11.68,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1100 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "111 8TH AVENUE": {
       "norm_delta_22_23": -11.23,
@@ -675,21 +675,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "111 EAST 59TH STREET": {
       "norm_delta_22_23": -10.0,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.92,
+      "acceleration": 17.92,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "111 EAST 85TH STREET": {
       "norm_delta_22_23": -5.48,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.73,
+      "acceleration": 3.75,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "111 JOHN STREET": {
       "norm_delta_22_23": -21.1,
@@ -700,10 +700,10 @@
     },
     "111 W 90TH ST": {
       "norm_delta_22_23": -4.53,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -6.55,
+      "acceleration": -2.02,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "111 WALL STREET": {
       "norm_delta_22_23": null,
@@ -717,7 +717,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "111 WEST 44 STREET": {
       "norm_delta_22_23": null,
@@ -731,21 +731,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1114 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": 2.26,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -2.85,
+      "acceleration": -5.11,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1120 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "113 W 60TH ST": {
       "norm_delta_22_23": null,
@@ -770,10 +770,10 @@
     },
     "114 EAST 72ND ST": {
       "norm_delta_22_23": -3.0,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 11.64,
+      "acceleration": 14.64,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1140 AVENUE OF AMERICAS": {
       "norm_delta_22_23": null,
@@ -815,7 +815,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "116 STREET": {
       "norm_delta_22_23": -100.0,
@@ -826,17 +826,17 @@
     },
     "1166 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -17.24,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.83,
+      "acceleration": 26.07,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "117 EAST 72ND ST": {
       "norm_delta_22_23": -54.61,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 90.86,
+      "acceleration": 145.47,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1175-1185 THIRD AVE": {
       "norm_delta_22_23": null,
@@ -847,17 +847,17 @@
     },
     "1177 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -15.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -21.71,
+      "acceleration": -6.36,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "118 EAST 60TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1180 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -17.46,
@@ -868,10 +868,10 @@
     },
     "1185 AVE OF THE AMERICAS": {
       "norm_delta_22_23": -8.42,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 2.98,
+      "acceleration": 11.4,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "119 WEST 57TH STREET": {
       "norm_delta_22_23": -12.69,
@@ -924,10 +924,10 @@
     },
     "120 E 56TH STREET": {
       "norm_delta_22_23": -9.89,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -2.95,
+      "acceleration": 6.94,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "120 E 87 ST": {
       "norm_delta_22_23": 5.95,
@@ -941,14 +941,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "120 PARK AVENUE": {
       "norm_delta_22_23": -8.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.01,
+      "acceleration": 7.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "120 W 14TH STREET": {
       "norm_delta_22_23": null,
@@ -969,7 +969,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "120 WEST 46TH STREET": {
       "norm_delta_22_23": -46.15,
@@ -1022,10 +1022,10 @@
     },
     "122 EAST 42ND STREET": {
       "norm_delta_22_23": -5.37,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -18.07,
+      "acceleration": -12.7,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "122 EAST 76TH STREET": {
       "norm_delta_22_23": -31.41,
@@ -1099,10 +1099,10 @@
     },
     "125 BROAD STREET CONDO": {
       "norm_delta_22_23": -21.83,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.27,
+      "acceleration": 43.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "125 COLUMBUS AVENUE": {
       "norm_delta_22_23": 4.55,
@@ -1120,10 +1120,10 @@
     },
     "125 EAST 63RD STREET": {
       "norm_delta_22_23": -25.34,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 14.59,
+      "acceleration": 39.93,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "125 WEST 45TH STREET": {
       "norm_delta_22_23": null,
@@ -1134,10 +1134,10 @@
     },
     "125 WEST 55TH STREET": {
       "norm_delta_22_23": -57.89,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 101.53,
+      "acceleration": 159.42,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "125 WEST END AVENUE": {
       "norm_delta_22_23": null,
@@ -1207,7 +1207,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1283 YORK AVE": {
       "norm_delta_22_23": 12.31,
@@ -1232,10 +1232,10 @@
     },
     "1290 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -6.82,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -12.59,
+      "acceleration": -5.77,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1293 BROADWAY": {
       "norm_delta_22_23": -12.73,
@@ -1256,14 +1256,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "130 EAST 18TH STREET": {
       "norm_delta_22_23": -2.92,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 3.54,
+      "acceleration": 6.46,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "130 WEST 56TH ST": {
       "norm_delta_22_23": null,
@@ -1316,17 +1316,17 @@
     },
     "131 W 56TH ST": {
       "norm_delta_22_23": -11.16,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -20.57,
+      "acceleration": -9.41,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "131 WEST 35TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1313 YORK AVE": {
       "norm_delta_22_23": 6.6,
@@ -1351,17 +1351,17 @@
     },
     "1325 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": 26.57,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 10.83,
+      "acceleration": -15.74,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "133 EAST 58TH STREET": {
       "norm_delta_22_23": -61.55,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 39.48,
+      "acceleration": 101.03,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1330 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -1.72,
@@ -1375,7 +1375,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1335 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -7.81,
@@ -1393,10 +1393,10 @@
     },
     "1345 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": 10.62,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -39.72,
+      "acceleration": -50.34,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "135 EAST 57TH STREET": {
       "norm_delta_22_23": -5.35,
@@ -1428,10 +1428,10 @@
     },
     "1350 AVE OF THE AMERICAS": {
       "norm_delta_22_23": -10.61,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.98,
+      "acceleration": 12.59,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1350 BROADWAY": {
       "norm_delta_22_23": null,
@@ -1442,24 +1442,24 @@
     },
     "1356 BROADWAY": {
       "norm_delta_22_23": -5.32,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -25.42,
+      "acceleration": -20.1,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "136 E 57TH ST": {
       "norm_delta_22_23": -97.36,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -62.67,
+      "acceleration": 34.69,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "136 EAST 56TH STREET": {
       "norm_delta_22_23": 0.18,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 5.13,
+      "acceleration": 4.95,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "1370 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": -16.82,
@@ -1484,24 +1484,24 @@
     },
     "139 EAST 63RD ST": {
       "norm_delta_22_23": 310.98,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -48.71,
+      "acceleration": -359.69,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "139 EAST 79TH STREET": {
       "norm_delta_22_23": 19.88,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 39.24,
+      "acceleration": 19.36,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "14 EAST 47 STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "14 EAST 60TH STREET": {
       "norm_delta_22_23": 52.06,
@@ -1519,10 +1519,10 @@
     },
     "14 SUTTON PLACE SOUTH": {
       "norm_delta_22_23": 5.86,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 11.33,
+      "acceleration": 5.47,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "14 WALL STREET": {
       "norm_delta_22_23": 1.79,
@@ -1540,10 +1540,10 @@
     },
     "140 EAST 45TH STREET": {
       "norm_delta_22_23": -7.4,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 12.76,
+      "acceleration": 20.16,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "140 EAST 63RD STREET": {
       "norm_delta_22_23": 8.87,
@@ -1554,10 +1554,10 @@
     },
     "140 EAST 72ND STREET": {
       "norm_delta_22_23": -0.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -4.99,
+      "acceleration": -4.18,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "140 W 62ND ST": {
       "norm_delta_22_23": 15.71,
@@ -1575,10 +1575,10 @@
     },
     "140 WEST STREET": {
       "norm_delta_22_23": 105.87,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -56.17,
+      "acceleration": -162.04,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "140 WILLIAM STREET": {
       "norm_delta_22_23": -7.14,
@@ -1606,7 +1606,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1410 BROADWAY": {
       "norm_delta_22_23": -16.43,
@@ -1617,17 +1617,17 @@
     },
     "1411 BROADWAY": {
       "norm_delta_22_23": -0.99,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -27.54,
+      "acceleration": -26.55,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "142 EAST 16TH STREET": {
       "norm_delta_22_23": -7.06,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.87,
+      "acceleration": 5.19,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "143 WEST 46 STREET": {
       "norm_delta_22_23": 171.99,
@@ -1676,14 +1676,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "145 WEST 57TH STREET": {
       "norm_delta_22_23": -69.05,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 319.65,
+      "acceleration": 388.7,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1450 BROADWAY": {
       "norm_delta_22_23": 39.2,
@@ -1694,17 +1694,17 @@
     },
     "146 W 57TH STREET": {
       "norm_delta_22_23": -6.82,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -84.67,
+      "acceleration": -77.85,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "146 WEST 57TH STREET": {
       "norm_delta_22_23": -6.82,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -33.52,
+      "acceleration": -26.7,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1460 BROADWAY": {
       "norm_delta_22_23": null,
@@ -1732,7 +1732,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "149 WEST 45 STREET": {
       "norm_delta_22_23": null,
@@ -1746,21 +1746,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "15 CENTRAL PARK WEST": {
       "norm_delta_22_23": 0.18,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 4.44,
+      "acceleration": 4.26,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "15 EAST 69TH STREET": {
       "norm_delta_22_23": -18.0,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -25.15,
+      "acceleration": -7.15,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "15 MAIDEN LANE": {
       "norm_delta_22_23": -16.45,
@@ -1778,10 +1778,10 @@
     },
     "15 WEST 3RD STREET": {
       "norm_delta_22_23": -14.31,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 22.06,
+      "acceleration": 36.37,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "15 WILLIAM STREET": {
       "norm_delta_22_23": -5.28,
@@ -1792,10 +1792,10 @@
     },
     "150 BROADWAY": {
       "norm_delta_22_23": -15.98,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 2.86,
+      "acceleration": 18.84,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "150 COLUMBUS AVE": {
       "norm_delta_22_23": -13.06,
@@ -1834,17 +1834,17 @@
     },
     "150 EAST 58TH STREET": {
       "norm_delta_22_23": -9.17,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.52,
+      "acceleration": 7.65,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "150 NASSAU STREET": {
       "norm_delta_22_23": -14.85,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.19,
+      "acceleration": 24.04,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "150 WEST 51ST STREET": {
       "norm_delta_22_23": null,
@@ -1904,10 +1904,10 @@
     },
     "151 EAST 85TH STREET": {
       "norm_delta_22_23": 69.26,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 34.82,
+      "acceleration": -34.44,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1515 BROADWAY": {
       "norm_delta_22_23": -16.6,
@@ -1932,10 +1932,10 @@
     },
     "153 W 54 ST": {
       "norm_delta_22_23": -15.65,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 45.17,
+      "acceleration": 60.82,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "155 E 52 STREET": {
       "norm_delta_22_23": 3.54,
@@ -1956,14 +1956,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "155 EAST 55TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "155 EAST 56TH STREET": {
       "norm_delta_22_23": 1.44,
@@ -1974,17 +1974,17 @@
     },
     "155 EAST 72ND STREET": {
       "norm_delta_22_23": -18.8,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.21,
+      "acceleration": 11.59,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "155 WEST 11TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "155 WEST 66TH STREET": {
       "norm_delta_22_23": null,
@@ -2019,7 +2019,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "157 WEST 57TH STREET": {
       "norm_delta_22_23": 13.92,
@@ -2051,10 +2051,10 @@
     },
     "16 SUTTON PLACE": {
       "norm_delta_22_23": -1.48,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 13.87,
+      "acceleration": 15.35,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "160 E 34TH STREET": {
       "norm_delta_22_23": -5.81,
@@ -2075,14 +2075,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "160 EAST 72ND ST": {
       "norm_delta_22_23": -32.38,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 25.11,
+      "acceleration": 57.49,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "160 WATER ST": {
       "norm_delta_22_23": null,
@@ -2096,7 +2096,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "160 WEST END AVENUE": {
       "norm_delta_22_23": -30.21,
@@ -2114,17 +2114,17 @@
     },
     "161 EAST 79TH STREET": {
       "norm_delta_22_23": 9.32,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -10.9,
+      "acceleration": -20.22,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "161 WILLIAM ST": {
       "norm_delta_22_23": -34.26,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -0.27,
+      "acceleration": 33.99,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "162 EAST 68 STREET": {
       "norm_delta_22_23": 18.32,
@@ -2142,24 +2142,24 @@
     },
     "1634 BROADWAY": {
       "norm_delta_22_23": 117.84,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 20.6,
+      "acceleration": -97.24,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "1646 1 AVE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "165 BROADWAY": {
       "norm_delta_22_23": -14.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.46,
+      "acceleration": 22.27,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "165 E 56TH STREET": {
       "norm_delta_22_23": -30.74,
@@ -2173,14 +2173,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "165 EAST 72ND ST": {
       "norm_delta_22_23": -5.71,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.23,
+      "acceleration": 6.94,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "165 WEST 66TH STREET": {
       "norm_delta_22_23": -100.0,
@@ -2198,24 +2198,24 @@
     },
     "165-215 PARK ROW": {
       "norm_delta_22_23": -4.6,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -0.21,
+      "acceleration": 4.39,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "1657 BROADWAY": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "166 3 AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "166 EAST 61ST STREET": {
       "norm_delta_22_23": -11.76,
@@ -2233,17 +2233,17 @@
     },
     "167 EAST 61ST STREET": {
       "norm_delta_22_23": -6.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.34,
+      "acceleration": 8.31,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "167 EAST 67TH ST": {
       "norm_delta_22_23": -14.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.2,
+      "acceleration": 35.55,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "1675 BROADWAY": {
       "norm_delta_22_23": -27.42,
@@ -2261,10 +2261,10 @@
     },
     "169 EAST 69TH STREET": {
       "norm_delta_22_23": -2.39,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 14.66,
+      "acceleration": 17.05,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "17 LEXINGTON AVE": {
       "norm_delta_22_23": null,
@@ -2296,10 +2296,10 @@
     },
     "170 WEST 23RD STREET": {
       "norm_delta_22_23": -8.48,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.79,
+      "acceleration": 17.27,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "170 WEST END AVENUE": {
       "norm_delta_22_23": null,
@@ -2324,10 +2324,10 @@
     },
     "1700 BROADWAY": {
       "norm_delta_22_23": 68.73,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 15.53,
+      "acceleration": -53.2,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "171 EAST 84TH STREET": {
       "norm_delta_22_23": null,
@@ -2348,14 +2348,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "175 WATER ST": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "175 WEST 13TH STREET": {
       "norm_delta_22_23": -2.56,
@@ -2369,14 +2369,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "1775 BROADWAY & 235 W 56TH ST": {
       "norm_delta_22_23": -8.58,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -0.72,
+      "acceleration": 7.86,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "178 EAST 70TH STREET": {
       "norm_delta_22_23": null,
@@ -2404,21 +2404,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "180 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": -4.71,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -4.83,
+      "acceleration": -0.12,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "180 MADISON AVENUE": {
       "norm_delta_22_23": -43.47,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 38.19,
+      "acceleration": 81.66,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "180 MAIDEN LANE": {
       "norm_delta_22_23": null,
@@ -2432,7 +2432,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "180 WEST END AVENUE": {
       "norm_delta_22_23": null,
@@ -2443,24 +2443,24 @@
     },
     "181 EAST 65TH STREET": {
       "norm_delta_22_23": -28.5,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 17.83,
+      "acceleration": 46.33,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "184 5TH AVENUE": {
       "norm_delta_22_23": 732.94,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -3.5,
+      "acceleration": -736.44,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "185 MADISON AVENUE, NEW YORK": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "185 WEST BROADWAY": {
       "norm_delta_22_23": null,
@@ -2485,24 +2485,24 @@
     },
     "188 EAST 64TH STREET": {
       "norm_delta_22_23": -6.11,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 36.99,
+      "acceleration": 43.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "188 EAST 70TH STREET": {
       "norm_delta_22_23": 9.33,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.59,
+      "acceleration": -16.92,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "188 EAST 76TH ST": {
       "norm_delta_22_23": -15.5,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -3.4,
+      "acceleration": 12.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "19 EAST 54TH STREET": {
       "norm_delta_22_23": null,
@@ -2513,10 +2513,10 @@
     },
     "190 EAST 72ND STREET": {
       "norm_delta_22_23": -72.33,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 155.29,
+      "acceleration": 227.62,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "195 BROADWAY": {
       "norm_delta_22_23": null,
@@ -2548,10 +2548,10 @@
     },
     "199 WATER STREET": {
       "norm_delta_22_23": -18.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.54,
+      "acceleration": 27.89,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "19E 57TH STREET": {
       "norm_delta_22_23": -17.09,
@@ -2572,7 +2572,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "2 COLUMBUS CIR": {
       "norm_delta_22_23": -15.24,
@@ -2586,7 +2586,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "2 EAST 61ST STREET": {
       "norm_delta_22_23": null,
@@ -2604,24 +2604,24 @@
     },
     "2 EAST 67TH ST": {
       "norm_delta_22_23": -0.37,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -2.15,
+      "acceleration": -1.78,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "2 EAST 70TH STREET": {
       "norm_delta_22_23": -4.07,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 0.77,
+      "acceleration": 4.84,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "2 EAST 88TH ST": {
       "norm_delta_22_23": -3.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.99,
+      "acceleration": 5.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "2 LEXINGTON AVENUE": {
       "norm_delta_22_23": null,
@@ -2639,10 +2639,10 @@
     },
     "2 PENN PLAZA": {
       "norm_delta_22_23": -28.63,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -64.22,
+      "acceleration": -35.59,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "2 UNITED NATIONS PLAZA": {
       "norm_delta_22_23": 4.08,
@@ -2677,7 +2677,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "20 WEST 44TH STREET": {
       "norm_delta_22_23": -28.13,
@@ -2691,7 +2691,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "20 WEST ST": {
       "norm_delta_22_23": 14.08,
@@ -2702,10 +2702,10 @@
     },
     "20-40 7TH AVENUE": {
       "norm_delta_22_23": 26.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -11.52,
+      "acceleration": -38.24,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "200  EAST  42ND  ST.": {
       "norm_delta_22_23": 57.97,
@@ -2747,7 +2747,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "200 EAST 61ST STREET": {
       "norm_delta_22_23": 1.36,
@@ -2761,7 +2761,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "200 EAST 69 STREET": {
       "norm_delta_22_23": null,
@@ -2782,7 +2782,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "200 LIBERTY STREET": {
       "norm_delta_22_23": -7.06,
@@ -2793,10 +2793,10 @@
     },
     "200 MADISON": {
       "norm_delta_22_23": -6.01,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -15.27,
+      "acceleration": -9.26,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "200 PARK AVE": {
       "norm_delta_22_23": -24.77,
@@ -2835,17 +2835,17 @@
     },
     "201 EAST 80TH ST": {
       "norm_delta_22_23": -24.68,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 2.34,
+      "acceleration": 27.02,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "201 PARK AVENUE SOUTH": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "201/205  EAST  42ND  ST.": {
       "norm_delta_22_23": null,
@@ -2880,7 +2880,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "205 WEST END AVENUE": {
       "norm_delta_22_23": null,
@@ -2891,10 +2891,10 @@
     },
     "206 EAST 31ST STREET": {
       "norm_delta_22_23": 2.49,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.59,
+      "acceleration": 5.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "206 WEST 46TH STREET": {
       "norm_delta_22_23": null,
@@ -2905,10 +2905,10 @@
     },
     "207 EAST 57TH STREET": {
       "norm_delta_22_23": -5.73,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.0,
+      "acceleration": 14.73,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "208 E 79 ST": {
       "norm_delta_22_23": -33.82,
@@ -2933,10 +2933,10 @@
     },
     "21 EAST 79TH ST": {
       "norm_delta_22_23": -10.29,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 15.13,
+      "acceleration": 25.42,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "21 WEST END AVENUE": {
       "norm_delta_22_23": null,
@@ -2950,12 +2950,12 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "210 EAST 36TH STREET": {
       "norm_delta_22_23": -17.15,
-      "norm_delta_23_24": -1.89,
-      "acceleration": 15.26,
+      "norm_delta_23_24": -1.72,
+      "acceleration": 15.43,
       "decline_trend_label": "accelerating",
       "n_years_data": 3
     },
@@ -2964,14 +2964,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "210 EAST 64TH STREET": {
       "norm_delta_22_23": 20.52,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -35.4,
+      "acceleration": -55.92,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "210 WEST 27TH STREET": {
       "norm_delta_22_23": -27.84,
@@ -2985,7 +2985,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "211 EAST 70TH STREET": {
       "norm_delta_22_23": 7.79,
@@ -2999,7 +2999,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "211 MADISON AVENUE": {
       "norm_delta_22_23": -20.61,
@@ -3017,10 +3017,10 @@
     },
     "212 WEST 18TH STREET": {
       "norm_delta_22_23": 26.3,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -46.54,
+      "acceleration": -72.84,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "213 EAST 63RD STREET": {
       "norm_delta_22_23": 17.32,
@@ -3034,12 +3034,12 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "215 EAST 58TH STREET": {
       "norm_delta_22_23": -85.87,
-      "norm_delta_23_24": 2046.74,
-      "acceleration": 2132.61,
+      "norm_delta_23_24": 2046.75,
+      "acceleration": 2132.62,
       "decline_trend_label": "accelerating",
       "n_years_data": 3
     },
@@ -3055,7 +3055,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "216 EAST 47TH STREET": {
       "norm_delta_22_23": -11.48,
@@ -3104,7 +3104,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "220 E 72ND STREET, 221 E 71ST STREET": {
       "norm_delta_22_23": null,
@@ -3122,17 +3122,17 @@
     },
     "220 EAST 60TH STREET": {
       "norm_delta_22_23": 18.1,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -18.97,
+      "acceleration": -37.07,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "220 EAST 72ND STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "220 HENRY STREET": {
       "norm_delta_22_23": -24.24,
@@ -3199,10 +3199,10 @@
     },
     "225 EAST 36TH STREET": {
       "norm_delta_22_23": -45.9,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.38,
+      "acceleration": 54.28,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "225 EAST 72ND STREET": {
       "norm_delta_22_23": -57.53,
@@ -3234,17 +3234,17 @@
     },
     "225 WEST 30TH STREET": {
       "norm_delta_22_23": 36.51,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -52.64,
+      "acceleration": -89.15,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "227 EAST 30TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "227 EAST 56TH STREET": {
       "norm_delta_22_23": null,
@@ -3286,14 +3286,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "230 EAST 15TH STREET": {
       "norm_delta_22_23": 5.38,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -10.61,
+      "acceleration": -15.99,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "230 EAST 21ST ST": {
       "norm_delta_22_23": null,
@@ -3325,10 +3325,10 @@
     },
     "230 W 36 ST": {
       "norm_delta_22_23": -4.32,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -73.49,
+      "acceleration": -69.17,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "230 W 49TH STEET": {
       "norm_delta_22_23": -50.23,
@@ -3381,17 +3381,17 @@
     },
     "233 EAST 69TH STREET": {
       "norm_delta_22_23": -12.07,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.3,
+      "acceleration": 20.37,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "233 EAST 70TH STREET": {
       "norm_delta_22_23": -5.03,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -5.08,
+      "acceleration": -0.05,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "234 WEST 44TH STREET": {
       "norm_delta_22_23": 21.35,
@@ -3402,10 +3402,10 @@
     },
     "235 EAST 40TH STREET": {
       "norm_delta_22_23": 1.33,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.83,
+      "acceleration": -6.16,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "235 EAST 42ND STREET": {
       "norm_delta_22_23": -39.86,
@@ -3416,10 +3416,10 @@
     },
     "235 EAST 57TH STREET": {
       "norm_delta_22_23": -6.14,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 42.81,
+      "acceleration": 48.95,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "235 WEST 46TH STREET": {
       "norm_delta_22_23": 52.01,
@@ -3433,7 +3433,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "236 EAST 47TH ST": {
       "norm_delta_22_23": -0.21,
@@ -3447,14 +3447,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "237 PARK AVE.": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "24 STATE STREET": {
       "norm_delta_22_23": -4.0,
@@ -3465,10 +3465,10 @@
     },
     "24 WEST 57TH STREET": {
       "norm_delta_22_23": 2.87,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -13.91,
+      "acceleration": -16.78,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "240 2ND AVENUE": {
       "norm_delta_22_23": -13.96,
@@ -3479,24 +3479,24 @@
     },
     "240 CENTRE STREET": {
       "norm_delta_22_23": -7.16,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 27.34,
+      "acceleration": 34.5,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "240 EAST 38TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "240 EAST 47TH STREET": {
       "norm_delta_22_23": -4.44,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.46,
+      "acceleration": 2.98,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "240 MADISON AVE": {
       "norm_delta_22_23": null,
@@ -3514,10 +3514,10 @@
     },
     "241 FIFTH AVENUE": {
       "norm_delta_22_23": 26.7,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 69.03,
+      "acceleration": 42.33,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "243 WEST 42ND STREET": {
       "norm_delta_22_23": -7.51,
@@ -3531,7 +3531,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "245 GREENWICH ST": {
       "norm_delta_22_23": null,
@@ -3587,7 +3587,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "25 MONTGOMERY STREET": {
       "norm_delta_22_23": 5.76,
@@ -3598,10 +3598,10 @@
     },
     "25 SUTTON PLACE": {
       "norm_delta_22_23": -2.99,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -3.89,
+      "acceleration": -0.9,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "25 WEST 39TH STREET": {
       "norm_delta_22_23": -25.64,
@@ -3650,7 +3650,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "254 EAST 68TH STREET": {
       "norm_delta_22_23": -5.97,
@@ -3668,17 +3668,17 @@
     },
     "255 EAST 74TH STREET": {
       "norm_delta_22_23": 6.98,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 17.63,
+      "acceleration": 10.65,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "255 GREENWICH STREET": {
       "norm_delta_22_23": -8.74,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -5.86,
+      "acceleration": 2.88,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "260 MADISON AVE": {
       "norm_delta_22_23": 13.19,
@@ -3706,7 +3706,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "27 BARROW ST.": {
       "norm_delta_22_23": -6.13,
@@ -3724,10 +3724,10 @@
     },
     "27 EAST 65TH STREET": {
       "norm_delta_22_23": -4.48,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.61,
+      "acceleration": 2.87,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "27 MADISON AVE": {
       "norm_delta_22_23": null,
@@ -3741,7 +3741,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "27 WEST 23RD STREET": {
       "norm_delta_22_23": -30.48,
@@ -3762,7 +3762,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "274 MADISON AVENUE": {
       "norm_delta_22_23": -16.17,
@@ -3801,10 +3801,10 @@
     },
     "28 EAST 70TH ST": {
       "norm_delta_22_23": 1.91,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.91,
+      "acceleration": 6.0,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "28 LIBERTY ST": {
       "norm_delta_22_23": null,
@@ -3815,10 +3815,10 @@
     },
     "28 WEST 44TH STREET": {
       "norm_delta_22_23": 5.46,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.13,
+      "acceleration": -4.33,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "280 BROADWAY": {
       "norm_delta_22_23": 95.25,
@@ -3888,7 +3888,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "299 PARK AVENUE": {
       "norm_delta_22_23": -10.07,
@@ -3902,7 +3902,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "3 EAST 54TH STREET": {
       "norm_delta_22_23": -36.26,
@@ -3923,7 +3923,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "3 PARK AVENUE": {
       "norm_delta_22_23": -13.89,
@@ -3951,14 +3951,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "3 WEST 57TH STREET": {
       "norm_delta_22_23": -15.71,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.0,
+      "acceleration": 36.71,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "30 BROAD STREET": {
       "norm_delta_22_23": null,
@@ -3972,21 +3972,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "30 EAST 62ND STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "30 EAST 65 ST.": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "30 EAST 68TH STREET": {
       "norm_delta_22_23": null,
@@ -4011,10 +4011,10 @@
     },
     "30 SUTTON PL": {
       "norm_delta_22_23": -20.49,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.32,
+      "acceleration": 21.81,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "30 VESEY STREET": {
       "norm_delta_22_23": -30.16,
@@ -4070,7 +4070,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "300 MADISON AVENUE": {
       "norm_delta_22_23": -7.36,
@@ -4088,10 +4088,10 @@
     },
     "300 WEST 55TH ST.": {
       "norm_delta_22_23": -14.49,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.95,
+      "acceleration": 9.54,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "300 WEST 57TH STREET": {
       "norm_delta_22_23": -3.25,
@@ -4137,10 +4137,10 @@
     },
     "302-304 EAST 42ND STREET": {
       "norm_delta_22_23": -18.2,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.79,
+      "acceleration": 10.41,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "303 EAST 60TH STREET": {
       "norm_delta_22_23": -22.27,
@@ -4154,7 +4154,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "303 GREENWICH ST.": {
       "norm_delta_22_23": null,
@@ -4172,17 +4172,17 @@
     },
     "304 EAST 65TH STREET": {
       "norm_delta_22_23": -6.36,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -18.9,
+      "acceleration": -12.54,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "308 EAST 72ND STREET": {
       "norm_delta_22_23": -17.87,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -3.17,
+      "acceleration": 14.7,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "31 CHAMBERS ST": {
       "norm_delta_22_23": null,
@@ -4193,10 +4193,10 @@
     },
     "31 EAST 79TH ST": {
       "norm_delta_22_23": 2.65,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.22,
+      "acceleration": -1.43,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "31 W 34 ST": {
       "norm_delta_22_23": null,
@@ -4210,28 +4210,28 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "31 WEST 52ND ST.": {
       "norm_delta_22_23": -44.8,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 96.99,
+      "acceleration": 141.79,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "310 EAST 14TH ST": {
       "norm_delta_22_23": -2.06,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -11.08,
+      "acceleration": -9.02,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "310 EAST 24TH ST": {
       "norm_delta_22_23": -5.14,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 26.78,
+      "acceleration": 31.92,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "310 EAST 67TH STREET": {
       "norm_delta_22_23": -10.43,
@@ -4252,14 +4252,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "310 WEST BROADWAY": {
       "norm_delta_22_23": -4.43,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 15.51,
+      "acceleration": 19.94,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "311 EAST 75TH STREET": {
       "norm_delta_22_23": null,
@@ -4270,10 +4270,10 @@
     },
     "315 EAST 70TH STREET": {
       "norm_delta_22_23": -10.77,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 24.22,
+      "acceleration": 34.99,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "315 WEST 70TH STREET": {
       "norm_delta_22_23": null,
@@ -4322,7 +4322,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "320 E 58TH ST": {
       "norm_delta_22_23": -27.25,
@@ -4333,10 +4333,10 @@
     },
     "320 EAST 23RD STREET": {
       "norm_delta_22_23": 22.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.47,
+      "acceleration": -22.25,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "320 EAST 43RD STREET": {
       "norm_delta_22_23": -49.36,
@@ -4378,7 +4378,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "327 CHERRY STREET": {
       "norm_delta_22_23": 32.21,
@@ -4403,10 +4403,10 @@
     },
     "33 MAIDEN LANE": {
       "norm_delta_22_23": 12.44,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.02,
+      "acceleration": 8.58,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "33 RECTOR STREET": {
       "norm_delta_22_23": 1.26,
@@ -4417,17 +4417,17 @@
     },
     "33 THIRD AVENUE": {
       "norm_delta_22_23": 3.94,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.42,
+      "acceleration": -11.36,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "33 WEST 56TH STREET": {
       "norm_delta_22_23": -12.62,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 16.92,
+      "acceleration": 29.54,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "33 WHITEHALL STREET": {
       "norm_delta_22_23": -12.37,
@@ -4438,17 +4438,17 @@
     },
     "330 E. 26TH STREET": {
       "norm_delta_22_23": 1.27,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 3.32,
+      "acceleration": 2.05,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "330 EAST 21ST ST": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "330 EAST 38TH STREET": {
       "norm_delta_22_23": null,
@@ -4462,14 +4462,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "330 EAST 75TH ST": {
       "norm_delta_22_23": -4.7,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 11.31,
+      "acceleration": 16.01,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "330 HUDSON ST": {
       "norm_delta_22_23": -15.53,
@@ -4497,14 +4497,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "331 E. 29TH ST": {
       "norm_delta_22_23": -5.86,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.24,
+      "acceleration": 27.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "333 E. 38TH ST": {
       "norm_delta_22_23": null,
@@ -4518,21 +4518,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "333 EAST 45TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "333 EAST 57TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "334 E 26TH STREET": {
       "norm_delta_22_23": -11.27,
@@ -4574,7 +4574,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "340 EAST 57TH STREET": {
       "norm_delta_22_23": 4.99,
@@ -4592,10 +4592,10 @@
     },
     "344 EAST 28TH STREET": {
       "norm_delta_22_23": -5.89,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -2.0,
+      "acceleration": 3.89,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "345 E 37TH ST": {
       "norm_delta_22_23": -11.34,
@@ -4613,17 +4613,17 @@
     },
     "345 EAST 52ND STREET": {
       "norm_delta_22_23": 3.34,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -6.02,
+      "acceleration": -9.36,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "345 EAST 56TH ST": {
       "norm_delta_22_23": -25.36,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.28,
+      "acceleration": 25.64,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "345 EAST 59TH ST": {
       "norm_delta_22_23": null,
@@ -4634,10 +4634,10 @@
     },
     "345 HUDSON STREET": {
       "norm_delta_22_23": 141.38,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 29.6,
+      "acceleration": -111.78,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "345 PARK AVE": {
       "norm_delta_22_23": -8.15,
@@ -4658,7 +4658,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "35 EAST 38 STREET": {
       "norm_delta_22_23": null,
@@ -4669,10 +4669,10 @@
     },
     "35 EAST 75TH STREET": {
       "norm_delta_22_23": -7.66,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 3.75,
+      "acceleration": 11.41,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "35 EAST 76TH STREET": {
       "norm_delta_22_23": -2.05,
@@ -4707,14 +4707,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "350 FIFTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "350 GRAND STREET": {
       "norm_delta_22_23": -14.98,
@@ -4732,17 +4732,17 @@
     },
     "350 PARK AVENUE": {
       "norm_delta_22_23": -18.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.36,
+      "acceleration": 26.08,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "350 WEST 50TH STREET": {
       "norm_delta_22_23": -0.36,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.02,
+      "acceleration": -6.66,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "351 E 68 ST": {
       "norm_delta_22_23": 16.61,
@@ -4753,10 +4753,10 @@
     },
     "351 EAST 51ST STREET": {
       "norm_delta_22_23": -10.03,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 10.88,
+      "acceleration": 20.91,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "353 EAST 83RD STREET": {
       "norm_delta_22_23": -9.94,
@@ -4795,24 +4795,24 @@
     },
     "36 CENTRAL PARK SOUTH": {
       "norm_delta_22_23": 4.04,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 25.69,
+      "acceleration": 21.65,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "36 EAST 72ND ST (34 EAST 72ND)": {
       "norm_delta_22_23": -7.93,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -12.58,
+      "acceleration": -4.65,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "360 EAST 72ND STREET": {
       "norm_delta_22_23": -98.78,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 5309.06,
+      "acceleration": 5407.84,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "360 FIRST AVENUE": {
       "norm_delta_22_23": null,
@@ -4840,14 +4840,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "363 EAST 76TH STREET": {
       "norm_delta_22_23": -100.0,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "365 5TH AVENUE": {
       "norm_delta_22_23": -8.96,
@@ -4868,7 +4868,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "37 W 57TH ST": {
       "norm_delta_22_23": null,
@@ -4889,14 +4889,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "375 HUDSON ST": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "375 PARK AVENUE": {
       "norm_delta_22_23": -32.12,
@@ -4921,10 +4921,10 @@
     },
     "383 MADISON": {
       "norm_delta_22_23": -3.82,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.16,
+      "acceleration": 9.98,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "385 5TH AVENUE": {
       "norm_delta_22_23": null,
@@ -4959,7 +4959,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "390 PARK AVENUE": {
       "norm_delta_22_23": -3.11,
@@ -5008,14 +5008,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "4 IRVING PLACE": {
       "norm_delta_22_23": 0.01,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -5.88,
+      "acceleration": -5.89,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "4 NEW YORK PLAZA": {
       "norm_delta_22_23": null,
@@ -5082,24 +5082,24 @@
     },
     "40 EAST 66TH STREET": {
       "norm_delta_22_23": 77.1,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -43.27,
+      "acceleration": -120.37,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "40 EAST 80TH STREET": {
       "norm_delta_22_23": -30.29,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 43.68,
+      "acceleration": 73.97,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "40 EAST 84TH ST": {
       "norm_delta_22_23": 95.41,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -36.6,
+      "acceleration": -132.01,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "40 IRVING PLACE": {
       "norm_delta_22_23": -25.3,
@@ -5141,7 +5141,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "400 FIFTH AVENUE": {
       "norm_delta_22_23": -6.17,
@@ -5176,14 +5176,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "401 EAST 84TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "401 SEVENTH AVENUE": {
       "norm_delta_22_23": null,
@@ -5197,7 +5197,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "405 LEXINGTON AVENUE": {
       "norm_delta_22_23": -32.62,
@@ -5236,10 +5236,10 @@
     },
     "410 GRAND STREET": {
       "norm_delta_22_23": -0.75,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.14,
+      "acceleration": 6.89,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "410 MADISON AVENUE": {
       "norm_delta_22_23": null,
@@ -5267,7 +5267,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "411 PEARL STREET": {
       "norm_delta_22_23": -14.57,
@@ -5278,8 +5278,8 @@
     },
     "411-421 1ST AVENUE": {
       "norm_delta_22_23": 13.12,
-      "norm_delta_23_24": -9.33,
-      "acceleration": -22.45,
+      "norm_delta_23_24": -43.82,
+      "acceleration": -56.94,
       "decline_trend_label": "decelerating",
       "n_years_data": 3
     },
@@ -5309,7 +5309,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "415 MADISON AVENUE": {
       "norm_delta_22_23": null,
@@ -5323,14 +5323,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "419 WEST 34 STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "42 WEST 44TH STREET": {
       "norm_delta_22_23": 3.01,
@@ -5365,7 +5365,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "420 EAST 70TH ST": {
       "norm_delta_22_23": 0.53,
@@ -5386,7 +5386,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "421 7TH AVENUE": {
       "norm_delta_22_23": -15.89,
@@ -5397,17 +5397,17 @@
     },
     "421 FIRST AVENUE / 340 E 25TH STREET": {
       "norm_delta_22_23": -5.42,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -8.11,
+      "acceleration": -2.69,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "422 EAST 72ND ST": {
       "norm_delta_22_23": -6.01,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -2.68,
+      "acceleration": 3.33,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "424 MADISON AVENUE": {
       "norm_delta_22_23": null,
@@ -5418,10 +5418,10 @@
     },
     "424 WEST 33RD STREET": {
       "norm_delta_22_23": -25.8,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 18.05,
+      "acceleration": 43.85,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "425 LEXINGTON AVE": {
       "norm_delta_22_23": -9.21,
@@ -5432,10 +5432,10 @@
     },
     "425 MADISON AVE": {
       "norm_delta_22_23": -12.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 28.46,
+      "acceleration": 41.43,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "425 WEST 50TH STREET": {
       "norm_delta_22_23": null,
@@ -5449,7 +5449,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "43 EAST 53RD STREET": {
       "norm_delta_22_23": null,
@@ -5470,14 +5470,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "43 WEST 64TH ST": {
       "norm_delta_22_23": -5.17,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 4.24,
+      "acceleration": 9.41,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "430 E 67 ST": {
       "norm_delta_22_23": -16.71,
@@ -5491,7 +5491,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "430-450 EAST 29TH ST": {
       "norm_delta_22_23": -0.14,
@@ -5512,14 +5512,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "435 EAST 52 STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "435 EAST 52ND STREET": {
       "norm_delta_22_23": null,
@@ -5533,7 +5533,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "437 MADISON AVENUE": {
       "norm_delta_22_23": 14.36,
@@ -5561,7 +5561,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "441 7TH AVE": {
       "norm_delta_22_23": -6.7,
@@ -5572,24 +5572,24 @@
     },
     "441 LEXINGTON AVENUE": {
       "norm_delta_22_23": -19.69,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 5.65,
+      "acceleration": 25.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "444 EAST 82ND STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "444 MADISON AVENUE": {
       "norm_delta_22_23": -21.28,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 29.5,
+      "acceleration": 50.78,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "445 EAST 69TH ST": {
       "norm_delta_22_23": -6.02,
@@ -5603,7 +5603,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "445 PARK AVE": {
       "norm_delta_22_23": 50.38,
@@ -5617,14 +5617,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "447 EAST 57TH STREET": {
       "norm_delta_22_23": -3.42,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 8.67,
+      "acceleration": 12.09,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "45 BROADWAY": {
       "norm_delta_22_23": -6.78,
@@ -5652,7 +5652,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "45 EAST 75TH ST": {
       "norm_delta_22_23": null,
@@ -5663,10 +5663,10 @@
     },
     "45 EAST 80TH STREET": {
       "norm_delta_22_23": -7.66,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 4.72,
+      "acceleration": 12.38,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "45 EAST 81ST STREET": {
       "norm_delta_22_23": -33.16,
@@ -5677,24 +5677,24 @@
     },
     "45 SUTTON PLACE SOUTH": {
       "norm_delta_22_23": 1.62,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.24,
+      "acceleration": -0.38,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "45 WEST 44TH STREET": {
       "norm_delta_22_23": -1.63,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 12.3,
+      "acceleration": 13.93,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "45 WEST 54TH STREET": {
       "norm_delta_22_23": 3.57,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 24.87,
+      "acceleration": 21.3,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "450 LEXINGTON AVENUE": {
       "norm_delta_22_23": -20.05,
@@ -5747,10 +5747,10 @@
     },
     "460 GRAND STREET": {
       "norm_delta_22_23": 2.31,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.82,
+      "acceleration": -7.13,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "460 PARK AVENUE": {
       "norm_delta_22_23": null,
@@ -5768,10 +5768,10 @@
     },
     "461 FIFTH AVENUE": {
       "norm_delta_22_23": -34.54,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 12.93,
+      "acceleration": 47.47,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "462 1ST AVE": {
       "norm_delta_22_23": null,
@@ -5834,7 +5834,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "485 LEXINGTON AVENUE": {
       "norm_delta_22_23": -13.76,
@@ -5845,24 +5845,24 @@
     },
     "485 MADISON AVE": {
       "norm_delta_22_23": -19.1,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 14.02,
+      "acceleration": 33.12,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "485 PARK AVE": {
       "norm_delta_22_23": -33.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -18.21,
+      "acceleration": 15.14,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "488 MADISON AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "489 5TH AVENUE": {
       "norm_delta_22_23": -10.07,
@@ -5887,24 +5887,24 @@
     },
     "49 EAST 52ND STREET": {
       "norm_delta_22_23": 9.69,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -7.42,
+      "acceleration": -17.11,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "49 EAST 79TH STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "499 PARK AVENUE": {
       "norm_delta_22_23": -16.17,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.96,
+      "acceleration": 23.13,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "5 BRYANT PARK": {
       "norm_delta_22_23": 12.12,
@@ -5960,7 +5960,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "50 BROADWAY": {
       "norm_delta_22_23": -14.53,
@@ -5974,21 +5974,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "50 EAST 79TH STREET": {
       "norm_delta_22_23": -6.46,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -4.82,
+      "acceleration": 1.64,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "50 GRAMERCY PARK NORTH": {
       "norm_delta_22_23": 22.51,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.39,
+      "acceleration": -22.12,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "50 ROCKEFELLER PLAZA": {
       "norm_delta_22_23": -0.83,
@@ -6002,7 +6002,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "50 VANDERBILT AVENUE": {
       "norm_delta_22_23": -3.49,
@@ -6027,24 +6027,24 @@
     },
     "50 W 57TH ST": {
       "norm_delta_22_23": 32.79,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -10.26,
+      "acceleration": -43.05,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "500 5TH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "500 PARK AVENUE": {
       "norm_delta_22_23": 454.24,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 118.31,
+      "acceleration": -335.93,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "500-518 E. 63RD STREET": {
       "norm_delta_22_23": 155.64,
@@ -6062,10 +6062,10 @@
     },
     "501 MADISON AVE": {
       "norm_delta_22_23": -12.74,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.87,
+      "acceleration": 19.61,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "502 PARK AVENUE": {
       "norm_delta_22_23": 9.31,
@@ -6076,10 +6076,10 @@
     },
     "504 EAST 63RD STREET": {
       "norm_delta_22_23": -9.37,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -100.0,
+      "acceleration": -90.63,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "505 FIFTH AVENUE": {
       "norm_delta_22_23": 18.39,
@@ -6097,10 +6097,10 @@
     },
     "505 PARK AVENUE": {
       "norm_delta_22_23": -16.45,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 17.48,
+      "acceleration": 33.93,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "509 MADISON AVENUE": {
       "norm_delta_22_23": 3.94,
@@ -6132,17 +6132,17 @@
     },
     "510 FIFTH AVENUE": {
       "norm_delta_22_23": -29.58,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.73,
+      "acceleration": 39.31,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "510 MADISON AVENUE": {
       "norm_delta_22_23": -19.53,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.03,
+      "acceleration": 40.56,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "511 EAST 71ST STREET": {
       "norm_delta_22_23": -1.26,
@@ -6156,7 +6156,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "513 W56TH ST": {
       "norm_delta_22_23": null,
@@ -6170,7 +6170,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "515 MADISON AVENUE": {
       "norm_delta_22_23": -26.65,
@@ -6181,10 +6181,10 @@
     },
     "515 PARK AVENUE": {
       "norm_delta_22_23": -18.24,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 26.91,
+      "acceleration": 45.15,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "515 WEST 59TH STREET": {
       "norm_delta_22_23": -1.24,
@@ -6219,7 +6219,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "52 WILLIAM STREET": {
       "norm_delta_22_23": 13.81,
@@ -6265,10 +6265,10 @@
     },
     "521-533 WEST 27TH ST": {
       "norm_delta_22_23": 10.27,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -33.49,
+      "acceleration": -43.76,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "522 FIFTH AVENUE": {
       "norm_delta_22_23": -7.59,
@@ -6279,24 +6279,24 @@
     },
     "524 PARK AVENUE": {
       "norm_delta_22_23": -17.36,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.45,
+      "acceleration": 26.81,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "525 PARK AVE": {
       "norm_delta_22_23": -8.76,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -0.69,
+      "acceleration": 8.07,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "529 FIFTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "53 WEST 53 ST": {
       "norm_delta_22_23": 8.24,
@@ -6342,10 +6342,10 @@
     },
     "535 MADISON AVENUE": {
       "norm_delta_22_23": -27.15,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.06,
+      "acceleration": 23.09,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "535 PARK AVENUE": {
       "norm_delta_22_23": -1.31,
@@ -6387,7 +6387,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "55 BROAD STREET": {
       "norm_delta_22_23": null,
@@ -6405,17 +6405,17 @@
     },
     "55 CHURCH STREET": {
       "norm_delta_22_23": -25.99,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 26.53,
+      "acceleration": 52.52,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "55 EAST 52ND STREET": {
       "norm_delta_22_23": -1.08,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 20.34,
+      "acceleration": 21.42,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "55 EAST 59TH STREET": {
       "norm_delta_22_23": 90.27,
@@ -6429,7 +6429,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "55 JOHN ST.": {
       "norm_delta_22_23": -12.93,
@@ -6447,10 +6447,10 @@
     },
     "55 WALL STREET": {
       "norm_delta_22_23": -5.99,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -3.44,
+      "acceleration": 2.55,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "55 WATER ST": {
       "norm_delta_22_23": -8.33,
@@ -6471,7 +6471,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "55 WORTH STREET": {
       "norm_delta_22_23": null,
@@ -6492,14 +6492,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "555 FIFTH AVENUE": {
       "norm_delta_22_23": -17.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 4.27,
+      "acceleration": 22.24,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "555 MADISON AVE": {
       "norm_delta_22_23": -9.57,
@@ -6520,7 +6520,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "56 LEONARD STREET": {
       "norm_delta_22_23": null,
@@ -6552,10 +6552,10 @@
     },
     "564 PARK AVE": {
       "norm_delta_22_23": 16.77,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -15.87,
+      "acceleration": -32.64,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "565 5TH AVENUE": {
       "norm_delta_22_23": -2.09,
@@ -6583,7 +6583,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "57 WEST 57TH STREET": {
       "norm_delta_22_23": -6.75,
@@ -6604,7 +6604,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "575 5TH AVE": {
       "norm_delta_22_23": null,
@@ -6646,14 +6646,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "589 FIFTH AVENUE": {
       "norm_delta_22_23": -9.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.95,
+      "acceleration": 16.92,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "59 JOHN STREET": {
       "norm_delta_22_23": null,
@@ -6688,28 +6688,28 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "590 FIFTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "590 MADISON AVENUE": {
       "norm_delta_22_23": -5.75,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -1.95,
+      "acceleration": 3.8,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "592 FIFTH AVENUE": {
       "norm_delta_22_23": 66.62,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -15.65,
+      "acceleration": -82.27,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "595 MADISON AVENUE": {
       "norm_delta_22_23": -22.61,
@@ -6723,7 +6723,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "598 MADISON AVENUE": {
       "norm_delta_22_23": 3.08,
@@ -6734,10 +6734,10 @@
     },
     "599 LEXINGTON": {
       "norm_delta_22_23": -12.52,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 11.34,
+      "acceleration": 23.86,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "6 EAST 43RD STREET": {
       "norm_delta_22_23": 5.96,
@@ -6758,7 +6758,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "60 BROAD STREET": {
       "norm_delta_22_23": -5.03,
@@ -6776,10 +6776,10 @@
     },
     "60 COLUMBUS AVE": {
       "norm_delta_22_23": 11.17,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -97.42,
+      "acceleration": -108.59,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "60 E 56TH ST": {
       "norm_delta_22_23": -49.99,
@@ -6793,7 +6793,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "60 HENRY STREET": {
       "norm_delta_22_23": null,
@@ -6814,7 +6814,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "60 WALL STREET": {
       "norm_delta_22_23": null,
@@ -6846,10 +6846,10 @@
     },
     "600 3RD AVENUE": {
       "norm_delta_22_23": 1.0,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -3.36,
+      "acceleration": -4.36,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "600 FIFTH AVENUE": {
       "norm_delta_22_23": -7.23,
@@ -6860,10 +6860,10 @@
     },
     "600 LEXINGTON AVENUE": {
       "norm_delta_22_23": -6.08,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -3.1,
+      "acceleration": 2.98,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "600 MADISON AVENUE": {
       "norm_delta_22_23": 46.71,
@@ -6874,17 +6874,17 @@
     },
     "601 LEXINGTON AVENUE": {
       "norm_delta_22_23": -3.25,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -0.22,
+      "acceleration": 3.03,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "605 3RD AVENUE": {
       "norm_delta_22_23": -2.8,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.13,
+      "acceleration": 3.93,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "605 WATER STREET": {
       "norm_delta_22_23": null,
@@ -6895,17 +6895,17 @@
     },
     "608 FIFTH AVENUE": {
       "norm_delta_22_23": -23.64,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 28.07,
+      "acceleration": 51.71,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "609 COLUMBUS AVE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "609 FIFTH AVENUE": {
       "norm_delta_22_23": null,
@@ -6916,10 +6916,10 @@
     },
     "61 7TH AVENUE": {
       "norm_delta_22_23": -2.98,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 0.07,
+      "acceleration": 3.05,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "61 BROADWAY": {
       "norm_delta_22_23": null,
@@ -6940,7 +6940,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "611 FIFTH AVENUE": {
       "norm_delta_22_23": null,
@@ -6958,17 +6958,17 @@
     },
     "620 EIGHTH AVENUE": {
       "norm_delta_22_23": 13.54,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 8.55,
+      "acceleration": -4.99,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "620 FIFTH AVENUE": {
       "norm_delta_22_23": 192.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 5466.21,
+      "acceleration": 5273.49,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "622 3RD AVENUE": {
       "norm_delta_22_23": -4.5,
@@ -7000,38 +7000,38 @@
     },
     "630 3RD AVENUE": {
       "norm_delta_22_23": -16.7,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.85,
+      "acceleration": 11.85,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "630 FIFTH AVENUE": {
       "norm_delta_22_23": 4.71,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 96.43,
+      "acceleration": 91.72,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "630 FIRST AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "630 SECOND AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "633 THIRD AVE": {
       "norm_delta_22_23": -4.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 14.87,
+      "acceleration": 19.68,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "635 MADISON AVE": {
       "norm_delta_22_23": null,
@@ -7042,17 +7042,17 @@
     },
     "640 FIFTH AVENUE": {
       "norm_delta_22_23": -16.81,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 5.52,
+      "acceleration": 22.33,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "641 AVENUE OF THE AMERICAS": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "641 LEXINGTON AVENUE": {
       "norm_delta_22_23": -13.32,
@@ -7066,14 +7066,14 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "645 5TH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "645 MADISON AVENUE": {
       "norm_delta_22_23": null,
@@ -7115,7 +7115,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "650 FIFTH AVENUE": {
       "norm_delta_22_23": 12.26,
@@ -7126,17 +7126,17 @@
     },
     "650 MADISON AVENUE": {
       "norm_delta_22_23": -21.45,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -2.0,
+      "acceleration": 19.45,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "650 PARK AVENUE": {
       "norm_delta_22_23": 0.2,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -62.28,
+      "acceleration": -62.48,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "650 WEST 57TH ST": {
       "norm_delta_22_23": null,
@@ -7161,24 +7161,24 @@
     },
     "655 PARK AVE": {
       "norm_delta_22_23": -12.53,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.23,
+      "acceleration": 8.3,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "655 SIXTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "66 EAST 79TH ST": {
       "norm_delta_22_23": 9.7,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 13.31,
+      "acceleration": 3.61,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "66 PARK AVENUE": {
       "norm_delta_22_23": 0.39,
@@ -7227,7 +7227,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "666 THIRD AVENUE": {
       "norm_delta_22_23": 2.25,
@@ -7262,21 +7262,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "680 FIFTH AVENUE": {
       "norm_delta_22_23": -18.87,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.96,
+      "acceleration": 19.83,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "681 FIFTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "685 5TH AVE": {
       "norm_delta_22_23": null,
@@ -7301,31 +7301,31 @@
     },
     "689 FIFTH AVENUE": {
       "norm_delta_22_23": -27.54,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.8,
+      "acceleration": 25.74,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "69 FIFTH AVENUE": {
       "norm_delta_22_23": -11.65,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 10.2,
+      "acceleration": 21.85,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "693 5 AVENUE": {
       "norm_delta_22_23": -3.03,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -6.55,
+      "acceleration": -3.52,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "7 EAST 12TH STREET": {
       "norm_delta_22_23": -4.84,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -9.49,
+      "acceleration": -4.65,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "7 GRAMERCY PARK": {
       "norm_delta_22_23": -24.72,
@@ -7343,17 +7343,17 @@
     },
     "7 W 34TH STREET": {
       "norm_delta_22_23": -10.26,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 33.28,
+      "acceleration": 43.54,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "7 WEST 43RD STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "7 WEST 55TH STREET": {
       "norm_delta_22_23": null,
@@ -7399,10 +7399,10 @@
     },
     "700 5TH AVENUE": {
       "norm_delta_22_23": 3.05,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -3.33,
+      "acceleration": -6.38,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "700 PARK AVENUE": {
       "norm_delta_22_23": -8.79,
@@ -7416,42 +7416,42 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "708 3RD AVE. NEW YORK, NY, 10017": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "71 PARK AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "71 W 35TH ST": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "711 5TH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "711 THIRD AVENUE": {
       "norm_delta_22_23": -13.96,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.4,
+      "acceleration": 21.36,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "712 7TH AVENUE": {
       "norm_delta_22_23": null,
@@ -7462,10 +7462,10 @@
     },
     "712 FIFTH AVENUE": {
       "norm_delta_22_23": -8.06,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 13.66,
+      "acceleration": 21.72,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "715 PARK AVENUE": {
       "norm_delta_22_23": -8.61,
@@ -7476,10 +7476,10 @@
     },
     "717 5TH AVE": {
       "norm_delta_22_23": -10.35,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 12.81,
+      "acceleration": 23.16,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "720 FIFTH AVENUE": {
       "norm_delta_22_23": null,
@@ -7490,10 +7490,10 @@
     },
     "720 PARK AVE": {
       "norm_delta_22_23": -55.42,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 74.28,
+      "acceleration": 129.7,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "724 FIFTH AVENUE": {
       "norm_delta_22_23": null,
@@ -7539,31 +7539,31 @@
     },
     "730 PARK AVE": {
       "norm_delta_22_23": -9.77,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.33,
+      "acceleration": 10.1,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "730 THIRD AVENUE": {
       "norm_delta_22_23": -0.77,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.44,
+      "acceleration": 2.21,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "731 LEXINGTON AVE": {
       "norm_delta_22_23": -5.85,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.13,
+      "acceleration": 5.98,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "732 LEXINGTON AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "733  THIRD  AVENUE": {
       "norm_delta_22_23": -4.86,
@@ -7574,31 +7574,31 @@
     },
     "740 PARK AVE": {
       "norm_delta_22_23": -5.83,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 2.3,
+      "acceleration": 8.13,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "745 FIFTH AVE.": {
       "norm_delta_22_23": -47.23,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 6.93,
+      "acceleration": 54.16,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "745 SEVENTH AVE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "75 BROAD STREET": {
       "norm_delta_22_23": -15.3,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -6.5,
+      "acceleration": 8.8,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "75 COLUMBIA STREET": {
       "norm_delta_22_23": -46.39,
@@ -7623,10 +7623,10 @@
     },
     "75 THIRD AVENUE": {
       "norm_delta_22_23": 23.73,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -19.41,
+      "acceleration": -43.14,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "75 WALL STREET": {
       "norm_delta_22_23": 2.49,
@@ -7637,10 +7637,10 @@
     },
     "750 EAST 16TH STREET": {
       "norm_delta_22_23": 81.03,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 16.11,
+      "acceleration": -64.92,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "750 LEXINGTON AVENUE": {
       "norm_delta_22_23": -10.22,
@@ -7658,10 +7658,10 @@
     },
     "750 THIRD AVENUE": {
       "norm_delta_22_23": -20.21,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -11.13,
+      "acceleration": 9.08,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "754 5TH AVENUE": {
       "norm_delta_22_23": null,
@@ -7686,17 +7686,17 @@
     },
     "767 FIFTH AVENUE": {
       "norm_delta_22_23": -66.53,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 18.97,
+      "acceleration": 85.5,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "77 WATER STREET": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "770 BROADWAY": {
       "norm_delta_22_23": 27.11,
@@ -7707,10 +7707,10 @@
     },
     "770 PARK AVE": {
       "norm_delta_22_23": -6.62,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 2.81,
+      "acceleration": 9.43,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "777 THIRD AVENUE": {
       "norm_delta_22_23": -22.17,
@@ -7721,10 +7721,10 @@
     },
     "777 UNITED NATIONS PLAZA": {
       "norm_delta_22_23": -11.21,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 3.84,
+      "acceleration": 15.05,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "778 PARK AVENUE": {
       "norm_delta_22_23": 4.29,
@@ -7756,10 +7756,10 @@
     },
     "785 FIFTH AVENUE": {
       "norm_delta_22_23": -15.91,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.5,
+      "acceleration": 14.41,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "787 SEVENTH AVENUE": {
       "norm_delta_22_23": 2.42,
@@ -7770,10 +7770,10 @@
     },
     "79 EAST 79TH ST": {
       "norm_delta_22_23": -12.87,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -9.88,
+      "acceleration": 2.99,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "79 LEONARD STREET": {
       "norm_delta_22_23": null,
@@ -7791,10 +7791,10 @@
     },
     "790 MADISON AVENUE": {
       "norm_delta_22_23": -8.91,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -0.74,
+      "acceleration": 8.17,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "799 PARK AVENUE": {
       "norm_delta_22_23": 12.51,
@@ -7819,10 +7819,10 @@
     },
     "8 WEST 38": {
       "norm_delta_22_23": -12.45,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 106.69,
+      "acceleration": 119.14,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "80 & 90 MAIDEN LANE": {
       "norm_delta_22_23": -15.28,
@@ -7896,10 +7896,10 @@
     },
     "800 PARK AVE": {
       "norm_delta_22_23": -12.53,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 3.21,
+      "acceleration": 15.74,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "805 3RD AVENUE": {
       "norm_delta_22_23": 1710.11,
@@ -7913,7 +7913,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "810 FIFTH AVENUE": {
       "norm_delta_22_23": 122.37,
@@ -7924,17 +7924,17 @@
     },
     "810 SEVENTH AVENUE": {
       "norm_delta_22_23": -14.27,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -10.4,
+      "acceleration": 3.87,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "812 FIFTH AVENUE": {
       "norm_delta_22_23": -11.69,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 17.84,
+      "acceleration": 29.53,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "812 PARK AVENUE": {
       "norm_delta_22_23": -4.08,
@@ -7945,24 +7945,24 @@
     },
     "815 SECOND AVENUE": {
       "norm_delta_22_23": 8.33,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -5.55,
+      "acceleration": -13.88,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "817 FIFTH AVE": {
       "norm_delta_22_23": -11.97,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 5.14,
+      "acceleration": 17.11,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "820 FIFTH AVE": {
       "norm_delta_22_23": -32.64,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -16.3,
+      "acceleration": 16.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "820 PARK AVENUE": {
       "norm_delta_22_23": -13.94,
@@ -7980,17 +7980,17 @@
     },
     "825 FIFTH AVENUE": {
       "norm_delta_22_23": -13.44,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -4.29,
+      "acceleration": 9.15,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "825 SEVENTH AVE": {
       "norm_delta_22_23": -7.51,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 4.81,
+      "acceleration": 12.32,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "83 MAIDEN LANE": {
       "norm_delta_22_23": -9.03,
@@ -8004,21 +8004,21 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "834 FIFTH AVE": {
       "norm_delta_22_23": -10.26,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -3.56,
+      "acceleration": 6.7,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "838 FIFTH AVENUE": {
       "norm_delta_22_23": null,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "845 1ST AVENUE": {
       "norm_delta_22_23": 4.06,
@@ -8039,7 +8039,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "85 WEST BROADWAY": {
       "norm_delta_22_23": -7.92,
@@ -8057,10 +8057,10 @@
     },
     "850 THIRD AVENUE": {
       "norm_delta_22_23": -5.45,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -3.3,
+      "acceleration": 2.15,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "860 PARK AVENUE": {
       "norm_delta_22_23": -14.19,
@@ -8085,10 +8085,10 @@
     },
     "866 THIRD AVENUE": {
       "norm_delta_22_23": 1.51,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.95,
+      "acceleration": 0.44,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "866 UN PLAZA": {
       "norm_delta_22_23": -58.88,
@@ -8099,10 +8099,10 @@
     },
     "870 FIFTH AVENUE": {
       "norm_delta_22_23": -7.7,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -7.36,
+      "acceleration": 0.34,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "870 SEVENTH AVE": {
       "norm_delta_22_23": 31.3,
@@ -8116,7 +8116,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "88 PINE STREET": {
       "norm_delta_22_23": null,
@@ -8134,10 +8134,10 @@
     },
     "880 THIRD AVE": {
       "norm_delta_22_23": -50.41,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 572.52,
+      "acceleration": 622.93,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "881 7TH AVE": {
       "norm_delta_22_23": null,
@@ -8148,10 +8148,10 @@
     },
     "885 SECOND AVENUE": {
       "norm_delta_22_23": -11.08,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 21.89,
+      "acceleration": 32.97,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "885 THIRD AVENUE": {
       "norm_delta_22_23": null,
@@ -8165,7 +8165,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "895 BROADWAY": {
       "norm_delta_22_23": null,
@@ -8176,10 +8176,10 @@
     },
     "898 PARK AVE": {
       "norm_delta_22_23": 6.65,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -9.6,
+      "acceleration": -16.25,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "9 W 57TH STREET": {
       "norm_delta_22_23": null,
@@ -8193,7 +8193,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "90 BROAD STREET": {
       "norm_delta_22_23": -20.23,
@@ -8228,7 +8228,7 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "90 TRINITY PLACE": {
       "norm_delta_22_23": -7.82,
@@ -8253,8 +8253,8 @@
     },
     "900 FIFTH AVENUE": {
       "norm_delta_22_23": -37.03,
-      "norm_delta_23_24": 46.11,
-      "acceleration": 83.14,
+      "norm_delta_23_24": 47.6,
+      "acceleration": 84.63,
       "decline_trend_label": "accelerating",
       "n_years_data": 3
     },
@@ -8263,42 +8263,42 @@
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 1
+      "n_years_data": 2
     },
     "900 THIRD AVE": {
       "norm_delta_22_23": -13.65,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -1.26,
+      "acceleration": 12.39,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "909 THIRD AVENUE": {
       "norm_delta_22_23": 27.24,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 10.45,
+      "acceleration": -16.79,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "912 FIFTH AVENUE": {
       "norm_delta_22_23": -4.21,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": -8.5,
+      "acceleration": -4.29,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "919 THIRD AVENUE": {
       "norm_delta_22_23": -13.84,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 0.8,
+      "acceleration": 14.64,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "920 FIFTH AVE": {
       "norm_delta_22_23": -19.95,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -5.19,
+      "acceleration": 14.76,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "921 MADISON AVENUE": {
       "norm_delta_22_23": 16.77,
@@ -8309,17 +8309,17 @@
     },
     "936 FIFTH AVENUE": {
       "norm_delta_22_23": 31.73,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -36.55,
+      "acceleration": -68.28,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "944 FIFTH AVENUE": {
       "norm_delta_22_23": -4.39,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.95,
+      "acceleration": 14.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "945 MADISON AVE": {
       "norm_delta_22_23": null,
@@ -8344,31 +8344,31 @@
     },
     "950 THIRD AVENUE": {
       "norm_delta_22_23": -23.9,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 23.23,
+      "acceleration": 47.13,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "953 FIFTH AVENUE": {
       "norm_delta_22_23": -13.5,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -5.73,
+      "acceleration": 7.77,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "955 FIFTH AVE": {
       "norm_delta_22_23": -100.0,
       "norm_delta_23_24": null,
       "acceleration": null,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "960 FIFTH AVE/3 EAST 77TH ST": {
       "norm_delta_22_23": 14.84,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 7.71,
+      "acceleration": -7.13,
+      "decline_trend_label": "decelerating",
+      "n_years_data": 3
     },
     "969 FIFTH AVENUE": {
       "norm_delta_22_23": null,
@@ -8393,10 +8393,10 @@
     },
     "980 FIFTH AVENUE": {
       "norm_delta_22_23": 1.19,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 1.3,
+      "acceleration": 0.11,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "980 MADISON AVENUE": {
       "norm_delta_22_23": -2.39,
@@ -8414,10 +8414,10 @@
     },
     "988 FIFTH AVE": {
       "norm_delta_22_23": -10.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 11.59,
+      "acceleration": 22.31,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "989 AVE OF THE AMERICAS": {
       "norm_delta_22_23": null,
@@ -8428,10 +8428,10 @@
     },
     "99 PARK AVENUE": {
       "norm_delta_22_23": -66.16,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": -0.96,
+      "acceleration": 65.2,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "990 FIFTH AVENUE": {
       "norm_delta_22_23": -12.29,
@@ -8442,31 +8442,31 @@
     },
     "993 FIFTH AVENUE": {
       "norm_delta_22_23": -7.11,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 1.79,
+      "acceleration": 8.9,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "995 FIFTH AVENUE": {
       "norm_delta_22_23": -11.16,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 20.06,
+      "acceleration": 31.22,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "ED SULLIVAN THEATER 1697 BROADWAY": {
       "norm_delta_22_23": -0.72,
-      "norm_delta_23_24": null,
-      "acceleration": null,
+      "norm_delta_23_24": 0.03,
+      "acceleration": 0.75,
       "decline_trend_label": "stable",
-      "n_years_data": 2
+      "n_years_data": 3
     },
     "ELEVEN PENN PLAZA": {
       "norm_delta_22_23": -32.14,
-      "norm_delta_23_24": null,
-      "acceleration": null,
-      "decline_trend_label": "stable",
-      "n_years_data": 2
+      "norm_delta_23_24": 9.2,
+      "acceleration": 41.34,
+      "decline_trend_label": "accelerating",
+      "n_years_data": 3
     },
     "ONE BRYANT PARK": {
       "norm_delta_22_23": 155.33,
@@ -8481,6 +8481,104 @@
       "acceleration": -47.32,
       "decline_trend_label": "decelerating",
       "n_years_data": 3
+    },
+    "100 WEST 92ND STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "104 HAVEN AVE.": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "1200 FIFTH AVENUE": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "176 WEST 94TH STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "1 HAVEN AVE; 701 W 168 STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "CHEZ 66 CONDOMINIUM": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "600 WEST 168TH ST": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "630, 650 W 168TH STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "65 W 96TH STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "711 AMSTERDAM AVE": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "689 COLUMBUS AVE": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "95 WEST 95TH STREET": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "ONE NORTH END AVENUE": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
+    },
+    "CLASSIFIED": {
+      "norm_delta_22_23": null,
+      "norm_delta_23_24": null,
+      "acceleration": null,
+      "decline_trend_label": "stable",
+      "n_years_data": 1
     }
   }
 }
