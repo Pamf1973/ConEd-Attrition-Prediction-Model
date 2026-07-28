@@ -39,18 +39,20 @@ ctx = ssl._create_unverified_context()
 # Each tuple lists names to try in order; first match wins.
 FIELD_CANDIDATES = {
     "address":            ["address_1", "property_name", "address"],
-    "bbl":                ["bbl", "nyc_borough_block_and_lot_bbl_", "nyc_bbl"],
-    "report_year":        ["year_ending", "reporting_year", "report_year"],
-    "district_steam_kbtu":["district_steam_kbtu", "district_steam_use_kbtu"],
+    "bbl":                ["nyc_borough_block_and_lot", "bbl", "nyc_bbl"],
+    "report_year":        ["report_year", "year_ending", "reporting_year"],
+    "district_steam_kbtu":["district_steam_use_kbtu", "district_steam_kbtu"],
     "energy_star_score":  ["energy_star_score", "energystar_score"],
-    "total_ghg_mt":       ["total_ghg_emissions_metric_tons_co2e",
-                           "total_ghg_emissions_mt_co2e", "total_ghg_mt"],
-    "ghg_intensity":      ["total_ghg_emissions_intensity_kgco2e_ft2",
-                           "ghg_intensity_kg_co2e_ft", "ghg_intensity",
-                           "weather_normalized_site_eui_kbtu_ft"],
-    "site_eui":           ["site_energy_use_intensity_kbtu_ft",
-                           "site_eui_kbtu_ft", "site_eui"],
-    "electricity_kwh":    ["electricity_kwh", "electricity_kbtu"],
+    "total_ghg_mt":       ["total_location_based_ghg",
+                           "net_emissions_metric_tons",
+                           "total_ghg_emissions_metric_tons_co2e", "total_ghg_mt"],
+    "ghg_intensity":      ["direct_ghg_emissions_intensity",
+                           "total_ghg_emissions_intensity_kgco2e_ft2",
+                           "ghg_intensity"],
+    "site_eui":           ["site_eui_kbtu_ft", "site_energy_use_kbtu_ft",
+                           "site_energy_use_intensity_kbtu_ft", "site_eui"],
+    "electricity_kwh":    ["electricity_use_grid_purchase",
+                           "electricity_kwh", "electricity_kbtu"],
     "natural_gas_kbtu":   ["natural_gas_use_kbtu", "natural_gas_kbtu"],
 }
 
@@ -155,19 +157,17 @@ def main():
 
     # ── 3. Fetch target year data for our BBLs ─────────────────────────────────
     print(f"\n[3/5] Fetching {target_year} records for {len(bbl_numeric)} BBLs...")
-    bbl_col = field_map.get("bbl", "bbl")
-    year_col = field_map.get("report_year", "year_ending")
+    bbl_col = field_map.get("bbl", "nyc_borough_block_and_lot")
+    year_col = field_map.get("report_year", "report_year")
     new_rows = []
     chunk_size = 30
     n_chunks = (len(bbl_numeric) + chunk_size - 1) // chunk_size
     for i in range(0, len(bbl_numeric), chunk_size):
         chunk = bbl_numeric[i:i+chunk_size]
-        bbl_clause = " OR ".join(f"{bbl_col}='{b}'" for b in chunk)
-        # year_ending is stored as a date string like '2024-12-31' in some vintages
-        year_clause = (
-            f"({year_col}='{target_year}' OR {year_col}='{target_year}-12-31' "
-            f"OR {year_col}='{target_year}-01-01')"
-        )
+        # BBLs are 10-digit strings in Socrata (e.g. '1012720034')
+        bbl_clause = " OR ".join(f"{bbl_col}='{str(b)}'" for b in chunk)
+        # report_year is stored as plain string '2024' in current dataset vintage
+        year_clause = f"{year_col}='{target_year}'"
         params = {
             "$where": f"({bbl_clause}) AND {year_clause}",
             "$limit": 500,
