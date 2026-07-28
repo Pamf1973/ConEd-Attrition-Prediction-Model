@@ -1,5 +1,24 @@
 import { useState, useEffect } from "react";
 
+const RISK_WEIGHTS = {
+  ll97_penalty: 1, steam_decline: 1, energy_star_inv: 1,
+  eui: 0.5, ll97_over: 1, dob_jobs_inv: 0.5, ml_risk: 1, ghg: 0.5,
+};
+const RISK_KEYS = Object.keys(RISK_WEIGHTS);
+
+function buildingRiskFactors(b, e) {
+  return {
+    ll97_penalty:    e.ll97_penalty_2024 ?? 0,
+    steam_decline:   e.decline_acceleration ?? 0,
+    energy_star_inv: 100 - (Number(e.energy_star) || 50),
+    eui:             Number(e.eui) || 0,
+    ll97_over:       e.ll97_over_2024 ?? 0,
+    dob_jobs_inv:    1 / (1 + (e.dob_jobs ?? 0)),
+    ml_risk:         e.ml_risk ?? 0,
+    ghg:             Number(b.ghg) || 0,
+  };
+}
+
 export function estimateScClass(useType, steamKbtu, dobJobs) {
   const steam = steamKbtu || 0;
   const jobs = parseInt(dobJobs || 0, 10);
@@ -99,6 +118,20 @@ export function useBuildings(token) {
 
         if (cancelled) return;
 
+        // Compute population-wide min/max for composite risk normalization (mirrors server SCORE_NORMS)
+        const allFactors = bldgs.map(b => buildingRiskFactors(b, enrich[b.address?.toUpperCase()] ?? {}));
+        const scoreMins = {}, scoreMaxs = {};
+        for (const k of RISK_KEYS) {
+          const vals = allFactors.map(f => f[k]).filter(Number.isFinite);
+          scoreMins[k] = vals.length ? Math.min(...vals) : 0;
+          scoreMaxs[k] = vals.length ? Math.max(...vals) : 0;
+        }
+        function normalizeRiskFactor(v, k) {
+          const range = scoreMaxs[k] - scoreMins[k];
+          if (!range) return 0.5;
+          return Math.max(0, Math.min(1, (v - scoreMins[k]) / range));
+        }
+
         // Enrichment keys are uppercased by ll97_model.py / kmeans_model.py
         const merged = bldgs.map(b => {
           const key = b.address?.toUpperCase();
@@ -106,11 +139,18 @@ export function useBuildings(token) {
           const y = yearly[key] ?? {};
           const yoy = yoyDeltas[key] ?? {};
           const has_ml_risk = e.ml_risk != null;
-          const risk   = has_ml_risk ? e.ml_risk : b.risk;
-          const signal = e.signal || null;
+          const f = buildingRiskFactors(b, e);
+          let wSum = 0, wTotal = 0;
+          for (const k of RISK_KEYS) {
+            wSum   += RISK_WEIGHTS[k] * normalizeRiskFactor(f[k], k);
+            wTotal += RISK_WEIGHTS[k];
+          }
+          const composite_risk = wTotal > 0 ? wSum / wTotal : 0;
+          const risk    = composite_risk;
+          const signal  = e.signal || null;
           const dobJobs = e.dob_jobs || 0;
           const sc_class = estimateScClass(b.use, b.steam, dobJobs);
-          return { ...b, ...e, ...y, ...yoy, risk, has_ml_risk, signal, sc_class };
+          return { ...b, ...e, ...y, ...yoy, risk, composite_risk, has_ml_risk, signal, sc_class };
         });
         setBuildings(merged);
       } catch (err) {

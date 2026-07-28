@@ -58,8 +58,8 @@ export default function RiskHistogram({ buildings, onFilterByRisk }) {
     <div className="bg-[#001748] border border-[#082244] rounded-xl p-5">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-slate-100 font-semibold text-sm">Attrition Risk Distribution</h3>
-          <p className="text-slate-500 text-xs mt-0.5">{scored.length} buildings with ML scores</p>
+          <h3 className="text-slate-100 font-semibold text-sm">Composite Risk Distribution</h3>
+          <p className="text-slate-500 text-xs mt-0.5">{scored.length} buildings scored</p>
         </div>
         <div className="flex gap-3 text-xs">
           <span className="text-red-400"><span className="font-bold">{high}</span> High</span>
