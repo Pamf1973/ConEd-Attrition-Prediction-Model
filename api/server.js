@@ -2,7 +2,8 @@
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { readFileSync } from "fs";
+import { readFileSync, realpathSync, accessSync, constants as fsConstants } from "fs";
+import { spawn } from "child_process";
 import { resolve, join, dirname } from "path";
 import { randomBytes, timingSafeEqual, createHmac } from "crypto";
 import { fileURLToPath } from "url";
@@ -979,6 +980,67 @@ const PREDICT_FEATURES = [
   "ll97_over_2024","steam_ghg_share",
 ];
 
+// Mirrors ll97_model.py USE_TYPE_RISK — ordinal risk encoding of building use
+const USE_TYPE_RISK = {
+  "Office": 4, "Financial Office": 4,
+  "Hotel": 3, "Retail Store": 3, "Repair Services (Vehicle, Shoe, Locksmith, etc.)": 3,
+  "Multifamily Housing": 2, "Residence Hall/Dormitory": 2, "College/University": 2,
+  "Medical Office": 2, "Urgent Care/Clinic/Other Outpatient": 2,
+  "Performing Arts": 2, "Worship Facility": 2,
+  "Museum": 1, "K-12 School": 1, "Hospital (General Medical & Surgical)": 1,
+  "Other - Specialty Hospital": 1, "Laboratory": 1, "Other - Technology/Science": 1,
+};
+
+// Precompute min/max for each weighted scoring factor at startup (O(n) once)
+const SCORE_NORMS = (() => {
+  if (!DATA_PARSED.buildings?.length) {
+    console.warn("[SCORE_NORMS] no buildings loaded — custom scoring will return 0.5 for all factors");
+    return { mins: {}, maxs: {} };
+  }
+  const rows = DATA_PARSED.buildings.map(b => {
+    const e = DATA_PARSED.enrichment[b.address?.toUpperCase()] ?? {};
+    return {
+      ll97_penalty:    e.ll97_penalty_2024 ?? 0,
+      steam_decline:   e.decline_acceleration ?? 0,
+      energy_star_inv: 100 - (Number(e.energy_star) || 50),
+      eui:             Number(e.eui) || 0,
+      ll97_over:       e.ll97_over_2024 ?? 0,
+      dob_jobs_inv:    1 / (1 + (e.dob_jobs ?? 0)),
+      ml_risk:         e.ml_risk ?? 0,
+      ghg:             Number(b.ghg) || 0,
+    };
+  });
+  const keys = Object.keys(rows[0]);
+  const mins = {}, maxs = {};
+  for (const k of keys) {
+    const vals = rows.map(r => r[k]).filter(Number.isFinite);
+    mins[k] = vals.length ? Math.min(...vals) : 0;
+    maxs[k] = vals.length ? Math.max(...vals) : 0;
+  }
+  return { mins, maxs };
+})();
+
+function _normalizeVal(v, k) {
+  const range = SCORE_NORMS.maxs[k] - SCORE_NORMS.mins[k];
+  if (!range) return 0.5; // no variance across buildings — treat as neutral
+  return Math.max(0, Math.min(1, (v - SCORE_NORMS.mins[k]) / range));
+}
+
+const ML_PYTHON = (() => {
+  const raw = process.env.ML_PYTHON ?? join(__dirname, "..", ".ml_venv", "bin", "python");
+  try {
+    const real = realpathSync(raw);
+    accessSync(real, fsConstants.X_OK);
+    return real;
+  } catch (e) {
+    console.warn(`[predict] ML_PYTHON not executable (${raw}): ${e.message} — /api/predict/live will fail`);
+    return raw;
+  }
+})();
+const PREDICT_PY = join(__dirname, "predict.py");
+const MAX_WEIGHT  = 10; // per-factor ceiling to prevent extreme re-ranking
+const PREDICT_RATE = rateLimit({ windowMs: 60_000, max: 30, standardHeaders: true, legacyHeaders: false });
+
 // Pre-built O(1) lookup: normalized address → original enrichment key
 const ENRICHMENT_NORM_INDEX = (() => {
   const idx = new Map();
@@ -1021,6 +1083,159 @@ app.get("/api/predict/compare", requireAuth, (req, res) => {
     gbm_auc:   0.6639,
     features:  PREDICT_FEATURES,
   });
+});
+
+// GET /api/predict/live?address=200+EAST+42ND+ST&model=both
+// Runs live inference through predict.py using current DATA_PARSED features.
+// Returns xgb_risk/gbm_risk computed NOW (vs cached values in enrichment).
+app.get("/api/predict/live", requireAuth, PREDICT_RATE, async (req, res) => {
+  const addr = (req.query.address ?? "").trim();
+  if (!addr) return res.status(400).json({ error: "address query param required" });
+
+  const norm = addr.toUpperCase().replace(/\s+/g, " ");
+  const key  = ENRICHMENT_NORM_INDEX.get(norm);
+  if (!key)  return res.status(404).json({ error: "Building not found" });
+
+  const b = DATA_PARSED.buildings.find(r => r.address?.toUpperCase() === key);
+  const e = DATA_PARSED.enrichment[key] ?? {};
+  if (!b) return res.status(404).json({ error: "Building record missing" });
+
+  const features = [
+    Math.log1p(Number(b.steam)  || 0),
+    Number(b.yr)                || 1950,
+    Math.log1p(Number(b.ghg)   || 0),
+    e.log_dob_jobs      ?? Math.log1p(e.dob_jobs ?? 0),
+    e.peer_score        ?? 0.5,
+    Number(e.energy_star) || 50,
+    USE_TYPE_RISK[b.use] ?? 2,
+    e.cluster_id        ?? 0,
+    Math.log1p(e.ll97_penalty_2024 ?? 0),
+    Math.log1p(e.ll97_penalty_2030 ?? 0),
+    e.ll97_over_2024    ?? 0,
+    e.steam_ghg_share   ?? 0,
+  ];
+
+  const modelReq = ["xgboost","gbm","both"].includes(req.query.model) ? req.query.model : "both";
+
+  let result;
+  try {
+    result = await new Promise((resolve, reject) => {
+      const child = spawn(ML_PYTHON, [PREDICT_PY], { cwd: join(__dirname, "..") });
+      let out = "", err = "";
+      // Kill predict.py if it hangs beyond 15 s
+      const timer = setTimeout(() => {
+        child.kill("SIGTERM");
+        reject(new Error("predict.py timed out (15s)"));
+      }, 15_000);
+      child.stdout.on("data", d => (out += d));
+      child.stderr.on("data", d => (err += d));
+      child.on("error", e => { clearTimeout(timer); reject(e); });
+      child.on("close", code => {
+        clearTimeout(timer);
+        if (code !== 0) return reject(new Error(`predict.py exited ${code}: ${err.slice(0, 200)}`));
+        try { resolve(JSON.parse(out)); } catch { reject(new Error("Bad JSON from predict.py")); }
+      });
+      req.on("close", () => { clearTimeout(timer); child.kill("SIGKILL"); });
+      child.stdin.write(JSON.stringify({ features, model: modelReq }));
+      child.stdin.end();
+    });
+  } catch (e) {
+    console.error("[/api/predict/live]", e.message);
+    return res.status(503).json({ error: "Prediction service unavailable" });
+  }
+
+  if (result.error) return res.status(500).json({ error: "Model returned an error" });
+
+  res.json({
+    address: key,
+    ...result,
+    cached_xgb_risk: e.xgb_risk ?? null,
+    features_used: Object.fromEntries(PREDICT_FEATURES.map((f, i) => [f, features[i]])),
+  });
+});
+
+// POST /api/predict/custom
+// Body: { "weights": { "ll97_penalty": 2, "ml_risk": 1, "steam_decline": 1.5, ... }, "top_n": 20 }
+// Body: { "address": "...", "weights": {...} }  — score one building
+// Supported factors: ll97_penalty, steam_decline, energy_star (inverted), eui, ll97_over, dob_jobs (inverted), ml_risk, ghg
+// Each factor is min-max normalized 0-1 across all buildings before weighting.
+app.post("/api/predict/custom", requireAuth, PREDICT_RATE, (req, res) => {
+  const { address, weights, top_n } = req.body;
+  const safeWeights = (weights && typeof weights === "object" && !Array.isArray(weights)) ? weights : {};
+
+  const rawW = {
+    ll97_penalty:    safeWeights.ll97_penalty    ?? 1,
+    steam_decline:   weights.steam_decline   ?? 1,
+    energy_star_inv: safeWeights.energy_star     ?? 1,
+    eui:             safeWeights.eui             ?? 0.5,
+    ll97_over:       safeWeights.ll97_over       ?? 1,
+    dob_jobs_inv:    safeWeights.dob_jobs        ?? 0.5,
+    ml_risk:         safeWeights.ml_risk         ?? 1,
+    ghg:             safeWeights.ghg             ?? 0.5,
+  };
+
+  for (const [k, v] of Object.entries(rawW)) {
+    const n = Number(v);
+    if (!Number.isFinite(n) || Math.abs(n) > MAX_WEIGHT)
+      return res.status(400).json({ error: `Weight '${k}' must be a finite number in [−${MAX_WEIGHT}, ${MAX_WEIGHT}]` });
+    rawW[k] = n;
+  }
+  const totalW = Object.values(rawW).reduce((s, w) => s + Math.abs(w), 0);
+  if (!totalW) return res.status(400).json({ error: "All weights are zero" });
+
+  function buildFactors(b, e) {
+    return {
+      ll97_penalty:    e.ll97_penalty_2024 ?? 0,
+      steam_decline:   e.decline_acceleration ?? 0,
+      energy_star_inv: 100 - (Number(e.energy_star) || 50),
+      eui:             Number(e.eui) || 0,
+      ll97_over:       e.ll97_over_2024 ?? 0,
+      dob_jobs_inv:    1 / (1 + (e.dob_jobs ?? 0)),
+      ml_risk:         e.ml_risk ?? 0,
+      ghg:             b.ghg ?? 0,
+    };
+  }
+
+  function customScore(b, e) {
+    const f = buildFactors(b, e);
+    let s = 0;
+    for (const k of Object.keys(rawW)) s += rawW[k] * _normalizeVal(f[k], k);
+    return Math.round((s / totalW) * 10000) / 10000;
+  }
+
+  if (address) {
+    const norm = address.trim().toUpperCase().replace(/\s+/g, " ");
+    const key  = ENRICHMENT_NORM_INDEX.get(norm);
+    if (!key)  return res.status(404).json({ error: "Building not found" });
+    const b = DATA_PARSED.buildings.find(r => r.address?.toUpperCase() === key) ?? {};
+    const e = DATA_PARSED.enrichment[key] ?? {};
+    return res.json({
+      address:     key,
+      custom_risk: customScore(b, e),
+      ml_risk:     e.ml_risk ?? null,
+      factors:     buildFactors(b, e),
+      weights:     rawW,
+    });
+  }
+
+  const limit = Math.min(200, Math.max(1, parseInt(top_n ?? 20, 10) || 20));
+  const ranked = DATA_PARSED.buildings
+    .map(b => {
+      const key = b.address?.toUpperCase();
+      const e   = DATA_PARSED.enrichment[key] ?? {};
+      return {
+        address:            key,
+        custom_risk:        customScore(b, e),
+        ml_risk:            e.ml_risk ?? null,
+        ll97_penalty_2024:  e.ll97_penalty_2024 ?? 0,
+        cluster_name:       e.cluster_name ?? null,
+        decline_trend:      e.decline_trend_label ?? null,
+      };
+    })
+    .sort((a, b) => b.custom_risk - a.custom_risk)
+    .slice(0, limit);
+
+  res.json({ weights: rawW, count: ranked.length, buildings: ranked });
 });
 
 app.get("/api/health", requireAuth, (_req, res) => {
