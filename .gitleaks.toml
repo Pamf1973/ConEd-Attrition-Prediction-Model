@@ -1,0 +1,5 @@
+[allowlist]
+  description = "Allowlist for NYC LL97 column name false positives"
+  regexes = [
+    "ll97_penalty_\\d{4}",
+  ]
