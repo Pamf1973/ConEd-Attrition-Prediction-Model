@@ -4,6 +4,9 @@ A decision-support tool for Con Edison's steam customer retention team. Built by
 
 **Live data:** 1,260 Manhattan buildings below 90th Street currently on ConEd district steam.
 
+URL: https://coned-attrition-prediction-model-production.up.railway.app/legacy
+password: coned-steam-2026
+
 ---
 
 ## What It Does
