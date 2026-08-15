@@ -140,7 +140,7 @@ export function useBuildings(token) {
           const y = yearly[key] ?? {};
           const yoy = yoyDeltas[key] ?? {};
           const has_ml_risk = e.ml_risk != null;
-          // Composite risk = primary (transparent weighted formula, mirrors /api/predict/custom)
+          // Composite risk = secondary field; XGBoost (ml_risk) remains primary `risk`
           const f = buildingRiskFactors(b, e);
           let wSum = 0, wTotal = 0;
           for (const k of RISK_KEYS) {
@@ -148,7 +148,7 @@ export function useBuildings(token) {
             wTotal += RISK_WEIGHTS[k];
           }
           const composite_risk = wTotal > 0 ? wSum / wTotal : 0;
-          const risk    = composite_risk; // PRIMARY display; ml_risk preserved via ...e spread
+          const risk    = has_ml_risk ? e.ml_risk : b.risk; // XGBoost primary; composite_risk is secondary field
           const signal  = e.signal || null;
           const dobJobs = e.dob_jobs || 0;
           const sc_class = estimateScClass(b.use, b.steam, dobJobs);

@@ -66,11 +66,11 @@ function DiagnosticSection({ building }) {
 
   const dc = DIAG_COLORS[diagnostic_risk] ?? DIAG_COLORS.Uncertain;
 
-  // Derive composite tier label using same thresholds as riskTier()
-  const compositeLabel = Number.isFinite(risk)
+  // Derive ML tier label using same thresholds as riskTier()
+  const mlLabel = Number.isFinite(risk)
     ? (risk > 0.7 ? "High" : risk > 0.4 ? "Medium" : "Low")
     : null;
-  const conflict = compositeLabel && compositeLabel !== diagnostic_risk && diagnostic_risk !== "Uncertain";
+  const conflict = mlLabel && mlLabel !== diagnostic_risk && diagnostic_risk !== "Uncertain";
 
   const accelFmt = decline_acceleration != null
     ? `${decline_acceleration > 0 ? "+" : ""}${decline_acceleration.toFixed(1)}%/yr²`
@@ -92,7 +92,7 @@ function DiagnosticSection({ building }) {
           </span>
           {conflict && (
             <span className="text-[10px] text-slate-500">
-              Composite: {compositeLabel} · Diagnostic: {diagnostic_risk}
+              ML: {mlLabel} · Diagnostic: {diagnostic_risk}
             </span>
           )}
         </div>
@@ -122,11 +122,11 @@ function DiagnosticSection({ building }) {
         {/* Conflict explanation */}
         {conflict && (
           <div className="mt-2 text-[10px] text-slate-500 leading-snug border-t border-[#082244] pt-2">
-            {compositeLabel === "Low" && diagnostic_risk === "High"
-              ? "Usage anomalies not fully reflected by external signals — watch manually."
-              : compositeLabel === "High" && diagnostic_risk === "Low"
+            {mlLabel === "Low" && diagnostic_risk === "High"
+              ? "Usage anomalies not captured by ML external signals — watch manually."
+              : mlLabel === "High" && diagnostic_risk === "Low"
               ? "External pressure (LL97/permits) without usage anomaly yet — early-warning case."
-              : "Conflicting signals — review both composite score and diagnostic tier."}
+              : "Conflicting signals — review both ML score and diagnostic modifiers."}
           </div>
         )}
       </div>
@@ -294,8 +294,8 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
       </div>
 
       <div className="px-5 pb-8 flex-1">
-        {/* Composite risk score (primary) */}
-        <Section title="Composite Risk Score">
+        {/* Attrition risk score */}
+        <Section title="Attrition Risk">
           <div className="flex items-end gap-3 py-3">
             <span className="text-5xl font-black" style={{ color: tier.color }}>
               {Number.isFinite(b.risk) ? Math.round(b.risk * 100) + "%" : "—"}
@@ -327,14 +327,14 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
 
           <MLDrivers drivers={b.ml_drivers} />
 
-          {/* ML Signal (XGBoost — secondary) */}
-          {b.ml_risk != null && (() => {
-            const mlT = riskTier(b.ml_risk);
+          {/* Composite Score (secondary) */}
+          {b.composite_risk != null && (() => {
+            const cT = riskTier(b.composite_risk);
             return (
               <div className="flex justify-between items-center mt-3 text-sm">
-                <span className="text-slate-500">ML Signal (XGBoost)</span>
-                <span className="font-semibold" style={{ color: mlT.color }}>
-                  {Math.round(b.ml_risk * 100)}% · {mlT.label}
+                <span className="text-slate-500">Composite Score</span>
+                <span className="font-semibold" style={{ color: cT.color }}>
+                  {Math.round(b.composite_risk * 100)}% · {cT.label}
                 </span>
               </div>
             );
@@ -359,7 +359,7 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
           )}
 
           <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-            Composite: LL97 penalty · decline trend · energy star · GHG · EUI · DOB filings · ML signal (XGBoost) · weighted 0–1 scale
+            Phase 1 decision-support ranking · XGBoost ML classifier · Composite score (LL97 · decline · energy star · GHG · EUI · DOB) shown as secondary signal
           </p>
         </Section>
 

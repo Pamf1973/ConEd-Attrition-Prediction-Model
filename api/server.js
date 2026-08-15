@@ -1238,7 +1238,7 @@ app.post("/api/predict/custom", requireAuth, PREDICT_RATE, (req, res) => {
   res.json({ weights: rawW, count: ranked.length, buildings: ranked });
 });
 
-app.get("/api/health", requireAuth, (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.json({
     ok:       true,
     provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : OPENROUTER_KEY ? "openrouter-llama3.3" : "none",

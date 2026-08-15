@@ -7,7 +7,7 @@ function buildCols() {
     { key: "address",           label: "Address",         sortable: true  },
     { key: "cluster_name",      label: "Cluster",         sortable: true  },
     { key: "sc_class",          label: "SC Class",        sortable: true  },
-    { key: "risk",              label: "Composite Score", sortable: true  },
+    { key: "risk",              label: "Attrition Risk",  sortable: true  },
     { key: "steam",             label: "Steam (M kBtu)",  sortable: true  },
     { key: "norm_delta_23_24",  label: "YoY Δ (norm)",    sortable: true  },
     { key: "signal",            label: "Top Signal",      sortable: false },
