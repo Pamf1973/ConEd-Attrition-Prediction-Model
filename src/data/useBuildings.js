@@ -144,11 +144,12 @@ export function useBuildings(token) {
           const f = buildingRiskFactors(b, e);
           let wSum = 0, wTotal = 0;
           for (const k of RISK_KEYS) {
+            if (k === "ml_risk" && !has_ml_risk) continue; // exclude absent ML signal rather than zeroing it
             wSum   += RISK_WEIGHTS[k] * normalizeRiskFactor(f[k], k);
             wTotal += RISK_WEIGHTS[k];
           }
           const composite_risk = wTotal > 0 ? wSum / wTotal : 0;
-          const risk    = has_ml_risk ? e.ml_risk : b.risk; // XGBoost primary; composite_risk is secondary field
+          const risk    = has_ml_risk ? e.ml_risk : (b.risk ?? 0); // XGBoost primary; composite_risk is secondary field
           const signal  = e.signal || null;
           const dobJobs = e.dob_jobs || 0;
           const sc_class = estimateScClass(b.use, b.steam, dobJobs);

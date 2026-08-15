@@ -1165,7 +1165,7 @@ app.post("/api/predict/custom", requireAuth, PREDICT_RATE, (req, res) => {
 
   const rawW = {
     ll97_penalty:    safeWeights.ll97_penalty    ?? 1,
-    steam_decline:   weights.steam_decline   ?? 1,
+    steam_decline:   safeWeights.steam_decline   ?? 1,
     energy_star_inv: safeWeights.energy_star     ?? 1,
     eui:             safeWeights.eui             ?? 0.5,
     ll97_over:       safeWeights.ll97_over       ?? 1,
@@ -1239,10 +1239,7 @@ app.post("/api/predict/custom", requireAuth, PREDICT_RATE, (req, res) => {
 });
 
 app.get("/api/health", (_req, res) => {
-  res.json({
-    ok:       true,
-    provider: ANTHROPIC_KEY ? "claude-haiku" : GROQ_KEY ? "groq-llama3.3" : OPENROUTER_KEY ? "openrouter-llama3.3" : "none",
-  });
+  res.json({ ok: true });
 });
 
 // SPA fallback for React Router. express.static above serves dist/index.html

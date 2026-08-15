@@ -66,8 +66,8 @@ function DiagnosticSection({ building }) {
 
   const dc = DIAG_COLORS[diagnostic_risk] ?? DIAG_COLORS.Uncertain;
 
-  // Derive ML tier label using same thresholds as riskTier()
-  const mlLabel = Number.isFinite(risk)
+  // Derive ML tier label — only valid when building has real XGBoost coverage
+  const mlLabel = building.has_ml_risk && Number.isFinite(risk)
     ? (risk > 0.7 ? "High" : risk > 0.4 ? "Medium" : "Low")
     : null;
   const conflict = mlLabel && mlLabel !== diagnostic_risk && diagnostic_risk !== "Uncertain";
@@ -327,8 +327,8 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
 
           <MLDrivers drivers={b.ml_drivers} />
 
-          {/* Composite Score (secondary) */}
-          {b.composite_risk != null && (() => {
+          {/* Composite Score (secondary) — only for buildings with real ML data */}
+          {b.has_ml_risk && b.composite_risk != null && (() => {
             const cT = riskTier(b.composite_risk);
             return (
               <div className="flex justify-between items-center mt-3 text-sm">
