@@ -1136,6 +1136,7 @@ app.get("/api/predict/live", requireAuth, PREDICT_RATE, async (req, res) => {
         try { resolve(JSON.parse(out)); } catch { reject(new Error("Bad JSON from predict.py")); }
       });
       req.on("close", () => { clearTimeout(timer); child.kill("SIGKILL"); });
+      child.stdin.on("error", () => {}); // prevent unhandled EPIPE if predict.py exits before stdin flushes
       child.stdin.write(JSON.stringify({ features, model: modelReq }));
       child.stdin.end();
     });
