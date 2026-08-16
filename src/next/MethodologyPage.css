@@ -1,0 +1,145 @@
+/* Methodology page — Report register (editorial, printable).
+   Different visual language from the workbench: paper stock, ink,
+   editorial type scale. Report register is defined in
+   system-v1.1.md §5 (Report sheet) and §Components (Methodology page). */
+
+.mp-scope {
+  --mp-paper: #F8F8F6;
+  --mp-ink: #17181A;
+  --mp-ink-muted: #6C6F75;
+  --mp-hairline: #DDDDD8;
+  --mp-hairline-strong: #17181A;
+  --mp-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mp-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --mp-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+.mp-page {
+  background: var(--mp-paper);
+  color: var(--mp-ink);
+  min-height: 100dvh;
+  font-family: var(--mp-body);
+  font-size: 15.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mp-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+}
+
+/* header */
+.mp-header {
+  border-bottom: 1px solid var(--mp-hairline-strong);
+  padding-bottom: 28px;
+  margin-bottom: 48px;
+}
+.mp-meta {
+  font-family: var(--mp-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mp-ink-muted);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.mp-title {
+  font-family: var(--mp-display);
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+}
+.mp-lede {
+  color: var(--mp-ink-muted);
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 60ch;
+  margin: 0;
+}
+
+/* sections */
+.mp-section {
+  margin: 0 0 56px;
+}
+.mp-section-eyebrow {
+  font-family: var(--mp-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mp-ink-muted);
+  margin-bottom: 8px;
+}
+.mp-section h2 {
+  font-family: var(--mp-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 0 0 18px;
+}
+.mp-section p {
+  margin: 0 0 14px;
+  max-width: 62ch;
+}
+.mp-section ul, .mp-section ol {
+  margin: 0 0 14px 24px;
+  padding: 0;
+}
+.mp-section li { margin-bottom: 6px; max-width: 60ch; }
+.mp-section code {
+  font-family: var(--mp-mono);
+  font-size: 13.5px;
+  background: #EEEEEA;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+/* per-section stamp (dual clocks) */
+.mp-stamp {
+  font-family: var(--mp-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--mp-ink-muted);
+  border-top: 1px solid var(--mp-hairline);
+  padding-top: 8px;
+  margin-top: 20px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.mp-stamp strong {
+  color: var(--mp-ink);
+  font-weight: 600;
+}
+
+/* placeholder blocks — clearly marked, matches M4 "research pending" idiom */
+.mp-placeholder {
+  border: 1px dashed var(--mp-ink-muted);
+  padding: 16px 18px;
+  color: var(--mp-ink-muted);
+  font-size: 14px;
+  border-radius: 2px;
+  margin: 8px 0 18px;
+}
+.mp-placeholder-label {
+  font-family: var(--mp-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mp-ink);
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* print treatment (§5 Report register — printable) */
+@media print {
+  .mp-page { background: white; }
+  .mp-section { page-break-inside: avoid; }
+  .mp-placeholder { border-color: black; }
+}

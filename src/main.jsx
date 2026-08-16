@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import LegacyApp from './legacy/App.jsx'
+import MethodologyPage from './next/MethodologyPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -11,6 +12,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/legacy" element={<LegacyApp />} />
+        <Route path="/methodology" element={<MethodologyPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
