@@ -609,6 +609,63 @@ app.get("/api/watchlist/load", requireAuth, (req, res) => {
   res.json({ addresses });
 });
 
+// ── /api/model_meta — model provenance object (written by train_xgboost.py) ──
+// Stored in data/ (not public/) so it is NOT served as a static file.
+// The requireAuth gate on this endpoint would be bypassed if the file were in public/.
+const MODEL_META_PATH = join(__dirname, "../data/model_meta.json");
+let _modelMeta = null;
+let _modelMetaLoadedAt = 0;
+const MODEL_META_TTL_MS = 60_000; // re-read from disk at most once per minute
+
+const safeNum = (v, fallback) => typeof v === "number" && isFinite(v) ? v : fallback;
+const safeStr = (v, fallback, maxLen = 128) =>
+  typeof v === "string" && v.length > 0 && v.length <= maxLen ? v : fallback;
+
+function validateModelMeta(m) {
+  // Explicit allowlist — no spread. Prevents arbitrary JSON keys (including XSS
+  // payloads in string fields) from reaching API responses or FAQ interpolation.
+  // safeNum rejects Infinity/NaN which typeof==="number" passes but renders as "Infinity%".
+  return {
+    model_name:       safeStr(m.model_name,       "XGBoost Classifier"),
+    model_version:    safeStr(m.model_version,    "XGB v1 · UNVAL"),
+    params_hash:      safeStr(m.params_hash,       ""),
+    commit:           safeStr(m.commit,            ""),
+    cv_auc:           safeNum(m.cv_auc,            0.68),
+    cv_std:           typeof m.cv_std === "number" && isFinite(m.cv_std) ? m.cv_std : null,
+    cv_kfold:         safeNum(m.cv_kfold,          5),
+    n_labeled:        typeof m.n_labeled  === "number" && isFinite(m.n_labeled)  ? m.n_labeled  : null,
+    n_positive:       safeNum(m.n_positive,        54),
+    run_date:         safeStr(m.run_date,           ""),
+    label_definition: safeStr(m.label_definition,  "", 512),
+    validation_status: safeStr(m.validation_status, "unvalidated"),
+  };
+}
+
+function getModelMeta() {
+  const now = Date.now();
+  if (!_modelMeta || now - _modelMetaLoadedAt > MODEL_META_TTL_MS) {
+    try {
+      _modelMeta = validateModelMeta(JSON.parse(readFileSync(MODEL_META_PATH, "utf8")));
+      _modelMetaLoadedAt = now;
+    } catch (err) {
+      console.error("[model_meta] Failed to load %s: %s", MODEL_META_PATH, err.message);
+      if (!_modelMeta) {
+        _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1 · UNVAL",
+                       cv_auc: 0.68, cv_kfold: 5, n_positive: 54, validation_status: "unvalidated" };
+      }
+    } finally {
+      // Always update timestamp — prevents unbounded sync readFileSync on every
+      // request when the file is transiently corrupt or missing.
+      _modelMetaLoadedAt = now;
+    }
+  }
+  return _modelMeta;
+}
+app.get("/api/model_meta", requireAuth, (_req, res) => {
+  res.setHeader("Cache-Control", "private, max-age=60");
+  res.json(getModelMeta());
+});
+
 // ── /api/buildings status endpoints — append-only workflow state ──────────────
 // IMPORTANT: bulk route must be registered before :bbl to prevent Express
 // matching the literal string "status" as a BBL parameter value.
@@ -705,14 +762,13 @@ app.get("/api/buildings/:bbl/status", requireAuth, statusReadLimiter, async (req
   }
 });
 
-
 // ── /api/meta — dataset freshness metadata ────────────────────────────────────
-app.get("/api/meta", (_req, res) => {
+app.get("/api/meta", requireAuth, (_req, res) => {
   const meta = {
     dataset_date: "2026-06",
     steam_year: "2024",
     ll84_date: "2025-05",
-    model_version: "GBM-v1+SHAP",
+    model_version: getModelMeta().model_version,
     buildings: DATA_PARSED.buildings?.length ?? 0,
   };
   res.setHeader("Cache-Control", "private, max-age=3600");
@@ -993,8 +1049,24 @@ const FAQ = [
     answer: `There are currently ${_hrCount} high-risk buildings (ml_risk > 0.70) in the portfolio, representing ${_hrPct}% of the ${_bldTotal.toLocaleString()} active steam customers tracked in this dashboard.`
   },
   {
-    keywords: ["what is", "ml_risk", "score", "risk score", "attrition risk"],
-    answer: "The attrition risk score (ml_risk) is a GBM (Gradient Boosting Machine) model prediction (0–1) of how likely a building is to reduce or cancel steam service within the next cycle. Key drivers include LL97 penalty exposure, steam GHG share, Energy Star score, and peer attrition rates in the same cluster."
+    keywords: ["what is", "ml_risk", "risk score", "attrition risk"],
+    getAnswer: () => {
+      const m = getModelMeta();
+      const auc = Math.round((m.cv_auc ?? 0.68) * 100);
+      const validated = (m.validation_status ?? "unvalidated") !== "unvalidated";
+      // §7 rule 8: AUC copy templated from model_meta.
+      // §7 rule 9: model version from model_meta.model_version, never hardcoded.
+      // §8 rule 1: ml_risk is a ranking, not a likelihood — no "(0–1)", no "likelihood".
+      // §8 rule 2: render validation_status explicitly.
+      // §8 rule 3: tier is the defensible claim — ML base plus named modifiers.
+      return `ml_risk is a ranking score from model ${m.model_version ?? "XGB v1 · UNVAL"} ` +
+        `(${validated ? "back-tested" : "unvalidated"}). ` +
+        `It ranks buildings by steam attrition signal: ML base score modified by LL97 penalty exposure, ` +
+        `steam GHG share, Energy Star score, and peer cluster rates. ` +
+        `The model ranks a true churner above a non-churner about ${auc}% of the time ` +
+        `(${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). ` +
+        `Use percentile position, not the raw score, to compare buildings.`;
+    }
   },
   {
     keywords: ["ll97", "penalty", "fine", "compliance", "local law 97"],
@@ -1021,7 +1093,7 @@ function matchFAQ(question) {
   const q = question.toLowerCase();
   for (const entry of FAQ) {
     const hits = entry.keywords.filter(k => q.includes(k)).length;
-    if (hits >= 2) return entry.answer;
+    if (hits >= 2) return entry.getAnswer ? entry.getAnswer() : entry.answer;
   }
   return null;
 }
