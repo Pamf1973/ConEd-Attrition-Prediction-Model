@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { riskTier, signalMeta } from "../data/useBuildings";
+import QuickFilters from "./QuickFilters";
 
 function buildCols() {
   return [
@@ -19,7 +20,7 @@ const USE_TYPES = [
   "Other", "Retail Store",
 ];
 
-export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token, clusterFilter: initialClusterFilter, riskMin: initialRiskMin, riskMax: initialRiskMax, searchInputRef }) {
+export default function RiskTable({ buildings, onSelect, selectedAddress, watchlist = [], onWatch, token, clusterFilter: initialClusterFilter, riskMin: initialRiskMin, riskMax: initialRiskMax, searchInputRef, contacted = new Set(), dismissed = new Set(), onContact, onDismiss }) {
   const [sortStack,      setSortStack]     = useState([{ key: "risk", dir: "desc" }]);
   const [tierFilter,     setTierFilter]    = useState("All");
   const [typeFilter,     setTypeFilter]    = useState("All");
@@ -41,6 +42,18 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const [selectedSet,    setSelectedSet]   = useState(new Set());
 
   const resetFilters = useCallback(() => {
+    setPage(1);
+    setSelectedSet(new Set());
+  }, []);
+
+  const handleQuickFilter = useCallback((f) => {
+    // Apply all filter values from the quick filter payload, then reset page/selection.
+    // DO NOT call resetFilters() here — React 19 batches all state updates in a single
+    // flush, so resetFilters() would overwrite the values just set above, making W6 a no-op.
+    if (f.tierFilter   !== undefined) setTierFilter(f.tierFilter);
+    if (f.signalFilter !== undefined) setSignalFilter(f.signalFilter);
+    if (f.ll97Filter   !== undefined) setLl97Filter(f.ll97Filter);
+    if (f.demandMin    !== undefined) setDemandMin(f.demandMin ?? "");
     setPage(1);
     setSelectedSet(new Set());
   }, []);
@@ -213,6 +226,14 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
   const medium = filtered.filter(b => b.risk > 0.4 && b.risk <= 0.7).length;
   const low    = filtered.filter(b => Number.isFinite(b.risk) && b.risk <= 0.4).length;
 
+  // W4 queue arithmetic — across ALL buildings, not just current filter view
+  const criticalAll   = buildings.filter(b => b.risk > 0.7).length;
+  const contactedAll  = buildings.filter(b => contacted.has(b.address)).length;
+  const dismissedAll  = buildings.filter(b => dismissed.has(b.address)).length;
+  // Use union so buildings in both sets are not double-counted
+  const handledAll    = buildings.filter(b => contacted.has(b.address) || dismissed.has(b.address)).length;
+  const toReview      = Math.max(0, criticalAll - handledAll);
+
   async function downloadPortfolioCSV() {
     if (!token) return;
     setCsvLoading(true);
@@ -263,6 +284,21 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           </div>
         ))}
 
+        {/* W4 — Queue arithmetic */}
+        <div className="flex items-center gap-1.5 text-xs text-slate-500 border-l border-[#082244] pl-6 ml-2">
+          <span className="font-bold text-[#ef4444]">{criticalAll}</span>
+          <span>Critical</span>
+          <span className="text-slate-700">−</span>
+          <span className="font-bold text-slate-400">{contactedAll}</span>
+          <span>contacted</span>
+          <span className="text-slate-700">−</span>
+          <span className="font-bold text-slate-400">{dismissedAll}</span>
+          <span>dismissed</span>
+          <span className="text-slate-700">=</span>
+          <span className="font-bold text-white text-sm">{toReview}</span>
+          <span className="font-semibold text-slate-300">to review</span>
+        </div>
+
         <div className="ml-auto flex items-center gap-2">
           {csvError && (
             <span className="text-xs text-red-400">{csvError}</span>
@@ -295,6 +331,9 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
           )}
         </div>
       </div>
+
+      {/* W6 — Quick filter buttons */}
+      <QuickFilters onApply={handleQuickFilter} />
 
       {/* Bulk action bar */}
       {selectedSet.size > 0 && (
@@ -476,6 +515,11 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                   <span className="text-slate-600 text-xs">★</span>
                 </th>
               )}
+              {(onContact || onDismiss) && (
+                <th className="px-2 py-3 text-center border-b border-[#082244] w-16">
+                  <span className="text-slate-600 text-[9px] uppercase tracking-wider">Status</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -596,6 +640,39 @@ export default function RiskTable({ buildings, onSelect, selectedAddress, watchl
                       <span className={`cursor-pointer text-sm transition-colors ${watched ? "text-[#E87722]" : "text-slate-600 hover:text-slate-400"}`}>
                         {watched ? "★" : "☆"}
                       </span>
+                    </td>
+                  )}
+                  {/* W4 — Contacted / Dismissed toggles */}
+                  {(onContact || onDismiss) && (
+                    <td className="px-1 py-2.5 text-center" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center gap-1 justify-center">
+                        {onContact && (
+                          <button
+                            onClick={() => onContact(b.address)}
+                            title={contacted.has(b.address) ? "Mark uncontacted" : "Mark contacted"}
+                            className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
+                              contacted.has(b.address)
+                                ? "border-green-700/60 text-green-400 bg-green-900/20"
+                                : "border-slate-700/40 text-slate-600 hover:text-green-400 hover:border-green-700/40"
+                            }`}
+                          >
+                            ✓
+                          </button>
+                        )}
+                        {onDismiss && (
+                          <button
+                            onClick={() => onDismiss(b.address)}
+                            title={dismissed.has(b.address) ? "Restore" : "Dismiss"}
+                            className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
+                              dismissed.has(b.address)
+                                ? "border-slate-600/60 text-slate-500 bg-slate-800/40"
+                                : "border-slate-700/40 text-slate-600 hover:text-slate-400 hover:border-slate-500/60"
+                            }`}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>

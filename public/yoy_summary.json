@@ -23,12 +23,12 @@
     "outlier_count": 93
   },
   "period_23_24": {
-    "n": 422,
-    "mean": 248.26,
-    "median": 2.2,
-    "stdev": 4794.9,
-    "p10": -20.24,
-    "p90": 40.0,
-    "outlier_count": 64
+    "n": 690,
+    "mean": 170.12,
+    "median": 1.98,
+    "stdev": 3760.61,
+    "p10": -19.47,
+    "p90": 37.22,
+    "outlier_count": 97
   }
 }

@@ -1,0 +1,140 @@
+import pg from "pg";
+
+const { Pool } = pg;
+
+// Fail fast in production if DATABASE_URL is not wired up
+if (!process.env.DATABASE_URL && process.env.NODE_ENV === "production") {
+  throw new Error("FATAL: DATABASE_URL must be set in production");
+}
+
+const _rawPoolMax = parseInt(process.env.DB_POOL_MAX ?? "5", 10);
+const _poolMax = Number.isFinite(_rawPoolMax) && _rawPoolMax > 0 ? _rawPoolMax : 5;
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL ?? "postgresql://localhost:5432/coned_dashboard",
+  // TODO: supply DATABASE_CA_CERT env var with Railway's CA bundle to enable cert verification.
+  // rejectUnauthorized: false is a known limitation until the CA cert is wired up — tracked issue.
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  // Tune via DB_POOL_MAX env var; default 5 works for single-dyno Railway deployments
+  max: _poolMax,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+});
+
+pool.on("error", (err) => {
+  console.error("[db] idle client error:", err.message);
+});
+
+const VALID_STATUSES = new Set([
+  "Unreviewed",
+  "In review",
+  "Contacted",
+  "Confirmed at-risk",
+  "False positive",
+  "Dismissed",
+]);
+
+// Guard: status values are interpolated into DDL — must contain no SQL special chars
+for (const s of VALID_STATUSES) {
+  if (!/^[A-Za-z ()-]+$/.test(s)) throw new Error(`Invalid status value for DDL: ${s}`);
+}
+
+export { pool, VALID_STATUSES };
+
+export async function initSchema() {
+  // Build CHECK constraint from VALID_STATUSES so they can never drift apart
+  const statusLiteral = [...VALID_STATUSES].map((s) => `'${s}'`).join(",");
+
+  // Table DDL in a transaction — concurrent startup (Railway deploy overlap) must not
+  // leave the table half-created. Indexes run outside the transaction because
+  // CREATE INDEX CONCURRENTLY cannot run inside one.
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS building_status_events (
+        id         SERIAL      PRIMARY KEY,
+        bbl        TEXT        NOT NULL,
+        status     TEXT        NOT NULL CHECK (status IN (${statusLiteral})),
+        note       TEXT        CHECK (note IS NULL OR length(note) <= 2000),
+        actor      TEXT        NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+
+  // CONCURRENTLY avoids an exclusive lock; safe to run after table exists
+  await pool.query(`
+    CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_bse_bbl_ts
+      ON building_status_events(bbl, created_at DESC, id DESC)
+  `);
+
+  await pool.query(`
+    CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_bse_actor
+      ON building_status_events(actor)
+  `);
+
+  console.log("[db] schema ready");
+}
+
+// Current status for a BBL — fetched independently from history so paginated
+// reads with offset>0 still return an accurate current field (not history[0]).
+export async function getCurrentStatus(bbl) {
+  const { rows } = await pool.query(
+    `SELECT status, note, actor, created_at
+     FROM building_status_events
+     WHERE bbl = $1
+     ORDER BY created_at DESC, id DESC
+     LIMIT 1`,
+    [bbl]
+  );
+  return rows[0] ?? null;
+}
+
+// Full history for a BBL, newest first — paginated (default 100, max 500)
+export async function getStatusHistory(bbl, limit = 100, offset = 0) {
+  const { rows } = await pool.query(
+    `SELECT id, status, note, actor, created_at
+     FROM building_status_events
+     WHERE bbl = $1
+     ORDER BY created_at DESC, id DESC
+     LIMIT $2 OFFSET $3`,
+    [bbl, limit, offset]
+  );
+  return rows;
+}
+
+// Append a new status event — never updates, never deletes
+export async function appendStatus(bbl, status, note, actor) {
+  const { rows } = await pool.query(
+    `INSERT INTO building_status_events (bbl, status, note, actor)
+     VALUES ($1, $2, $3, $4)
+     RETURNING id, bbl, status, note, actor, created_at`,
+    [bbl, status, note ?? null, actor]
+  );
+  return rows[0];
+}
+
+// Bulk: latest status per BBL — LATERAL forces per-BBL index scan instead of DISTINCT ON seqscan
+export async function getBulkCurrentStatus(bbls) {
+  if (!bbls.length) return {};
+  const { rows } = await pool.query(
+    `SELECT b.bbl, e.status, e.actor, e.created_at
+     FROM unnest($1::text[]) AS b(bbl)
+     CROSS JOIN LATERAL (
+       SELECT status, actor, created_at
+       FROM building_status_events
+       WHERE bbl = b.bbl
+       ORDER BY created_at DESC, id DESC
+       LIMIT 1
+     ) e`,
+    [bbls]
+  );
+  return Object.fromEntries(rows.map((r) => [r.bbl, r]));
+}

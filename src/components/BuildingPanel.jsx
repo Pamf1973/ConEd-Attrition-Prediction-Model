@@ -66,8 +66,8 @@ function DiagnosticSection({ building }) {
 
   const dc = DIAG_COLORS[diagnostic_risk] ?? DIAG_COLORS.Uncertain;
 
-  // Derive ML tier label using same thresholds as riskTier()
-  const mlLabel = Number.isFinite(risk)
+  // Derive ML tier label — only valid when building has real XGBoost coverage
+  const mlLabel = building.has_ml_risk && Number.isFinite(risk)
     ? (risk > 0.7 ? "High" : risk > 0.4 ? "Medium" : "Low")
     : null;
   const conflict = mlLabel && mlLabel !== diagnostic_risk && diagnostic_risk !== "Uncertain";
@@ -327,6 +327,19 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
 
           <MLDrivers drivers={b.ml_drivers} />
 
+          {/* Composite Score (secondary) — only for buildings with real ML data */}
+          {b.has_ml_risk && b.composite_risk != null && (() => {
+            const cT = riskTier(b.composite_risk);
+            return (
+              <div className="flex justify-between items-center mt-3 text-sm">
+                <span className="text-slate-500">Composite Score</span>
+                <span className="font-semibold" style={{ color: cT.color }}>
+                  {Math.round(b.composite_risk * 100)}% · {cT.label}
+                </span>
+              </div>
+            );
+          })()}
+
           {/* Peer + portfolio signals */}
           {(Number.isFinite(b.peer_score) && b.peer_score > 0) && (
             <div className="flex justify-between items-center mt-2 text-sm">
@@ -346,7 +359,7 @@ export default function BuildingPanel({ building, onClose, allBuildings }) {
           )}
 
           <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-            Phase 1 decision-support ranking · Public signal model · Not a validated production classifier
+            Phase 1 decision-support ranking · XGBoost ML classifier · Composite score (LL97 · decline · energy star · GHG · EUI · DOB) shown as secondary signal
           </p>
         </Section>
 
