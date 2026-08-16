@@ -100,7 +100,7 @@ No `.github/workflows/` — CI/CD is not set up.
 ## Frontend architecture
 
 - **Stack:** React 19 + Vite 8 + TailwindCSS 4. No CSS-in-JS.
-- **Router:** none yet. `App.jsx` currently uses tab state (`activeTab`), not URL routes. **M0 introduces React Router** to support `/` (new build) vs `/legacy` (archived).
+- **Router:** React Router 7 (`react-router-dom`) mounted in `src/main.jsx`. `/` renders `src/App.jsx` (new-build stub during M0; workflow-focused build lands here M3+); `/legacy` renders `src/legacy/App.jsx` (frozen portfolio-view dashboard). Deep links resolve via an Express SPA fallback in `api/server.js` (any non-`/api/` GET returns `dist/index.html`).
 - **State:** React hooks (`useState`, `useEffect`, `useCallback`, `useMemo`). `sessionStorage` for auth token. No Redux/Zustand.
 - **Data flow:** `useBuildings(token)` in `src/data/useBuildings.js` fetches 4 endpoints (`/api/data/buildings`, `/enrichment`, `/yearly`, `/yoy-deltas`), merges by uppercased address, returns `{ buildings, loading, error }`. All components downstream consume this shape.
 - **Auth flow:** password → `/api/auth/login` → session token → `Authorization: Bearer <token>` on every request → `/api/auth/check` for hydration.
@@ -109,10 +109,12 @@ No `.github/workflows/` — CI/CD is not set up.
 
 | File | Role |
 |---|---|
-| `src/App.jsx` | Root, tab routing, auth, alerts wiring |
-| `src/main.jsx` | Vite mount point |
-| `src/components/RiskTable.jsx` | Sortable/filterable building table (M3 replaces its score column) |
-| `src/components/BuildingPanel.jsx` | Detail drawer (M4 replaces this with the Spec 2 case-file header) |
+| `src/App.jsx` | New-build root. Stub until M3 (workflow-focused build lands here) |
+| `src/main.jsx` | Vite mount point + React Router setup (`/` and `/legacy`) |
+| `src/legacy/App.jsx` | Legacy portfolio-view root at `/legacy`. Frozen (no new features, no design updates) |
+| `src/legacy/components/*` | Legacy runtime, self-contained. No cross-imports from new-build |
+| `src/components/RiskTable.jsx` | (Legacy) sortable/filterable building table; M3 ships a new score-cell component under new-build |
+| `src/components/BuildingPanel.jsx` | (Legacy) detail drawer; M4 ships the Spec 2 case-file header under new-build |
 | `src/components/AIAgent.jsx` | Chatbot; **archived to `src/legacy/` in M0**, not in new build |
 | `src/components/Watchlist.jsx` | Session watchlist (M6 migrates to Postgres) |
 | `src/data/useBuildings.js` | Data hook, exports `riskTier`, `signalMeta`, `estimateScClass`, `isUncertain`, `recommendedAction` |
@@ -133,7 +135,7 @@ No `.github/workflows/` — CI/CD is not set up.
 - **Data loading:** at startup, `DATA_PARSED = { buildings, enrichment, yearly, yoyDeltas }` reads the four `public/` JSONs once. Endpoints serve from this in-memory cache. **JSONs are container-baked until M8 data-decoupling ships** (deferred per Ismael Q8; workaround uses `model_meta.run_date` for freshness anchors).
 - **In-memory stores that M6 migrates to Postgres:**
   - `sessions` Map — session tokens (stays in memory; short-lived, not persistence-critical)
-  - `watchlistStore` Map at line ~314 — per-session watchlists (**M6 migrates** to Postgres status events table; `/api/watchlist/save` and `/load` become endpoints on the new table)
+  - `watchlistStore` Map (grep `const watchlistStore = new Map`) — per-session watchlists (**M6 migrates** to Postgres status events table; `/api/watchlist/save` and `/load` become endpoints on the new table)
   - `proactiveDismissed` Map — per-session dismissed alert IDs (stays for now)
 - **LLM:** Anthropic → Groq → OpenRouter fallback chain in `callLLM()`. Placeholder detection drops known template keys. Providers driven by `ANTHROPIC_API_KEY` / `GROQ_API_KEY` / `OPENROUTER_API_KEY`.
 
@@ -156,7 +158,7 @@ No `.github/workflows/` — CI/CD is not set up.
 | GET  | `/api/watchlist/load` | Bearer | Load watchlist (**M6: same**) |
 | POST | `/api/query` | Bearer + aiLimiter | LLM filter-spec generation (legacy AIAgent) |
 | POST | `/api/summarize` | Bearer + aiLimiter | LLM multi-building summary (legacy) |
-| POST | `/api/explain` | Bearer + aiLimiter | FAQ + LLM answer (legacy AIAgent; **M1 rewrites the FAQ answer at server.js:867**) |
+| POST | `/api/explain` | Bearer + aiLimiter | FAQ + LLM answer (legacy AIAgent; **M1 rewrites the `ml_risk` FAQ answer** — find via the FAQ entry keyed `keywords: ["what is", "ml_risk", ...]` in `api/server.js`) |
 | GET  | `/api/export/csv` | Bearer + exportLimiter | Paginated CSV export |
 | GET  | `/api/meta` | Bearer | Dataset metadata + model version (**M1: sources from `model_meta.model_version`, not hardcoded**) |
 | GET  | `/api/health` | none | Readiness check |
@@ -182,7 +184,7 @@ All scripts live at repo root (Python). Outputs land in `public/`. No orchestrat
 | `kmeans_model.py` | K-means clustering into 5 archetypes | enrichment fields |
 | `ll97_model.py` | LL97 penalty calculator + supervised GBM baseline | enrichment + model meta |
 | `train_xgboost.py` | Hyperparameter search XGBoost vs GBM (~320 lines) | enrichment + **M1: `model_meta.json`** |
-| `update_enrichment_risk.py` | Rule-based diagnostic risk tiering; **`compute_diagnostic_risk()` at line 71** implements the Path C hybrid chain (`system-v1.1.md` §4.1); no code change per Q1 | `buildingEnrichment.json`; **M1: also writes `model_meta.json`** on params-unchanged runs (refreshes `run_date` only) |
+| `update_enrichment_risk.py` | Rule-based diagnostic risk tiering; **`compute_diagnostic_risk()`** implements the Path C hybrid chain (`system-v1.1.md` §4.1); no code change per Q1 | `buildingEnrichment.json`; **M1: also writes `model_meta.json`** on params-unchanged runs (refreshes `run_date` only) |
 | `yoy_analysis.py` | YoY steam decline analysis (citywide HDD multiplier) | `yoy_deltas.json` |
 | `noaa_degree_days.py` | NOAA CDO API monthly HDD/CDD; hardcoded Central Park fallback if no `NOAA_TOKEN` | `noaa_degree_days.json` |
 | `building_weather_regression.py` | OLS regression (steam ~ HDD + CDD) for NYCHA 24 developments | `building_regression_results.json` |
@@ -258,7 +260,7 @@ The current build is preserved after M0 as an unlinked demo hedge. Durable rules
 ### Chatbot situation (durable notes)
 
 - Frontend `src/components/AIAgent.jsx` copies to `src/legacy/components/AIAgent.jsx` in M0; new build does not import AIAgent.
-- Backend `/api/explain` endpoint at `api/server.js:899` stays live. The FAQ fallback array at lines 860–888 is shared between surfaces. **M1 rewrites the `ml_risk` FAQ answer at line 867** to remove the stale "GBM" reference and the L1-violating probability phrasing (per `system-v1.1.md` §7 rule 9 and ledger #20).
+- Backend `POST /api/explain` handler in `api/server.js` stays live. The FAQ fallback array (grep for `keywords: ["how many", "buildings"`) is shared between surfaces. **M1 rewrites the `ml_risk` FAQ answer** — the entry keyed `keywords: ["what is", "ml_risk", ...]` — to remove the stale "GBM" reference and the L1-violating probability phrasing (per `system-v1.1.md` §7 rule 9 and ledger #20).
 - A future "ask about this building" contextual affordance inside Spec 2 is a Round 2 design conversation with Fable — not in this roadmap.
 
 ---
@@ -268,7 +270,7 @@ The current build is preserved after M0 as an unlinked demo hedge. Durable rules
 | Milestone | Files it touches |
 |---|---|
 | M0 | Router setup in `src/App.jsx` or new `src/routes.jsx`; file moves to `src/legacy/`; `vite.config.js` (SPA fallback if needed) |
-| M1 | `train_xgboost.py`, `update_enrichment_risk.py` (both write `model_meta.json`); `api/server.js:585` (model version source), `:867` (FAQ chatbot answer rewrite), `/api/meta` handler |
+| M1 | `train_xgboost.py`, `update_enrichment_risk.py` (both write `model_meta.json`); `/api/meta` handler in `api/server.js` (currently hardcodes `model_version: "GBM-v1+SHAP"` — rewire to `model_meta.model_version`); FAQ `ml_risk` answer rewrite (find via `keywords: ["what is", "ml_risk", ...]`) |
 | M2 | `train_xgboost.py` (add `cross_val_score` runner); freshness residual named in `update_enrichment_risk.py` output |
 | M3 | New score cell component under `src/components/` or `src/next/`; wired into `RiskTable.jsx` replacement |
 | M4 | New case-file header component; replaces `src/components/BuildingPanel.jsx` in new-build routes |
@@ -314,7 +316,7 @@ The current build is preserved after M0 as an unlinked demo hedge. Durable rules
 |---|---|
 | What copy goes in the case-file ledger's middle column? | `system-v1.1.md` §5 Components (Claim ledger row), §4.1 |
 | What's the exact XGBoost config for M2? | `docs/ref/2026-07-13_ismael-q1-q10-response.md` Q4 |
-| How is the tier computed? | `update_enrichment_risk.py:71` (`compute_diagnostic_risk`), `system-v1.1.md` §4.1 |
+| How is the tier computed? | `compute_diagnostic_risk()` in `update_enrichment_risk.py`, `system-v1.1.md` §4.1 |
 | What fields are in `model_meta.json`? | This file §Pipeline; `docs/ref/2026-07-13_ismael-q1-q10-response.md` Q5; `system-v1.1.md` §9 |
 | Where's the AUC copy template? | `system-v1.1.md` §7 rule 8 |
 | Where's the legacy dashboard boundary rule? | `roadmap-supplement-m0.md`; this file §Legacy |

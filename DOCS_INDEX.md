@@ -9,6 +9,8 @@ Line format:
 
 Naming convention: see `docs/ref/CONVENTIONS.md`. Origin omitted when Ed authored; type omitted when folder implies it.
 
+Length: entries are one line, typically ~200 chars in the summary field. Longer summaries are allowed when a doc is a grep target for multiple distinct concerns; those lines carry an inline "intentional grep double-duty" marker and cite the decision ID that forced them. Do not shorten these on cleanup passes without checking the referenced decision.
+
 Folders: docs/ref, docs/briefs, docs/design, docs/decks, docs/research, docs/notes, docs/data, docs/archive
 
 ---
@@ -21,12 +23,14 @@ Folders: docs/ref, docs/briefs, docs/design, docs/decks, docs/research, docs/not
 - 2026-07-16 | ed | ref | methodology alignment | docs/ref/2026-07-16_methodology-alignment.md | orig: CONED_METHODOLOGY_ALIGNMENT.md | Johan/Ildi methodology gap analysis. Source for M10 section 8 (complementary signals positioning).
 - 2026-07-13 | ismael | ref | q1-q10 response | docs/ref/2026-07-13_ismael-q1-q10-response.md | orig: ISMAEL-RESPONSE-2026-07-13.md | Ismael's Q1–Q10 backend scoping answers. Ground truth for model_meta schema, XGBoost config, snapshot diffing scope.
 - 2026-07-06 | ed | ref | client notes | docs/ref/2026-07-06_client-notes.md | orig: coned-dashboard-CLIENT-NOTES.md | ConEd/David verbatim quotes plus contact map. Design anchor; used to constrain quote usage in decks. Sensitive — team-repo only, not for onward sharing.
+- 2026-05-04 | coned | ref | steam customer drop-off predictor intake | docs/ref/2026-05-04_coned-intake-form.md | orig: ConEd_intake_form.md | ConEd's founding scope doc, narrowed from the original Gas & Steam brief to steam-only in David Caiafa's May 4 email. Anchors the ≥70% back-tested recall benchmark that model deepening will return to, and the client's "high-probability drop-off" phrasing that system-v1.1 reframed as ranking. Intentional grep double-duty; see D7.
 
 ## briefs/ — per-person Fable-cycle briefs
 
 - 2026-07-13 | ed | brief | edwin domain composition | docs/briefs/2026-07-13_edwin-domain-composition.md | orig: EDWIN-BRIEF-DOMAIN-COMPOSITION.md | Edwin's own milestone brief covering chatbot answer, report content, methodology page authoring, David packet.
 - 2026-07-13 | ed | brief | ismael backend build | docs/briefs/2026-07-13_ismael-backend-build.md | orig: ISMAEL-BRIEF-BACKEND-BUILD.md | Milestone-by-milestone backend brief for Ismael (model_meta, AUC rerun, snapshot diffing, status events).
 - 2026-07-13 | ed | brief | ismael path-c decisions | docs/briefs/2026-07-13_ismael-path-c-decisions.md | orig: ISMAEL-BRIEF-PATH-C-AND-BACKEND-DECISIONS-2026-07-13.md | Q1–Q10 questions and Path C framing sent to Ismael prior to the response.
+- 2026-07-17 | ed | brief | pedro M3 kickoff | docs/briefs/2026-07-17_pedro-m3-kickoff.md | orig: n/a | Delta on top of the 2026-07-13 milestone brief for Pedro's M3 start. Reflects R1 landing (PR #13), the PR-9 → #10/#11/#12 split, model_meta not-yet-merged so mock it, interim chip copy, exact setup checklist. Supersedes the 2026-07-16 checkpoint (removed).
 - 2026-07-13 | ed | brief | pedro frontend build | docs/briefs/2026-07-13_pedro-frontend-build.md | orig: PEDRO-BRIEF-FRONTEND-BUILD.md | Milestone-by-milestone frontend brief for Pedro (legacy separation, score cell, case-file header, report, queue, landing, digest).
 - 2026-07-13 | ed | brief | model plan for fable | docs/briefs/2026-07-13_model-plan-for-fable.md | orig: coned-dashboard-MODEL-PLAN-FOR-FABLE.md | Self-contained model brief for Fable review; intake ask, current build, dual-layer plan, pattern-surfacing options, ten sharpened questions.
 - 2026-07-06 | ed | brief | design brief | docs/briefs/2026-07-06_design-brief.md | orig: coned-dashboard-DESIGN-BRIEF.md | Voice + capability inventory sent into the Fable redesign; Bloomberg Terminal instinct applied to a decision-support tool.
@@ -40,6 +44,9 @@ Folders: docs/ref, docs/briefs, docs/design, docs/decks, docs/research, docs/not
 
 ## notes/ — internal working notes
 
+- 2026-07-16 | ismael | notes | pr split update | docs/notes/2026-07-16_ismael_pr-split-update.md | orig: Slack #coned-dashboard | Ismael's follow-up to PR #9 close: PRs #10/#11/#12 announced with per-PR panel-review security fixes (trust proxy, HMAC actorTag, BBL regex, model_meta public→data path move, useEffect clobber fix, djb2-hash localStorage key, queue union arithmetic); references plans/ai_model_config.md (5-model panel, BullMQ, structured form v1).
+- 2026-07-16 | ed | notes | pr #9 review | docs/notes/2026-07-16_pr-9-review.md | orig: n/a | Edwin's review of Ismael's PR #9 (monday-workflow bundle). Path A split analysis (D2 source), R2/R3/R7-partial/W-laws mapping, boundary concern on frontend files landing on RiskTable/App/BuildingPanel that R4/R5 replace, "Suggested comment" draft. PR #9 is now closed; review remains the source-of-record for D2.
+- 2026-07-16 | ismael | notes | pr #9 announcement | docs/notes/2026-07-16_ismael-pr9-message.md | orig: Slack #coned-dashboard | Ismael's original PR #9 announcement (W1/W4/W6 + M1 model_meta + M6 status events + M2 AUC rerun bundled). Verbatim message anchoring the PR-9 review. Superseded operationally by 2026-07-16_ismael_pr-split-update.md after Path A split.
 - 2026-07-13 | ed | notes | progress tracker | docs/notes/2026-07-13_progress-tracker.md | orig: coned-dashboard-PROGRESS-TRACKER.md | Rolling personal status snapshot; model perf, two-number problem, diagnostic risk, open work items.
 - 2026-07-01 | ismael | notes | ismael build update | docs/notes/2026-07-01_ismael_build-update.md | orig: coned-dashboard-ISMAEL-UPDATE-2026-07-01.md | Ismael's pull recap, smoke test results against dev server, PR #7 rebase notes.
 - 2026-06-23 | ed | notes | story timeline | docs/notes/2026-06-23_story-timeline.md | orig: coned-dashboard-STORY-TIMELINE.md | Slide-by-slide narrative arc audit for the Blackstone deck (v5 deck + Script v3).

@@ -157,7 +157,9 @@ LEGACY HEURISTIC    fallback rows without ml_risk; value slot shows "est."
 
 **The chip never carries a numeric AUC.** The AUC appears in exactly two places, the case-file-header ledger and the methodology-page footer, and is always rendered from `model_meta.cv_auc` per §7 rule 8. Model-version text everywhere sources from `model_meta.model_version` per §7 rule 9.
 
-*v1.1: chip naming updated to XGB convention; verbatim AUC sentence replaced by the templated single-source rule; explicit no-AUC-in-chip rule added; sources: Round 1.1 §4, Ismael Q4/Q5, prompt 05 §4.*
+**Transition from UNVAL to BT is not automatic on any internal metric.** The chip moves from `XGB v1 · UNVAL` to `XGB v2 · BT nn%` only after back-testing against ConEd disconnect records completes. Cross-validation AUC is a self-consistency check on the training universe and does not clear UNVAL; `model_meta.cv_auc` populating is not the trigger. Same discipline governs `model_meta.validation_status`: `"validated"` is set only when the back-test lands, not when the CV rerun does. Until then the field reads `"unvalidated"` and the chip carries `UNVAL`. This gates both fields together so §7 rule 9 and §8 rule 2 stay coherent at render time.
+
+*v1.1: chip naming updated to XGB convention; verbatim AUC sentence replaced by the templated single-source rule; explicit no-AUC-in-chip rule added; sources: Round 1.1 §4, Ismael Q4/Q5, prompt 05 §4. v1.1.1: UNVAL→BT transition gate clarified after PR #11 review surfaced a read where CV completion was taken as validation (DECISIONS D7 fallout).*
 
 ### 4.5 Freshness chips
 
@@ -279,7 +281,7 @@ Portfolio-scale claims (methodology page, aggregate views, any counted claim at 
 ## 8. Data honesty rules (summary)
 
 1. ml_risk is a ranking. Percentile display, no percent sign, no decimals, ties acknowledged. The distribution is strongly bimodal: below the ≥0.99 quasi-tie block, percentile gaps reflect very small score differences. This is stated once, on the methodology page, not as a per-surface caveat.
-2. Provenance chip on every score. Model + validation status, never a numeric AUC. "Unvalidated" is written out until back-testing says otherwise.
+2. Provenance chip on every score. Model + validation status, never a numeric AUC. "Unvalidated" is written out until back-testing against ConEd disconnect records completes (§4.4); cross-validation does not clear this state.
 3. The tier is the defensible claim as a documented procedure: ML base plus named, checkable modifiers. It gets the color and the word, and its chain is shown wherever the tier is asserted at case-file scale or beyond.
 4. Freshness always rendered; stale is the designed majority state, in four named states (§4.5).
 5. The LL97 penalty is statute arithmetic and is labeled "not a model output." It is the strongest claim in the product; present it accordingly. At portfolio scale, LL97 pressure renders as penalty-magnitude bands, never the boolean count.

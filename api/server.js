@@ -4,7 +4,7 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { readFileSync } from "fs";
 import { resolve, join, dirname } from "path";
-import { randomBytes, timingSafeEqual } from "crypto";
+import { randomBytes, timingSafeEqual, createHash, createHmac } from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -12,6 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
+import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -74,7 +75,11 @@ app.use(helmet({
 // ERR_ERL_UNEXPECTED_X_FORWARDED_FOR and cannot identify clients for rate limiting.
 // If a CDN is ever placed in front of Railway, increment this count to match
 // the total number of trusted proxy hops.
-if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+// Trust proxy only in production — Railway sets NODE_ENV=production at deploy time.
+// Do NOT key on DATABASE_URL: local dev often sets it, which would allow any caller
+// to spoof X-Forwarded-For and bypass all rate limiters.
+// If a non-production Railway environment needs this, set TRUST_PROXY=1 explicitly.
+if (process.env.NODE_ENV === "production" || process.env.TRUST_PROXY === "1") app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "16kb" }));
 app.use((err, req, res, next) => {
@@ -101,6 +106,30 @@ const aiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "AI query rate limit — max 20 per minute" },
+});
+
+const statusWriteLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Status write rate limit — max 10 per minute" },
+});
+
+const statusBulkLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Bulk status rate limit — max 20 per minute" },
+});
+
+const statusReadLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Status read rate limit — max 60 per minute" },
 });
 
 // ── Authentication & Sessions ──────────────────────────────────────────────────
@@ -163,10 +192,11 @@ app.post("/api/auth/login", loginLimiter, (req, res) => {
   if (!password) {
     return res.status(400).json({ error: "Password is required" });
   }
-  const pwdBuf  = Buffer.from(password);
-  const hashBuf = Buffer.from(DASHBOARD_PASSWORD);
-  const match   = pwdBuf.length === hashBuf.length &&
-                  timingSafeEqual(pwdBuf, hashBuf);
+  // Hash both to fixed 32-byte digests so timingSafeEqual always runs
+  // regardless of submitted password length — prevents length oracle attack
+  const pwdBuf  = createHash("sha256").update(password).digest();
+  const hashBuf = createHash("sha256").update(DASHBOARD_PASSWORD).digest();
+  const match   = timingSafeEqual(pwdBuf, hashBuf);
   if (match) {
     // Enforce hard cap inline: if at limit, reject new sessions immediately
     if (activeSessions.size >= MAX_SESSIONS) {
@@ -636,6 +666,102 @@ app.get("/api/model_meta", requireAuth, (_req, res) => {
   res.json(getModelMeta());
 });
 
+// ── /api/buildings status endpoints — append-only workflow state ──────────────
+// IMPORTANT: bulk route must be registered before :bbl to prevent Express
+// matching the literal string "status" as a BBL parameter value.
+
+// NYC BBLs: 1 borough digit (1–5) + 5 block digits + 4 lot digits = 10 digits total
+const BBL_RE = /^[1-5]\d{9}$/;
+
+// Per-deployment HMAC secret for actor pseudonyms — prevents cross-deployment correlation.
+// MUST be set in production: a random fallback is re-generated on every restart, silently
+// destroying the audit trail's actor attribution across deploys.
+if (!process.env.ACTOR_HMAC_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("FATAL: ACTOR_HMAC_SECRET must be set in production (see Railway env vars)");
+}
+const ACTOR_HMAC_SECRET = process.env.ACTOR_HMAC_SECRET ?? randomBytes(32).toString("hex");
+
+// Stable per-deployment pseudonym for actor attribution — HMAC so raw token is never
+// stored and actors cannot be correlated across different deployments
+function actorTag(token) {
+  if (!token || typeof token !== "string") throw new Error("actorTag: missing session token");
+  return createHmac("sha256", ACTOR_HMAC_SECRET).update(token).digest("hex").slice(0, 16);
+}
+
+// Strip C0/C1 controls and all Unicode problematic characters.
+// Explicitly covers: C0 (\x00-\x1f excl tab/LF), DEL (\x7f), CR (\x0d),
+// NEL (\x85), soft hyphen (\xad), zero-width chars (U+200B–U+200D),
+// bidi marks (U+200E/U+200F), ALM (U+061C), bidi overrides (U+202A–U+202E),
+// bidi isolates (U+2066–U+2069), line terminators (U+2028/U+2029), BOM (U+FEFF).
+// Tab (\x09) and LF (\x0a) intentionally kept for multiline notes.
+function sanitizeNote(raw) {
+  return raw
+    .normalize("NFC")
+    .replace(/[\x00-\x08\x0b-\x0d\x0e-\x1f\x7f\x85\xad؜​-‏  ‪-‮⁠-⁩﻿]/g, "");
+}
+
+// Bulk current status — registered before :bbl route to avoid param shadowing
+app.post("/api/buildings/status/bulk", requireAuth, statusBulkLimiter, async (req, res) => {
+  const { bbls } = req.body ?? {};
+  if (!Array.isArray(bbls) || bbls.length > 500) {
+    return res.status(400).json({ error: "bbls must be an array of ≤ 500 strings" });
+  }
+  const clean = bbls.filter((b) => typeof b === "string" && BBL_RE.test(b));
+  if (clean.length === 0 && bbls.length > 0) {
+    return res.status(400).json({ error: "No valid BBLs in request (expected 10-digit strings)" });
+  }
+  try {
+    const result = await getBulkCurrentStatus(clean);
+    res.json(result);
+  } catch (err) {
+    console.error("[status] bulk read failed:", err?.message ?? String(err));
+    res.status(500).json({ error: "Failed to read bulk status" });
+  }
+});
+
+app.post("/api/buildings/:bbl/status", requireAuth, statusWriteLimiter, async (req, res) => {
+  const { bbl } = req.params;
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
+
+  const { status, note } = req.body ?? {};
+  if (!VALID_STATUSES.has(status)) {
+    return res.status(400).json({ error: `status must be one of: ${[...VALID_STATUSES].join(", ")}` });
+  }
+  if (note !== undefined && (typeof note !== "string" || note.length > 2000)) {
+    return res.status(400).json({ error: "note must be a string ≤ 2000 chars" });
+  }
+
+  const cleanNote = note !== undefined ? sanitizeNote(note) : undefined;
+  try {
+    const event = await appendStatus(bbl, status, cleanNote, actorTag(req.sessionToken));
+    res.status(201).json(event);
+  } catch (err) {
+    console.error("[status] write failed:", err?.message ?? String(err));
+    res.status(500).json({ error: "Failed to persist status event" });
+  }
+});
+
+app.get("/api/buildings/:bbl/status", requireAuth, statusReadLimiter, async (req, res) => {
+  const { bbl } = req.params;
+  if (!BBL_RE.test(bbl)) return res.status(400).json({ error: "Invalid BBL — must be exactly 10 digits" });
+
+  const rawLimit  = parseInt(req.query.limit  ?? "100", 10);
+  const rawOffset = parseInt(req.query.offset ?? "0",   10);
+  const limit  = Math.min(Number.isFinite(rawLimit)  && rawLimit  >= 1 ? rawLimit  : 100, 500);
+  const offset = Math.min(Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0, 100_000);
+
+  try {
+    const [current, history] = await Promise.all([
+      getCurrentStatus(bbl),
+      getStatusHistory(bbl, limit, offset),
+    ]);
+    res.json({ current, history, limit, offset });
+  } catch (err) {
+    console.error("[status] read failed:", err?.message ?? String(err));
+    res.status(500).json({ error: "Failed to read status" });
+  }
+});
+
 // ── /api/meta — dataset freshness metadata ────────────────────────────────────
 app.get("/api/meta", requireAuth, (_req, res) => {
   const meta = {
@@ -1102,6 +1228,17 @@ app.get("/api/health", requireAuth, (_req, res) => {
   });
 });
 
+// SPA fallback for React Router. express.static above serves dist/index.html
+// only for `/` and matching static files; deep links like /legacy 404 without
+// this. Any GET that isn't an /api/ route and didn't match a static file gets
+// index.html, so the client-side router can pick up the path.
+app.use((req, res, next) => {
+  if (req.method !== "GET") return next();
+  if (req.path.startsWith("/api/")) return next();
+  res.setHeader("Cache-Control", "no-store");
+  res.sendFile(resolve(process.cwd(), "dist", "index.html"));
+});
+
 // Terminal error handler — catches anything that reaches next(err) and isn't
 // already handled above; prevents Express default from leaking stack traces.
 // eslint-disable-next-line no-unused-vars
@@ -1110,10 +1247,16 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-const server = app.listen(PORT, () => {
-  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
-  console.log(`[api] listening on :${PORT} | provider: ${provider}`);
-});
+// Schema must be ready before accepting connections — exit on failure
+const server = await initSchema()
+  .then(() => app.listen(PORT, () => {
+    const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
+    console.log(`[api] listening on :${PORT} | provider: ${provider}`);
+  }))
+  .catch((err) => {
+    console.error("[db] FATAL: schema init failed:", err?.message ?? String(err));
+    process.exit(1);
+  });
 
 // Kill slow/stalled connections — prevents Slowloris exhaustion attacks
 server.requestTimeout  = 30_000; // 30s to complete request
