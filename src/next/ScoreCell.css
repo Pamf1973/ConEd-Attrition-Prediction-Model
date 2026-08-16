@@ -1,0 +1,116 @@
+/* Score cell atom — tokens and styles ported from
+   docs/design/fable-round-0-2026-07-12/score-cell-anatomy.html.
+   Scope: only .sc-* classes. Not global. */
+
+.sc-scope {
+  --sc-canvas: #0C0F13;
+  --sc-canvas-raised: #12161C;
+  --sc-bench-text: #E6E8EB;
+  --sc-bench-muted: #8A919C;
+  --sc-bench-line: #232A33;
+  --sc-low: #4C8A68;
+  --sc-med: #D19A3D;
+  --sc-high: #E05545;
+  --sc-crit: #C22B1F;
+  --sc-crit-text: #E8574A;
+  --sc-uncertain: #7A828D;
+  --sc-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.sc-cell {
+  display: flex;
+  align-items: stretch;
+  min-width: 196px;
+  max-width: 232px;
+  background: var(--sc-canvas-raised);
+  border: 1px solid var(--sc-bench-line);
+  padding: 9px 12px 9px 0;
+}
+
+.sc-tick {
+  width: 3px;
+  flex: none;
+  margin-right: 11px;
+  background: var(--sc-bench-line);
+}
+.sc-tick--low  { background: var(--sc-low); }
+.sc-tick--med  { background: var(--sc-med); }
+.sc-tick--high { background: var(--sc-high); }
+.sc-tick--crit {
+  background: var(--sc-crit);
+  width: 5px;
+  margin-right: 9px;
+}
+.sc-tick--uncertain {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--sc-uncertain) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+.sc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sc-r1 { display: flex; align-items: baseline; gap: 8px; }
+
+.sc-pct {
+  font-family: var(--sc-mono);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--sc-bench-text);
+  font-variant-numeric: tabular-nums;
+}
+.sc-pct--est {
+  color: var(--sc-bench-muted);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.sc-tier {
+  font-family: var(--sc-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.sc-tier--low  { color: var(--sc-low); }
+.sc-tier--med  { color: var(--sc-med); }
+.sc-tier--high { color: var(--sc-high); }
+.sc-tier--crit { color: var(--sc-crit-text); }
+.sc-tier--uncertain { color: var(--sc-uncertain); }
+
+.sc-diverge {
+  font-family: var(--sc-mono);
+  font-size: 10px;
+  color: var(--sc-med);
+}
+
+.sc-r2 { display: flex; gap: 5px; flex-wrap: wrap; }
+
+.sc-chip {
+  font-family: var(--sc-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-bench-muted);
+  border: 1px solid var(--sc-bench-line);
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.sc-chip--stale {
+  border-style: dashed;
+  color: #6B7280;
+}
+.sc-chip--verified {
+  border-color: var(--sc-bench-muted);
+  color: var(--sc-bench-text);
+  background: rgba(230, 232, 235, 0.06);
+}
