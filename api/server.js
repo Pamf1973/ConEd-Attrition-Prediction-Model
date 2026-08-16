@@ -697,6 +697,7 @@ function actorTag(token) {
 // bidi isolates (U+2066–U+2069), line terminators (U+2028/U+2029), BOM (U+FEFF).
 // Tab (\x09) and LF (\x0a) intentionally kept for multiline notes.
 function sanitizeNote(raw) {
+  if (typeof raw !== "string") return "";
   return raw
     .normalize("NFC")
     .replace(/[\x00-\x08\x0b-\x0d\x0e-\x1f\x7f\x85\xad؜​-‏  ‪-‮⁠-⁩﻿]/g, "");
