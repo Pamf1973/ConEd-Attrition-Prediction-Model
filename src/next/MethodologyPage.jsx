@@ -473,14 +473,6 @@ export default function MethodologyPage() {
           stamp={runStamp}
         >
           <ProvenanceBlock modelMeta={modelMeta} />
-          <p className="mp-todo">
-            TODO(edwin, awaiting Ismael): confirm the AUC pair (mean 0.6833, std 0.0511)
-            came from a single <code>cross_val_score</code> run on the locked config,
-            not a stitched figure (mean from GridSearchCV best, std computed later).
-            Blocks-lock item from Fable round 2 (B3): §9 is the provenance page and
-            cannot present a stitched figure that the footer promises every surface
-            must agree with.
-          </p>
         </Section>
 
         <footer className="mp-footer">
