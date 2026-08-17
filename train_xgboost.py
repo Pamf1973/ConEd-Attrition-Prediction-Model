@@ -6,7 +6,7 @@ Compares GridSearchCV XGBClassifier with the original GradientBoostingClassifier
 Run: .ml_venv/bin/python3.13 train_xgboost.py
 """
 
-import json, os, sys
+import json, os, sys, hashlib, subprocess, datetime
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -19,7 +19,13 @@ from sklearn.metrics import roc_auc_score
 
 # ── Import model building functions from ll97_model.py ───────────────────────
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ll97_model import load_data, build_rows, make_labels, FEATURES
+from ll97_model import load_data, build_rows, make_labels, FEATURES, compute_shap_drivers, update_enrichment
+
+try:
+    import shap as _shap_mod
+    HAS_SHAP = True
+except ImportError:
+    HAS_SHAP = False
 
 # ── XGBoost (optional — graceful fallback if import fails) ───────────────────
 try:
@@ -308,6 +314,69 @@ def main():
     with open(out_path, "w") as f:
         f.write(md)
     print(f"  Written: {out_path}")
+
+    # ── Write data/model_meta.json ───────────────────────────────────────────
+    if HAS_XGB and results["xgboost"]["status"] == "completed":
+        cv_std = float(gs.cv_results_["std_test_score"][gs.best_index_])
+        params_hash = hashlib.sha256(
+            json.dumps(best_params, sort_keys=True).encode()
+        ).hexdigest()[:12]
+        try:
+            commit = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True, text=True,
+                cwd=os.path.dirname(os.path.abspath(__file__)),
+            ).stdout.strip()
+        except Exception:
+            commit = ""
+        meta = {
+            "model_name":       "XGBoost Classifier",
+            "model_version":    "XGB v1 · UNVAL",
+            "params_hash":      params_hash,
+            "commit":           commit,
+            "cv_auc":           round(best_score, 4),
+            "cv_std":           round(cv_std, 4),
+            "cv_kfold":         5,
+            "n_labeled":        X.shape[0],
+            "n_positive":       pos_count,
+            "run_date":         datetime.date.today().isoformat(),
+            "label_definition": "big_drop (≥50% steam decline, 2yr window) = 1, no_signal = 0, mod_drop excluded",
+            "validation_status": "unvalidated",
+        }
+        meta_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "model_meta.json")
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, indent=2)
+        print(f"  Written: {meta_path}")
+
+    # ── SHAP ml_drivers + enrichment write ──────────────────────────────────
+    if HAS_XGB and results["xgboost"]["status"] == "completed":
+        if not HAS_SHAP:
+            print("\n  [shap] package not found — skipping ml_drivers write (pip install shap)")
+        else:
+            print("\n  Computing SHAP drivers for all buildings (this uses ALL rows, not just labeled)...")
+            # predict_proba on ALL rows so ml_risk covers unlabeled buildings too
+            X_all = np.array([[r[f] for f in FEATURES] for r in rows])
+            X_all_sc = scaler.transform(X_all)
+            probs_all = gs.best_estimator_.predict_proba(X_all_sc)[:, 1]
+
+            drivers_all = compute_shap_drivers(gs.best_estimator_, scaler, rows, top_n=5)
+
+            enrichment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "buildingEnrichment.json")
+            with open(enrichment_path) as f:
+                enrichment_data = json.load(f)
+
+            update_enrichment(enrichment_data, rows, probs_all, drivers_all)
+
+            with open(enrichment_path, "w") as f:
+                json.dump(enrichment_data, f, indent=2)
+
+            print(f"  ml_risk + ml_drivers written for {len(rows)} buildings → {enrichment_path}")
+            if rows:
+                sample_addr = rows[0]["address"]
+                sample_d = enrichment_data.get(sample_addr, {}).get("ml_drivers", [])
+                if sample_d:
+                    print(f"  Sample ({sample_addr}): top driver = {sample_d[0]['feature']} (contrib={sample_d[0]['contribution']:+.4f})")
+
     print("=" * 70)
 
     # ── Quick console summary ────────────────────────────────────────────────

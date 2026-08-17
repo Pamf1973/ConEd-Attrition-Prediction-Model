@@ -33,7 +33,7 @@ Usage:
     /opt/homebrew/bin/python3.13 update_enrichment_risk.py
 """
 
-import json
+import json, datetime
 from pathlib import Path
 
 PUBLIC_DIR = Path(__file__).parent / "public"
@@ -252,6 +252,16 @@ def main():
         print(f"  ✅ UNCERTAIN COUNT >= 10 — threshold check PASS")
     else:
         print(f"  ⚠️  Only {risk_counts.get('Uncertain', 0)} Uncertain — threshold check FAIL")
+
+    # Refresh run_date in data/model_meta.json (params-unchanged run)
+    meta_path = Path(__file__).parent / "data" / "model_meta.json"
+    if meta_path.exists():
+        with open(meta_path) as f:
+            meta = json.load(f)
+        meta["run_date"] = datetime.date.today().isoformat()
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, indent=2)
+        print(f"[meta] refreshed run_date in {meta_path}")
 
     print("\nDone.")
 

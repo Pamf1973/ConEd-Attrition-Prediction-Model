@@ -19,3 +19,7 @@ Answer: billing aggregates only pre-2018. Led to D14.
 Statuses: open | resolved <date> | moot <date> (with one line on why it stopped mattering)
 
 ---
+
+## Q1 | open | owner: Ismael | subject: pipeline
+Asked 2026-08-17. When does `ml_drivers` (SHAP top-N per building) get emitted into `buildingEnrichment.json`? Surfaced in PR #21 review: `buildDrivers` reads `building.ml_drivers` which enrichment doesn't produce yet, so the M4 CaseFileHeader drivers band renders empty against live data.
+Resolves: M4 drivers band populates with real data. Natural fit alongside M2 AUC rerun in `train_xgboost.py`.

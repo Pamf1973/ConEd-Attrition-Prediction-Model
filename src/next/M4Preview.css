@@ -1,0 +1,85 @@
+/* M4 preview page — paper canvas surrounding dark case-file specimens.
+   Only .m4-* classes; not global. */
+
+.m4-preview {
+  --m4-paper: #F8F8F6;
+  --m4-ink: #17181A;
+  --m4-ink-muted: #6C6F75;
+  --m4-hairline: #DDDDD8;
+  --m4-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --m4-body: 'Inter', system-ui, sans-serif;
+  --m4-display: 'Space Grotesk', sans-serif;
+
+  background: var(--m4-paper);
+  color: var(--m4-ink);
+  font-family: var(--m4-body);
+  min-height: 100vh;
+  padding: 56px 32px 96px;
+}
+
+.m4-header {
+  max-width: 1040px;
+  margin: 0 auto 48px;
+  border-bottom: 1px solid var(--m4-ink);
+  padding-bottom: 28px;
+}
+.m4-meta {
+  font-family: var(--m4-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m4-ink-muted);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.m4-header h1 {
+  font-family: var(--m4-display);
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  max-width: 28ch;
+  margin: 0;
+}
+.m4-lede {
+  margin-top: 16px;
+  max-width: 68ch;
+  color: var(--m4-ink-muted);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.m4-lede code {
+  font-family: var(--m4-mono);
+  font-size: 13px;
+  color: var(--m4-ink);
+  background: rgba(23, 24, 26, 0.06);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.m4-stack {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.m4-state-meta { margin-bottom: 14px; }
+.m4-state-id {
+  font-family: var(--m4-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m4-ink);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.m4-state-scenario {
+  color: var(--m4-ink-muted);
+  font-size: 14px;
+  max-width: 72ch;
+  margin: 0;
+}

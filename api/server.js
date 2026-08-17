@@ -13,7 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
-import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
+import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES, saveWatchlist, loadWatchlist } from "./db.js";
+import { renderReportPdf, shutdownBrowser } from "./pdf.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -346,9 +347,6 @@ app.get("/api/buildings", requireAuth, (req, res) => {
   res.json({ buildings: paged, total, page: pageNum, per_page: perPage, total_pages: totalPages });
 });
 
-// ── Watchlist — per-session persistence (Map, localStorage fallback on client) ──
-const watchlistStore = new Map(); // token → string[]
-
 // ── Proactive Alert Engine ────────────────────────────────────────────────────
 // Per-session dismissed alert IDs (lightweight — just tracks which were dismissed)
 const proactiveDismissed = new Map(); // sessionToken → Set<alertId>
@@ -587,8 +585,7 @@ app.post("/api/alerts/proactive/dismiss", requireAuth, (req, res) => {
   res.json({ ok: true, alert_id });
 });
 
-app.post("/api/watchlist/save", requireAuth, (req, res) => {
-  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
+app.post("/api/watchlist/save", requireAuth, async (req, res) => {
   const { addresses } = req.body ?? {};
   if (!Array.isArray(addresses)) {
     return res.status(400).json({ error: "addresses must be an array of strings" });
@@ -597,18 +594,25 @@ app.post("/api/watchlist/save", requireAuth, (req, res) => {
     return res.status(400).json({ error: "addresses array too large (max 10,000)" });
   }
   if (!addresses.every(a => typeof a === "string" && a.length <= 500)) {
-    return res.status(400).json({ error: "each address must be a non-empty string ≤ 500 chars" });
+    return res.status(400).json({ error: "each address must be a string ≤ 500 chars" });
   }
-  // Evict oldest entry when store reaches 500 sessions to bound memory use
-  if (watchlistStore.size >= 500) watchlistStore.delete(watchlistStore.keys().next().value);
-  watchlistStore.set(req.sessionToken, addresses);
-  res.json({ ok: true, count: addresses.length });
+  try {
+    await saveWatchlist(actorTag(req.sessionToken), addresses);
+    res.json({ ok: true, count: addresses.length });
+  } catch (err) {
+    console.error("[watchlist/save] db error:", err.message);
+    res.status(500).json({ error: "Failed to save watchlist" });
+  }
 });
 
-app.get("/api/watchlist/load", requireAuth, (req, res) => {
-  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
-  const addresses = watchlistStore.get(req.sessionToken) ?? [];
-  res.json({ addresses });
+app.get("/api/watchlist/load", requireAuth, async (req, res) => {
+  try {
+    const addresses = await loadWatchlist(actorTag(req.sessionToken));
+    res.json({ addresses });
+  } catch (err) {
+    console.error("[watchlist/load] db error:", err.message);
+    res.status(500).json({ error: "Failed to load watchlist" });
+  }
 });
 
 // ── /api/model_meta — model provenance object (written by train_xgboost.py) ──
@@ -632,11 +636,11 @@ function validateModelMeta(m) {
     model_version:    safeStr(m.model_version,    "XGB v1 · UNVAL"),
     params_hash:      safeStr(m.params_hash,       ""),
     commit:           safeStr(m.commit,            ""),
-    cv_auc:           safeNum(m.cv_auc,            0.68),
+    cv_auc:           typeof m.cv_auc === "number" && isFinite(m.cv_auc) ? m.cv_auc : null,
     cv_std:           typeof m.cv_std === "number" && isFinite(m.cv_std) ? m.cv_std : null,
     cv_kfold:         safeNum(m.cv_kfold,          5),
     n_labeled:        typeof m.n_labeled  === "number" && isFinite(m.n_labeled)  ? m.n_labeled  : null,
-    n_positive:       safeNum(m.n_positive,        54),
+    n_positive:       typeof m.n_positive === "number" && isFinite(m.n_positive) ? m.n_positive : null,
     run_date:         safeStr(m.run_date,           ""),
     label_definition: safeStr(m.label_definition,  "", 512),
     validation_status: safeStr(m.validation_status, "unvalidated"),
@@ -653,7 +657,7 @@ function getModelMeta() {
       console.error("[model_meta] Failed to load %s: %s", MODEL_META_PATH, err.message);
       if (!_modelMeta) {
         _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1 · UNVAL",
-                       cv_auc: 0.68, cv_kfold: 5, n_positive: 54, validation_status: "unvalidated" };
+                       cv_auc: null, cv_kfold: 5, n_positive: null, validation_status: "unvalidated" };
       }
     } finally {
       // Always update timestamp — prevents unbounded sync readFileSync on every
@@ -697,9 +701,10 @@ function actorTag(token) {
 // bidi isolates (U+2066–U+2069), line terminators (U+2028/U+2029), BOM (U+FEFF).
 // Tab (\x09) and LF (\x0a) intentionally kept for multiline notes.
 function sanitizeNote(raw) {
+  if (typeof raw !== "string") return "";
   return raw
     .normalize("NFC")
-    .replace(/[\x00-\x08\x0b-\x0d\x0e-\x1f\x7f\x85\xad؜​-‏  ‪-‮⁠-⁩﻿]/g, "");
+    .replace(/[\x00-\x08\x0b-\x0d\x0e-\x1f\x7f\x85\xad\u061C\u200B-\u200F\u2028\u2029\u202A-\u202E\u2060-\u2069\uFEFF]/g, "");
 }
 
 // Bulk current status — registered before :bbl route to avoid param shadowing
@@ -1054,19 +1059,23 @@ const FAQ = [
     keywords: ["what is", "ml_risk", "risk score", "attrition risk"],
     getAnswer: () => {
       const m = getModelMeta();
-      const auc = Math.round((m.cv_auc ?? 0.68) * 100);
+      const auc = m.cv_auc != null ? Math.round(m.cv_auc * 100) : null;
       const validated = (m.validation_status ?? "unvalidated") !== "unvalidated";
-      // §7 rule 8: AUC copy templated from model_meta.
+      // §7 rule 8: AUC copy templated from model_meta. When cv_auc or n_positive
+      // are unavailable, emit the interim sentence rather than fabricating a
+      // rounded number from a stale literal.
       // §7 rule 9: model version from model_meta.model_version, never hardcoded.
       // §8 rule 1: ml_risk is a ranking, not a likelihood — no "(0–1)", no "likelihood".
       // §8 rule 2: render validation_status explicitly.
       // §8 rule 3: tier is the defensible claim — ML base plus named modifiers.
+      const aucClause = auc != null && m.n_positive != null
+        ? `The model ranks a true churner above a non-churner about ${auc}% of the time (${m.cv_kfold ?? 5}-fold CV, ${m.n_positive} positive labels). `
+        : `Validation rerun in progress. `;
       return `ml_risk is a ranking score from model ${m.model_version ?? "XGB v1 · UNVAL"} ` +
         `(${validated ? "back-tested" : "unvalidated"}). ` +
         `It ranks buildings by steam attrition signal: ML base score modified by LL97 penalty exposure, ` +
         `steam GHG share, Energy Star score, and peer cluster rates. ` +
-        `The model ranks a true churner above a non-churner about ${auc}% of the time ` +
-        `(${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). ` +
+        aucClause +
         `Use percentile position, not the raw score, to compare buildings.`;
     }
   },
@@ -1152,6 +1161,42 @@ const exportLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Export rate limit — try again in a minute" },
+});
+
+// ── M5 /api/report/:bbl.pdf ──────────────────────────────────────────────────
+// Puppeteer renders /report/:bbl (screen DOM, print media) to a PDF Buffer.
+// Graceful degradation per roadmap §M5: if this fails, /report/:bbl alone
+// is the deliverable (browser print-to-PDF). Reuses BBL_RE from §status.
+
+app.get("/api/report/:bbl.pdf", requireAuth, exportLimiter, async (req, res) => {
+  const bbl = req.params.bbl;
+  if (!BBL_RE.test(bbl)) {
+    return res.status(400).json({ error: "Invalid BBL" });
+  }
+  const authHeader = req.headers.authorization ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return res.status(401).json({ error: "Missing token" });
+
+  // Prefer an explicit env var to prevent x-forwarded-host spoofing on deploys
+  // where the reverse proxy does not strip client-supplied headers.
+  const origin =
+    process.env.PUBLIC_ORIGIN ??
+    (process.env.RAILWAY_PUBLIC_DOMAIN
+      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+      : `${req.get("x-forwarded-proto") || req.protocol || "http"}://${req.get("x-forwarded-host") || req.get("host") || `localhost:${PORT}`}`);
+
+  try {
+    const pdf = await renderReportPdf(bbl, token, { origin });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="report-${bbl}.pdf"`);
+    res.setHeader("Cache-Control", "no-store, private");
+    res.send(pdf);
+  } catch (err) {
+    console.error("[/api/report/:bbl.pdf] render failed:", err.message);
+    res.status(500).json({
+      error: "PDF render failed — use browser print-to-PDF on /report/" + bbl,
+    });
+  }
 });
 
 app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {
@@ -1262,7 +1307,7 @@ app.get("/api/predict/xgboost", requireAuth, (req, res) => {
   const e = lookupEnrichment(addr);
   if (!e) return res.status(404).json({ error: "Building not found" });
   if (e.xgb_risk == null) return res.status(503).json({ error: "XGBoost scores not available — run save_models.py" });
-  res.json({ address: addr.toUpperCase(), xgb_risk: e.xgb_risk, gbm_risk: e.gbm_risk ?? null, auc: 0.6833 });
+  res.json({ address: addr.toUpperCase(), xgb_risk: e.xgb_risk, gbm_risk: e.gbm_risk ?? null, auc: getModelMeta().cv_auc ?? null });
 });
 
 // Compare GBM vs XGBoost for a building
@@ -1278,8 +1323,8 @@ app.get("/api/predict/compare", requireAuth, (req, res) => {
     xgb_risk:  e.xgb_risk,
     gbm_risk:  e.gbm_risk ?? e.ml_risk,
     delta:     Math.round(delta * 10000) / 10000,
-    xgb_auc:   0.6833,
-    gbm_auc:   0.6639,
+    xgb_auc:   getModelMeta().cv_auc ?? null,
+    gbm_auc:   null,
     features:  PREDICT_FEATURES,
   });
 });
@@ -1461,15 +1506,25 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Schema must be ready before accepting connections — exit on failure
+// Schema must be ready before accepting connections in production. In dev,
+// warn and keep serving so contributors without a local Postgres can still
+// run the UI and non-status endpoints; /api/buildings/:bbl/status* will fail
+// per-request, which the container already handles.
+const startServer = () => app.listen(PORT, () => {
+  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
+  console.log(`[api] listening on :${PORT} | provider: ${provider}`);
+});
+
 const server = await initSchema()
-  .then(() => app.listen(PORT, () => {
-    const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
-    console.log(`[api] listening on :${PORT} | provider: ${provider}`);
-  }))
+  .then(startServer)
   .catch((err) => {
-    console.error("[db] FATAL: schema init failed:", err?.message ?? String(err));
-    process.exit(1);
+    const msg = err?.message ?? String(err);
+    if (process.env.NODE_ENV === "production") {
+      console.error("[db] FATAL: schema init failed:", msg);
+      process.exit(1);
+    }
+    console.warn("[db] schema init failed (dev):", msg, "— status endpoints will 500 per request");
+    return startServer();
   });
 
 // Kill slow/stalled connections — prevents Slowloris exhaustion attacks
@@ -1488,9 +1543,9 @@ process.on("exit", (code) => {
 });
 process.on("SIGTERM", () => {
   console.error("[server] received SIGTERM");
-  process.exit(0);
+  shutdownBrowser().finally(() => process.exit(0));
 });
 process.on("SIGINT", () => {
   console.error("[server] received SIGINT");
-  process.exit(0);
+  shutdownBrowser().finally(() => process.exit(0));
 });

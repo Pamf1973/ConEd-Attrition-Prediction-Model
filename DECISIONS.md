@@ -79,3 +79,33 @@ Context: Commit aecde22 on ismael/pr-9c-frontend-workflow (2026-07-28) flipped t
 Decided: Revert the primary-binding and labeling changes from aecde22 on PR #12. Restore `risk = ml_risk` (strict revert to pre-aecde22 binding; M3-spec percentile binding lands in M3 work, not smuggled into PR #12). Restore "Attrition Risk" language on BuildingPanel section header, RiskTable "Attrition Score" column, RiskHistogram subtitle. Fully revert src/legacy/data/useBuildings.js changes — legacy is frozen. Keep the composite compute infrastructure in src/data/useBuildings.js exposed as a secondary field `composite_risk` (not written into `risk`); it is real work with future use for filter/queue logic and the /api/predict/custom weight-tuning surface. The DECISIONS.md entry now exists so this question is not silently re-litigated in a future commit; any future proposal to promote composite to primary must file its own D-entry against this one.
 Rejected: (a) Bless the flip and update docs (Option A) — would require rewriting M3 acceptance criteria, §7 rule 7, §8 rule 1, and D7 mid-cycle; the flip is a material redesign choice, not a polish, and the panel consensus was not documented at design time. (b) Revert the entire commit including composite compute (Option B strict) — throws away useful infrastructure the /api/predict/custom endpoint needs downstream. (c) Merge as-is with a follow-up D-entry (Option D) — normalizes shipping architecturally significant changes without decision anchors, and drift compounds across teammates.
 Affects: PR #12 (needs surgical revert before merge). system-v1.1.md §7 rule 7 and §8 rule 1 (reaffirmed, no change). D7 (reaffirmed). M3 kickoff brief (unchanged). aecde22 (partial revert required). Composite score infrastructure preserved as `composite_risk` field for R11 methodology surfaces and future weight-tuning UX. Convention reinforced: architectural changes to primary display bindings require a filed D-entry before merging, not after.
+
+## D12 | 2026-08-17 | Make db init non-fatal outside production (option C over Docker or eyeball-only)
+Context: After PR #18 (regex fix) landed, `npm run dev` still crashed at `[db] FATAL: schema init failed:` because `initSchema()` in api/server.js calls `process.exit(1)` unconditionally. No local Postgres running. Blocks M4 container eyeball and any future frontend contributor without a DB. Three options considered: (A) eyeball M4 preview route only, defer container verification; (B) stand up Docker Postgres locally; (C) file a small PR gating the hard-fail on NODE_ENV=production so dev logs a warning and boots anyway.
+Decided: Option C. Filed as PR #19. Production behavior unchanged (still exits 1). In dev, warns and starts the server; status endpoints 500 per-request, which CaseFileContainer already handles via its warn banner.
+Rejected: (A) leaves the container unverified against real data and pushes the problem forward; (B) adds ops burden every frontend contributor pays forever to solve a dev-only problem.
+Affects: api/server.js (initSchema call site, lines 1466-1479). Sets convention that dev-only environmental blockers should be gated on NODE_ENV rather than mandated as setup. Container eyeball unblocked once #19 merges (or via local branch checkout in the interim).
+
+## D13 | 2026-08-17 | M4 container ships read-only against status endpoint; POST wiring deferred
+Context: M4 container adapter (edwin/M4-case-file-container, b737df0) wires the case-file header to real data through `/api/data/*` + `/api/model_meta` + `GET /api/buildings/:bbl/status`. Question was whether to also wire the status segment as an interactive writer (POST /api/buildings/:bbl/status) inside this PR or defer.
+Decided: Ship read-only. Status segment renders the 6 states from the latest event but does not accept input. POST wiring lands as a separate follow-up PR.
+Rejected: Bundling POST into the M4 container PR — scope creep, would gate M4 review on a second surface (write UX + optimistic update behavior + toast/error patterns) that has no design anchor in Fable spec 2 yet.
+Affects: edwin/M4-case-file-container. Follow-up PR to be filed after M4 lands. Does not affect the M6 backend contract, which is already Postgres-backed on main.
+
+## D14 | 2026-08-17 | M5 puppeteer variant: full bundled chromium over @sparticuz/chromium
+Context: /api/report/:bbl.pdf needs a browser to render /report/:bbl. Two candidates: full puppeteer (bundled chromium, zero config, ~170MB image add + system libs) vs puppeteer-core + @sparticuz/chromium (Lambda-oriented, mechanical wiring, smaller cold-start).
+Decided: Ship full puppeteer as runtime dep. Isolated all Puppeteer usage in api/pdf.js so a future swap is one-file if Railway image size bites.
+Rejected: puppeteer-core + @sparticuz/chromium — designed for serverless size limits that do not apply to Railway's long-running container; wiring overhead not justified without evidence of a problem.
+Affects: api/pdf.js, Dockerfile (chromium system deps), package.json. Graceful degradation per roadmap §M5 covers the worst case (browser print-to-PDF of /report/:bbl).
+
+## D15 | 2026-08-17 | M5 temp adapter to avoid stacking on M4
+Context: R1 requires the report to be a projection of the M4 case-file header, ideally by consuming the same adapter. But M4 (#21) is still in review and stacking M5 on it would gate M5 review on M4 review, and force re-rebase on M4 iterations.
+Decided: Ship src/next/reportAdapter.js as a temp local adapter mirroring caseFileAdapter.jsx shape. TODO(M4-merge) marker in place. Swap import + delete temp when #21 lands, at which point R1 becomes a code-level guarantee rather than a mirrored derivation.
+Rejected: (a) stacking on M4 branches — review coupling; (b) waiting for M4 to merge before scaffolding M5 — burns the session, blocks parallelism.
+Affects: src/next/reportAdapter.js (deletable), src/next/ReportPage.jsx (import swap). PR #24 body flags the deviation.
+
+## D16 | 2026-08-17 | Defer R5 review-confirmed flow (removes DRAFT watermark) to after M6
+Context: R5 requires "a human signs it" + DRAFT watermark until review confirmed. Ismael owns M6 (status events endpoint), which is the natural home for a "reviewed" state.
+Decided: Ship DRAFT watermark hardcoded on. Review-confirmed flow deferred to a follow-up PR once M6 status vocabulary is live.
+Rejected: Building an ad-hoc review flag now — would duplicate what M6 will provide and risk migration churn.
+Affects: src/next/ReportPage.jsx (signature.draft = true always). Not blocking M5 acceptance; flagged in PR #24 body.

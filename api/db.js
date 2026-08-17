@@ -80,7 +80,34 @@ export async function initSchema() {
       ON building_status_events(actor)
   `);
 
+  // Watchlist: one row per actor (HMAC-pseudonymized token), addresses stored as JSONB.
+  // UPSERT on save — no append-only audit trail needed here, just current state.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS watchlists (
+      actor       TEXT        PRIMARY KEY,
+      addresses   JSONB       NOT NULL DEFAULT '[]',
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
   console.log("[db] schema ready");
+}
+
+export async function saveWatchlist(actor, addresses) {
+  await pool.query(
+    `INSERT INTO watchlists (actor, addresses, updated_at)
+     VALUES ($1, $2, NOW())
+     ON CONFLICT (actor) DO UPDATE SET addresses = $2, updated_at = NOW()`,
+    [actor, addresses]
+  );
+}
+
+export async function loadWatchlist(actor) {
+  const { rows } = await pool.query(
+    `SELECT addresses FROM watchlists WHERE actor = $1`,
+    [actor]
+  );
+  return rows[0]?.addresses ?? [];
 }
 
 // Current status for a BBL — fetched independently from history so paginated
