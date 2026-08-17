@@ -6,7 +6,7 @@ Compares GridSearchCV XGBClassifier with the original GradientBoostingClassifier
 Run: .ml_venv/bin/python3.13 train_xgboost.py
 """
 
-import json, os, sys
+import json, os, sys, hashlib, subprocess, datetime
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -308,6 +308,39 @@ def main():
     with open(out_path, "w") as f:
         f.write(md)
     print(f"  Written: {out_path}")
+
+    # ── Write data/model_meta.json ───────────────────────────────────────────
+    if HAS_XGB and results["xgboost"]["status"] == "completed":
+        cv_std = float(gs.cv_results_["std_test_score"][gs.best_index_])
+        params_hash = hashlib.sha256(
+            json.dumps(best_params, sort_keys=True).encode()
+        ).hexdigest()[:12]
+        try:
+            commit = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                capture_output=True, text=True,
+                cwd=os.path.dirname(os.path.abspath(__file__)),
+            ).stdout.strip()
+        except Exception:
+            commit = ""
+        meta = {
+            "model_name":       "XGBoost Classifier",
+            "model_version":    "XGB v1 · UNVAL",
+            "params_hash":      params_hash,
+            "commit":           commit,
+            "cv_auc":           round(best_score, 4),
+            "cv_std":           round(cv_std, 4),
+            "cv_kfold":         5,
+            "n_labeled":        X.shape[0],
+            "n_positive":       pos_count,
+            "run_date":         datetime.date.today().isoformat(),
+            "label_definition": "big_drop (≥50% steam decline, 2yr window) = 1, no_signal = 0, mod_drop excluded",
+            "validation_status": "unvalidated",
+        }
+        meta_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "model_meta.json")
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, indent=2)
+        print(f"  Written: {meta_path}")
     print("=" * 70)
 
     # ── Quick console summary ────────────────────────────────────────────────
