@@ -54,4 +54,7 @@ RUN npm prune --omit=dev
 ENV NODE_ENV=production
 EXPOSE 3001
 
+# Run as non-root — Chromium --no-sandbox is required but doesn't need root.
+USER node
+
 CMD ["node", "api/server.js"]

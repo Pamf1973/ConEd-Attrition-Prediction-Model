@@ -14,7 +14,7 @@ import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
 import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
-import { renderReportPdf } from "./pdf.js";
+import { renderReportPdf, shutdownBrowser } from "./pdf.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -1540,9 +1540,9 @@ process.on("exit", (code) => {
 });
 process.on("SIGTERM", () => {
   console.error("[server] received SIGTERM");
-  process.exit(0);
+  shutdownBrowser().finally(() => process.exit(0));
 });
 process.on("SIGINT", () => {
   console.error("[server] received SIGINT");
-  process.exit(0);
+  shutdownBrowser().finally(() => process.exit(0));
 });
