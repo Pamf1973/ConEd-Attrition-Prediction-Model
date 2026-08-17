@@ -632,11 +632,11 @@ function validateModelMeta(m) {
     model_version:    safeStr(m.model_version,    "XGB v1 · UNVAL"),
     params_hash:      safeStr(m.params_hash,       ""),
     commit:           safeStr(m.commit,            ""),
-    cv_auc:           safeNum(m.cv_auc,            0.68),
+    cv_auc:           typeof m.cv_auc === "number" && isFinite(m.cv_auc) ? m.cv_auc : null,
     cv_std:           typeof m.cv_std === "number" && isFinite(m.cv_std) ? m.cv_std : null,
     cv_kfold:         safeNum(m.cv_kfold,          5),
     n_labeled:        typeof m.n_labeled  === "number" && isFinite(m.n_labeled)  ? m.n_labeled  : null,
-    n_positive:       safeNum(m.n_positive,        54),
+    n_positive:       typeof m.n_positive === "number" && isFinite(m.n_positive) ? m.n_positive : null,
     run_date:         safeStr(m.run_date,           ""),
     label_definition: safeStr(m.label_definition,  "", 512),
     validation_status: safeStr(m.validation_status, "unvalidated"),
@@ -653,7 +653,7 @@ function getModelMeta() {
       console.error("[model_meta] Failed to load %s: %s", MODEL_META_PATH, err.message);
       if (!_modelMeta) {
         _modelMeta = { model_name: "XGBoost Classifier", model_version: "XGB v1 · UNVAL",
-                       cv_auc: 0.68, cv_kfold: 5, n_positive: 54, validation_status: "unvalidated" };
+                       cv_auc: null, cv_kfold: 5, n_positive: null, validation_status: "unvalidated" };
       }
     } finally {
       // Always update timestamp — prevents unbounded sync readFileSync on every
@@ -1055,19 +1055,23 @@ const FAQ = [
     keywords: ["what is", "ml_risk", "risk score", "attrition risk"],
     getAnswer: () => {
       const m = getModelMeta();
-      const auc = Math.round((m.cv_auc ?? 0.68) * 100);
+      const auc = m.cv_auc != null ? Math.round(m.cv_auc * 100) : null;
       const validated = (m.validation_status ?? "unvalidated") !== "unvalidated";
-      // §7 rule 8: AUC copy templated from model_meta.
+      // §7 rule 8: AUC copy templated from model_meta. When cv_auc or n_positive
+      // are unavailable, emit the interim sentence rather than fabricating a
+      // rounded number from a stale literal.
       // §7 rule 9: model version from model_meta.model_version, never hardcoded.
       // §8 rule 1: ml_risk is a ranking, not a likelihood — no "(0–1)", no "likelihood".
       // §8 rule 2: render validation_status explicitly.
       // §8 rule 3: tier is the defensible claim — ML base plus named modifiers.
+      const aucClause = auc != null && m.n_positive != null
+        ? `The model ranks a true churner above a non-churner about ${auc}% of the time (${m.cv_kfold ?? 5}-fold CV, ${m.n_positive} positive labels). `
+        : `Validation rerun in progress. `;
       return `ml_risk is a ranking score from model ${m.model_version ?? "XGB v1 · UNVAL"} ` +
         `(${validated ? "back-tested" : "unvalidated"}). ` +
         `It ranks buildings by steam attrition signal: ML base score modified by LL97 penalty exposure, ` +
         `steam GHG share, Energy Star score, and peer cluster rates. ` +
-        `The model ranks a true churner above a non-churner about ${auc}% of the time ` +
-        `(${m.cv_kfold ?? 5}-fold CV, ${m.n_positive ?? 54} positive labels). ` +
+        aucClause +
         `Use percentile position, not the raw score, to compare buildings.`;
     }
   },
