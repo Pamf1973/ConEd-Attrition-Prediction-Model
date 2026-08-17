@@ -117,7 +117,7 @@ export default function CaseFileContainer() {
             const bbl = normalizeBbl(b.bbl);
             return bbl ? (
               <div key={b.address} className="cfc-example">
-                <a href={`/case-file/${urlBbl}`}>{b.address} · {bbl}</a>
+                <a href={`/case-file/${bbl}`}>{b.address} · {bbl}</a>
               </div>
             ) : null;
           })}
