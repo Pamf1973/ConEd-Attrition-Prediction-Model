@@ -67,11 +67,37 @@
   font-size: 15px;
   line-height: 1.55;
 }
-.mp-note p { margin: 0; }
+.mp-note p { margin: 0 0 8px; }
+.mp-note p:last-child { margin-bottom: 0; }
 .mp-note code {
   font-family: var(--mp-mono);
   font-size: 13px;
   background: rgba(255, 255, 255, 0.5);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.mp-runfacts {
+  border-left: 2px solid var(--mp-line);
+  padding: 10px 14px;
+  margin: 16px 0;
+  background: rgba(255, 255, 255, 0.35);
+}
+.mp-runfacts-label {
+  font-family: var(--mp-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mp-muted);
+  display: block;
+  margin-bottom: 8px;
+}
+.mp-runfacts p { margin: 0 0 8px; }
+.mp-runfacts p:last-child { margin-bottom: 0; }
+.mp-runfacts code {
+  font-family: var(--mp-mono);
+  font-size: 13px;
+  background: var(--mp-quote-bg);
   padding: 1px 4px;
   border-radius: 2px;
 }

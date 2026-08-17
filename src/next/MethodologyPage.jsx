@@ -35,6 +35,9 @@ export default function MethodologyPage() {
   const runStamp = modelMeta?.run_date
     ? formatRunDate(modelMeta.run_date)
     : "pipeline run pending";
+  const runStampShort = modelMeta?.run_date
+    ? formatRunDate(modelMeta.run_date).slice(0, 10)
+    : "pending";
 
   return (
     <>
@@ -65,14 +68,22 @@ export default function MethodologyPage() {
             validation run on 2026-07-01 fit the current XGBoost configuration to
             1,003 labeled buildings and produced the AUC reported in §9. The scoring
             refresh on 2026-07-15 reran the tiering pipeline against that same model
-            configuration on the current enrichment, producing the ml_risk values
-            shown in the rankings and case files. Same model, later scores. Label
-            counts, positive counts, and AUC in this document trace to the 07-01
-            validation run; population totals and per-building tiers trace to the
-            07-15 scoring refresh. When the model configuration itself changes — a
-            rerun of <code>train_xgboost.py</code> that yields a new{" "}
-            <code>params_hash</code> — both clocks advance together and this note
-            is retired.
+            configuration on the current enrichment, producing the tier and modifier
+            assignments shown in the rankings and case files. Same model, later
+            downstream computation.
+          </p>
+          <p>
+            Label counts, positive counts, and AUC in this document trace to the 07-01
+            validation run; population totals, prevalence counts, and per-building
+            tiers trace to the 07-15 scoring refresh. Every run-clock sub-block on the
+            page carries its own "as of" label so a reader can tell which snapshot a
+            number came from. The 07-01 date itself appears only in this note; §9's
+            run stamp is the 07-15 refresh.
+          </p>
+          <p>
+            When the model configuration itself changes — a rerun of{" "}
+            <code>train_xgboost.py</code> that yields a new <code>params_hash</code>{" "}
+            — both clocks advance together and this note is retired.
           </p>
         </div>
 
@@ -120,10 +131,9 @@ export default function MethodologyPage() {
           <FeatureImportances importances={modelMeta?.feature_importances} />
           <p>
             The single-highest-importance feature is the log-scaled LL97 penalty
-            (<code>ll97_penalty_2024_log</code>). The over-cap boolean carries near-zero
-            importance because the log-scaled penalty already encodes statute pressure
-            richly; presenting the boolean as an additional modifier would double-count.
-            This is why LL97 over-cap is excluded from the Critical modifier leg (§5).
+            (<code>ll97_penalty_2024_log</code>). The over-cap boolean carries 0.0000
+            importance against it, which is why LL97 over-cap is excluded from the
+            Critical modifier leg (canonical explanation in §5).
           </p>
           <p className="mp-todo">
             TODO(edwin): the pending item is <code>model_meta.feature_importances</code>
@@ -165,10 +175,16 @@ export default function MethodologyPage() {
             </li>
           </ol>
           <p>
-            Distribution facts the copy must not hide: 70% of non-Uncertain rows are
-            modifier-shifted; 78% of final High (182 of 233) is modifier-promoted, 176 of
-            those from base Low. The system is model-seeded and modifier-driven.
+            The system is model-seeded and modifier-driven. Definition lives under the
+            model clock; the current-run distribution facts below live under the run
+            clock because they regenerate on every scoring refresh.
           </p>
+          <RunFacts stamp={runStampShort}>
+            <p>
+              70% of non-Uncertain rows are modifier-shifted; 78% of final High
+              (182 of 233) is modifier-promoted, 176 of those from base Low.
+            </p>
+          </RunFacts>
           <p>
             The ledger column label is <strong>"Tier · ML base + trend/statute modifiers."</strong>
           </p>
@@ -184,16 +200,18 @@ export default function MethodologyPage() {
             Modifier prevalence surfaces as counted filter chips on the queue and table.
             The count on a chip is the count of rows the chip opens; the two can never
             disagree because they are the same query. Every count in this section is
-            named against the population it describes — "N of the 1,210 ranked
-            buildings," never a bare number.
+            named against its population — the natural denominator for modifier
+            prevalence is the 956 non-Uncertain rows (modifiers don't apply to Uncertain);
+            for cross-cutting counts (e.g., queue membership), the denominator is the
+            1,210 ranked buildings. Each table below states its denominator once.
           </p>
           <p className="mp-todo">
             TODO(edwin): this section regenerates per pipeline run. Populate the prevalence
             table (Outlier Δ, Accelerating, Decelerating, LL97 over-cap 2024/2030,
-            Modifier-promoted) with counts from the 2026-07-15 scoring refresh, each
-            named against the 1,210 ranked buildings, plus the top three co-occurrence
-            pairs. LL97 pressure at portfolio scale renders as penalty-magnitude bands
-            (dollar ranges), never the over-cap boolean count (§8 rule 5).
+            Modifier-promoted) with counts from the 2026-07-15 scoring refresh, named
+            against the 956 non-Uncertain rows, plus the top three co-occurrence pairs.
+            LL97 pressure at portfolio scale renders as penalty-magnitude bands (dollar
+            ranges), never the over-cap boolean count (§8 rule 5).
           </p>
           <p className="mp-todo">
             TODO(edwin): per-run tables regenerate manually per pipeline run until
@@ -216,16 +234,19 @@ export default function MethodologyPage() {
             normalized delta present AND at least one trend modifier (IQR outlier in
             either period OR accelerating decline).
           </blockquote>
+          <RunFacts stamp={runStampShort}>
+            <p>
+              Current population: <strong>23 buildings</strong>. Top of queue: 660
+              Madison Ave, 200 E 42nd St, 58 W 58th St.
+            </p>
+          </RunFacts>
           <p>
-            Current population: <strong>23 buildings</strong> (per the 2026-07-15
-            scoring refresh; see the reconciliation note above). Top of queue: 660
-            Madison Ave, 200 E 42nd St, 58 W 58th St.
-          </p>
-          <p>
-            LL97 over-cap is deliberately excluded from the modifier leg: the boolean
-            carries 0.0000 feature importance while the log-scaled penalty is feature
-            #1 at 0.2074, so the statute pressure is already encoded richly inside the
-            model. The boolean would add double counting, not evidence.
+            LL97 over-cap is deliberately excluded from the modifier leg. The over-cap
+            boolean carries 0.0000 feature importance while the log-scaled penalty is
+            feature #1 at 0.2074, so the statute pressure is already encoded richly
+            inside the model. The boolean would add double counting, not evidence.
+            This is the canonical statement of the LL97 double-count decision; §2
+            references it in one line and does not repeat the arithmetic.
           </p>
           <p>
             The defensible sentence: "the model puts it with past churners, its actual
@@ -248,46 +269,61 @@ export default function MethodologyPage() {
             score differences (§8 rule 1).
           </p>
           <p>
-            <strong>Quasi-tie block.</strong> The top 52 rows share ml_risk ≥ 0.99. Within
-            the block, ordering is noise. The score cell in the rankings table still
-            shows the row's percentile because that cell is a table primitive; at
-            case-file scale, however, the rank line renders block membership instead
-            of ordinal position for rows inside the quasi-tie (§6 law L6, v1.1
-            refinement). "Ranked #7 of 1,210" implies a precision the model does not
-            have when six neighbors sit within noise of you.
+            <strong>Quasi-tie block.</strong> Rows with ml_risk ≥ 0.99 share a saturated
+            score; within that block, ordering is noise. The score cell in the rankings
+            table still shows the row's percentile because that cell is a table
+            primitive; at case-file scale, however, the rank line renders block
+            membership instead of ordinal position for rows inside the quasi-tie
+            (§6 law L6, v1.1 refinement).
           </p>
+          <RunFacts stamp={runStampShort}>
+            <p>
+              The quasi-tie block currently holds 52 rows. "Ranked #7 of 1,210"
+              implies a precision the model does not have when 51 other rows sit
+              within noise of that position.
+            </p>
+          </RunFacts>
           <p>
             <strong>Freshness states.</strong> Four named states, always naming the vintage
-            of the newest normalized delta: fresh (Δ '24, 422 rows), Δ '23 only (321 rows),
-            no adjacent-year Δ (208 rows), Uncertain (254 rows, handled by the tier).
-            Freshness is a state, not a decoration, because the ranking of a row against
-            no-signal peers can be defensible while the same ranking against fresh-signal
-            peers is not; the state tells the reader which comparison they are looking at.
-            Absence of fresh signal is a designed state, never a bare dash. Roughly 5 rows
-            sit in an unnamed edge state pending Ismael (ledger #22).
+            of the newest normalized delta: fresh (Δ '24), Δ '23 only, no adjacent-year Δ,
+            Uncertain (handled by the tier). Freshness is a state, not a decoration,
+            because the ranking of a row against no-signal peers can be defensible while
+            the same ranking against fresh-signal peers is not; the state tells the reader
+            which comparison they are looking at. Absence of fresh signal is a designed
+            state, never a bare dash. The data cause for the older states: many rows lack
+            a '24 delta because <code>steam_2024</code> is null in LL84 for them
+            (publication lag, not a pipeline failure), and the no-adjacent-year rows have
+            non-consecutive reporting years so no adjacent-year delta is computable.
           </p>
+          <RunFacts stamp={runStampShort}>
+            <p>
+              Fresh (Δ '24): 422 rows. Δ '23 only: 321 rows. No adjacent-year Δ: 208
+              rows. Uncertain: 254 rows. Roughly 5 rows sit in an unnamed edge state
+              pending Ismael (ledger #22).
+            </p>
+          </RunFacts>
         </Section>
 
         <Section
           n="7"
-          title="Known limitations (the tech-spec four)"
+          title="Model limitations (tech-spec §7)"
           clock="model"
           stamp={modelStamp}
         >
           <p>
             The four limitations below are the tech-spec §7 register (see{" "}
             <code>docs/model-technical-spec.md</code>). They describe what this model
-            cannot answer honestly today. Each limitation ships with the model version
-            stamped above; when a limitation is closed, it moves to the supersessions
-            block in §8.
+            cannot yet answer, and why. Each limitation ships with the model version
+            stamped above; when a limitation is closed by a future model, its retirement
+            is recorded in §8's supersessions block.
           </p>
           <ol className="mp-chain">
             <li>
               <strong>Weather normalization gap (§7.1).</strong> ConEd's internal model
               uses per-building HDD/CDD linear regression with billing-day adjustment.
-              Our labels use a single annual citywide HDD ratio. Some of the 57 positive
-              labels may be partially weather-driven rather than behavioral. Best
-              estimate: affects 5 to 15% of training labels.
+              Our labels use a single annual citywide HDD ratio. Some of the 54
+              positive-labeled buildings may be partially weather-driven rather than
+              behavioral. Best estimate: affects 5 to 15% of training labels.
             </li>
             <li>
               <strong>Causal validity gap (§7.2, partially addressed).</strong>{" "}
@@ -314,14 +350,14 @@ export default function MethodologyPage() {
               simultaneous neighborhood-level decisions rather than predictive signal.
             </li>
           </ol>
-          <h3 className="mp-h3">Data limitations (secondary)</h3>
+          <h3 className="mp-h3">Data limitations</h3>
           <p>
             These are not tech-spec §7 items but are load-bearing enough to name here:
           </p>
           <ol className="mp-chain">
             <li>
               <strong>Small positive-label sample.</strong> The classifier is trained on
-              54 confirmed steam-demand drops. Cross-validation AUC around 0.68 is a
+              54 positive-labeled buildings. Cross-validation AUC around 0.68 is a
               self-consistency check on the training universe, not a back-test against
               ConEd disconnect records. The provenance chip reads <code>UNVAL</code>{" "}
               until back-testing completes.
@@ -343,7 +379,7 @@ export default function MethodologyPage() {
         >
           <p>
             These aren't two flavors of the same idea. They're two epistemic stances,
-            and the shipped tool is honest about which one it takes.
+            and the shipped tool is honest about the blend it runs.
           </p>
           <h3 className="mp-h3">ConEd's approach: diagnostic / detective work</h3>
           <p>
@@ -368,21 +404,21 @@ export default function MethodologyPage() {
             defaulters."
           </p>
           <p>
-            <em>Strengths:</em> works from day one without per-customer history, captures
+            <em>Strengths:</em> works from day one without per-customer history, surfaces
             external pressure (LL97, DOB permits, peer behavior), model inspectable via
-            SHAP per-building drivers. <em>Weaknesses:</em> small positive sample (57
-            confirmed drops), can't say "this customer's usage is anomalous for them,"
+            SHAP per-building drivers. <em>Weaknesses:</em> small positive-label sample
+            (54 buildings), can't say "this customer's usage is anomalous for them,"
             black box at the math layer.
           </p>
           <h3 className="mp-h3">Where they meet</h3>
           <p>
             ConEd's diagnostic approach surfaces customer-specific usage anomalies
-            before they are externally visible, and customers whose own pattern is
+            that are not yet externally visible, and customers whose own pattern is
             breaking down. Our classifier surfaces external pressure (LL97 fines, DOB
             permits) alongside customers in market conditions historically correlated
             with departure. These are <strong>complementary signals</strong>, not
-            competing models. The ideal early-warning system runs both and
-            triangulates.
+            competing models. Target state: an early-warning system that runs both
+            and triangulates. The shipped tool is one half of that pairing.
           </p>
           <p>
             <strong>The shipped chain is not a pure classifier.</strong> Path C in
@@ -395,11 +431,11 @@ export default function MethodologyPage() {
           </p>
           <p>
             <strong>Uncertain, aligned.</strong> Our Uncertain tier already converges
-            partially with Johan's fit-based definition. Where a fit exists (NYCHA
-            developments, R² &lt; 0.3), we use it. Where no per-building fit can exist
-            on public data (fewer than 2 years, ml_risk missing), we use the coverage-based
-            gate. Round 2 extends the fit-based gate portfolio-wide when per-building
-            regressions land.
+            partially with Johan's fit-based definition. Where a per-building fit exists
+            (the 24 NYCHA developments), we use its R² and gate Uncertain below 0.3.
+            Where no per-building fit can exist on public data (fewer than 2 years,
+            ml_risk missing), we use the coverage-based gate. Round 2 extends the
+            fit-based gate portfolio-wide when per-building regressions land.
           </p>
           <h3 className="mp-h3">Supersessions</h3>
           <p>
@@ -436,6 +472,14 @@ export default function MethodologyPage() {
           stamp={runStamp}
         >
           <ProvenanceBlock modelMeta={modelMeta} />
+          <p className="mp-todo">
+            TODO(edwin, awaiting Ismael): confirm the AUC pair (mean 0.6833, std 0.0511)
+            came from a single <code>cross_val_score</code> run on the locked config,
+            not a stitched figure (mean from GridSearchCV best, std computed later).
+            Blocks-lock item from Fable round 2 (B3): §9 is the provenance page and
+            cannot present a stitched figure that the footer promises every surface
+            must agree with.
+          </p>
         </Section>
 
         <footer className="mp-footer">
@@ -447,6 +491,15 @@ export default function MethodologyPage() {
         </footer>
       </div>
     </>
+  );
+}
+
+function RunFacts({ stamp, children }) {
+  return (
+    <div className="mp-runfacts">
+      <span className="mp-runfacts-label">as of the {stamp} scoring refresh · run clock</span>
+      {children}
+    </div>
   );
 }
 
