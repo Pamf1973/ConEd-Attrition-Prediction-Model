@@ -88,10 +88,11 @@ def _delta_evidence(yoy_e, which_period):
 # ── Snapshot ──────────────────────────────────────────────────────────────────
 
 def snapshot():
-    if not os.path.exists(ENRICHMENT):
+    try:
+        shutil.copy2(ENRICHMENT, ENRICHMENT_PREV)
+    except FileNotFoundError:
         print(f"[snapshot] {ENRICHMENT} not found — nothing to snapshot", file=sys.stderr)
         sys.exit(1)
-    shutil.copy2(ENRICHMENT, ENRICHMENT_PREV)
     print(f"[snapshot] saved → {ENRICHMENT_PREV}")
 
 
