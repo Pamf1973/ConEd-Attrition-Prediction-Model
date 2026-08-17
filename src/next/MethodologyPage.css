@@ -77,6 +77,15 @@
   border-radius: 2px;
 }
 
+.mp-error {
+  max-width: 720px;
+  margin: 80px auto;
+  padding: 20px 24px;
+  border: 1px solid var(--mp-ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
 .mp-runfacts {
   border-left: 2px solid var(--mp-line);
   padding: 10px 14px;

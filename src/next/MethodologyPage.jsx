@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import "./MethodologyPage.css";
-
-// TODO(post-M10-merge): wrap the page in <ErrorBoundary label="MethodologyPage" fallback={...}>.
-// ErrorBoundary already landed on main via be97bd1; this branch predates that merge, so the
-// wrap ships as a follow-up PR once M10 is in. Same discipline as ScoreCell / CaseFileHeader.
 
 /**
  * MethodologyPage — the M10 register.
@@ -18,6 +15,21 @@ import "./MethodologyPage.css";
  * of the shipped model). Each section carries its own stamp.
  */
 export default function MethodologyPage() {
+  return (
+    <ErrorBoundary
+      label="MethodologyPage"
+      fallback={
+        <div className="mp-error">
+          Methodology page failed to render. Check console for stack.
+        </div>
+      }
+    >
+      <MethodologyPageInner />
+    </ErrorBoundary>
+  );
+}
+
+function MethodologyPageInner() {
   const [token] = useState(() => sessionStorage.getItem("coned_token") || null);
   const [modelMeta, setModelMeta] = useState(null);
   const [modelMetaErr, setModelMetaErr] = useState(null);
