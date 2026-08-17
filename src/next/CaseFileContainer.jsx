@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import CaseFileHeader from "./CaseFileHeader.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import { buildCaseFileProps, computePercentileMap, normalizeBbl } from "./caseFileAdapter.jsx";
 import "./CaseFileContainer.css";
 
@@ -116,7 +117,7 @@ export default function CaseFileContainer() {
             const bbl = normalizeBbl(b.bbl);
             return bbl ? (
               <div key={b.address} className="cfc-example">
-                <a href={`/case-file/${bbl}`}>{b.address} · {bbl}</a>
+                <a href={`/case-file/${urlBbl}`}>{b.address} · {bbl}</a>
               </div>
             ) : null;
           })}
@@ -135,7 +136,16 @@ export default function CaseFileContainer() {
               status fetch failed: {statusErr} — defaulting to Unreviewed.
             </div>
           )}
-          <CaseFileHeader {...props} />
+          <ErrorBoundary
+            label={`CaseFileHeader:${urlBbl}`}
+            fallback={
+              <div className="cfc-warn">
+                Case file failed to render for BBL {bbl} — record is malformed. Check console for details.
+              </div>
+            }
+          >
+            <CaseFileHeader {...props} />
+          </ErrorBoundary>
         </>
       )}
     </div>

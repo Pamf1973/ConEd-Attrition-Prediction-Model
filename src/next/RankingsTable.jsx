@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import ScoreCell from "./ScoreCell.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import { computePercentileMap, toScoreCellProps } from "./scoreCellAdapter.js";
 import "./RankingsTable.css";
 
@@ -43,7 +44,11 @@ export default function RankingsTable({ buildings, limit = 100 }) {
             <tr key={b.address}>
               <td className="addr">{b.address}</td>
               <td className="cluster">{b.cluster_name ?? "—"}</td>
-              <td><ScoreCell {...cell} /></td>
+              <td>
+                <ErrorBoundary label={`ScoreCell:${b.address}`} fallback={<span className="sc-err">—</span>}>
+                  <ScoreCell {...cell} />
+                </ErrorBoundary>
+              </td>
               <td className="num">{formatMkBtu(b.steam)}</td>
               <td className="num">{formatMoney(b.ll97_penalty_2030)}</td>
             </tr>

@@ -33,6 +33,17 @@
   margin-right: 11px;
   background: var(--sc-bench-line);
 }
+
+.sc-err {
+  display: inline-block;
+  min-width: 196px;
+  color: var(--sc-bench-muted);
+  font-family: var(--sc-mono);
+  font-size: 12px;
+  padding: 9px 12px;
+  border: 1px dashed var(--sc-bench-line);
+  background: var(--sc-canvas-raised);
+}
 .sc-tick--low  { background: var(--sc-low); }
 .sc-tick--med  { background: var(--sc-med); }
 .sc-tick--high { background: var(--sc-high); }
