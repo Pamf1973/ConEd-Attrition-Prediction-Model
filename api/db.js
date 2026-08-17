@@ -98,7 +98,7 @@ export async function saveWatchlist(actor, addresses) {
     `INSERT INTO watchlists (actor, addresses, updated_at)
      VALUES ($1, $2, NOW())
      ON CONFLICT (actor) DO UPDATE SET addresses = $2, updated_at = NOW()`,
-    [actor, JSON.stringify(addresses)]
+    [actor, addresses]
   );
 }
 
