@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import "./MethodologyPage.css";
 
-// TODO(post-M10-merge): wrap the page in <ErrorBoundary label="MethodologyPage" fallback={...}>.
-// ErrorBoundary already landed on main via be97bd1; this branch predates that merge, so the
-// wrap ships as a follow-up PR once M10 is in. Same discipline as ScoreCell / CaseFileHeader.
-
 /**
  * MethodologyPage — the M10 register.
  *

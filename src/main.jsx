@@ -11,6 +11,7 @@ import M4Preview from './next/M4Preview.jsx'
 import CaseFileContainer from './next/CaseFileContainer.jsx'
 import ReportPage from './next/ReportPage.jsx'
 import MethodologyPage from './next/MethodologyPage.jsx'
+import ErrorBoundary from './next/ErrorBoundary.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,7 +24,11 @@ createRoot(document.getElementById('root')).render(
         <Route path="/m4-preview" element={<M4Preview />} />
         <Route path="/case-file/:bbl" element={<CaseFileContainer />} />
         <Route path="/report/:bbl" element={<ReportPage />} />
-        <Route path="/methodology" element={<MethodologyPage />} />
+        <Route path="/methodology" element={
+          <ErrorBoundary label="MethodologyPage" fallback={<div style={{padding:"2rem"}}>Methodology page failed to load.</div>}>
+            <MethodologyPage />
+          </ErrorBoundary>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

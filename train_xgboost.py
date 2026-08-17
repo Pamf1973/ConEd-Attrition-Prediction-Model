@@ -330,18 +330,25 @@ def main():
         except Exception:
             commit = ""
         meta = {
-            "model_name":       "XGBoost Classifier",
-            "model_version":    "XGB v1 · UNVAL",
-            "params_hash":      params_hash,
-            "commit":           commit,
-            "cv_auc":           round(best_score, 4),
-            "cv_std":           round(cv_std, 4),
-            "cv_kfold":         5,
-            "n_labeled":        X.shape[0],
-            "n_positive":       pos_count,
-            "run_date":         datetime.date.today().isoformat(),
-            "label_definition": "big_drop (≥50% steam decline, 2yr window) = 1, no_signal = 0, mod_drop excluded",
+            "model_name":        "XGBoost Classifier",
+            "model_version":     "XGB v1 · UNVAL",
+            "params_hash":       params_hash,
+            "commit":            commit,
+            "cv_auc":            round(best_score, 4),
+            "cv_std":            round(cv_std, 4),
+            "cv_kfold":          5,
+            "n_labeled":         X.shape[0],
+            "n_positive":        pos_count,
+            "run_date":          datetime.date.today().isoformat(),
+            "label_definition":  "big_drop (≥50% steam decline, 2yr window) = 1, no_signal = 0, mod_drop excluded",
             "validation_status": "unvalidated",
+            "feature_importances": [
+                {"feature": feat, "importance": round(float(imp), 4)}
+                for feat, imp in sorted(
+                    zip(FEATURES, gs.best_estimator_.feature_importances_),
+                    key=lambda x: -x[1],
+                )
+            ],
         }
         meta_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "model_meta.json")
         with open(meta_path, "w") as f:

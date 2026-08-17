@@ -1,0 +1,15 @@
+{
+  "run_date": "2026-07-15T20:41:52Z",
+  "prev_run_date": null,
+  "generated_at": "2026-08-17T23:56:33Z",
+  "first_run": false,
+  "events": [
+    {
+      "kind": "DATA",
+      "subject": "1,210 buildings",
+      "verb": "scanned",
+      "evidence": "nothing crossed a threshold",
+      "consequence": null
+    }
+  ]
+}

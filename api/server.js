@@ -256,6 +256,7 @@ const DATA_CACHE = {
   enrichment: loadJsonFile("buildingEnrichment.json"),
   yearly:     loadJsonFile("yearly.json"),
   yoyDeltas:  loadJsonFile("yoy_deltas.json"),
+  events:     loadJsonFile("events.json"),
 };
 
 // ETag for the enrichment payload — changes each time the server starts (i.e. after redeploy).
@@ -287,6 +288,7 @@ app.get("/api/data/enrichment",  requireAuth, (req, res) => {
 });
 app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
 app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
+app.get("/api/events",           requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.events));
 
 // GET /api/buildings — server-side filtered + paginated building query
 app.get("/api/buildings", requireAuth, (req, res) => {
