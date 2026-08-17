@@ -1466,15 +1466,25 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error" });
 });
 
-// Schema must be ready before accepting connections — exit on failure
+// Schema must be ready before accepting connections in production. In dev,
+// warn and keep serving so contributors without a local Postgres can still
+// run the UI and non-status endpoints; /api/buildings/:bbl/status* will fail
+// per-request, which the container already handles.
+const startServer = () => app.listen(PORT, () => {
+  const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
+  console.log(`[api] listening on :${PORT} | provider: ${provider}`);
+});
+
 const server = await initSchema()
-  .then(() => app.listen(PORT, () => {
-    const provider = ANTHROPIC_KEY ? "Claude Haiku" : GROQ_KEY ? "Groq Llama 3.3" : OPENROUTER_KEY ? "OpenRouter Llama 3.3" : "NO KEY SET";
-    console.log(`[api] listening on :${PORT} | provider: ${provider}`);
-  }))
+  .then(startServer)
   .catch((err) => {
-    console.error("[db] FATAL: schema init failed:", err?.message ?? String(err));
-    process.exit(1);
+    const msg = err?.message ?? String(err);
+    if (process.env.NODE_ENV === "production") {
+      console.error("[db] FATAL: schema init failed:", msg);
+      process.exit(1);
+    }
+    console.warn("[db] schema init failed (dev):", msg, "— status endpoints will 500 per request");
+    return startServer();
   });
 
 // Kill slow/stalled connections — prevents Slowloris exhaustion attacks
