@@ -13,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
-import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
+import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES, saveWatchlist, loadWatchlist } from "./db.js";
 import { renderReportPdf, shutdownBrowser } from "./pdf.js";
 
 // Keep track of inherited keys before dotenv overrides them
@@ -347,9 +347,6 @@ app.get("/api/buildings", requireAuth, (req, res) => {
   res.json({ buildings: paged, total, page: pageNum, per_page: perPage, total_pages: totalPages });
 });
 
-// ── Watchlist — per-session persistence (Map, localStorage fallback on client) ──
-const watchlistStore = new Map(); // token → string[]
-
 // ── Proactive Alert Engine ────────────────────────────────────────────────────
 // Per-session dismissed alert IDs (lightweight — just tracks which were dismissed)
 const proactiveDismissed = new Map(); // sessionToken → Set<alertId>
@@ -588,8 +585,7 @@ app.post("/api/alerts/proactive/dismiss", requireAuth, (req, res) => {
   res.json({ ok: true, alert_id });
 });
 
-app.post("/api/watchlist/save", requireAuth, (req, res) => {
-  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
+app.post("/api/watchlist/save", requireAuth, async (req, res) => {
   const { addresses } = req.body ?? {};
   if (!Array.isArray(addresses)) {
     return res.status(400).json({ error: "addresses must be an array of strings" });
@@ -598,18 +594,25 @@ app.post("/api/watchlist/save", requireAuth, (req, res) => {
     return res.status(400).json({ error: "addresses array too large (max 10,000)" });
   }
   if (!addresses.every(a => typeof a === "string" && a.length <= 500)) {
-    return res.status(400).json({ error: "each address must be a non-empty string ≤ 500 chars" });
+    return res.status(400).json({ error: "each address must be a string ≤ 500 chars" });
   }
-  // Evict oldest entry when store reaches 500 sessions to bound memory use
-  if (watchlistStore.size >= 500) watchlistStore.delete(watchlistStore.keys().next().value);
-  watchlistStore.set(req.sessionToken, addresses);
-  res.json({ ok: true, count: addresses.length });
+  try {
+    await saveWatchlist(actorTag(req.sessionToken), addresses);
+    res.json({ ok: true, count: addresses.length });
+  } catch (err) {
+    console.error("[watchlist/save] db error:", err.message);
+    res.status(500).json({ error: "Failed to save watchlist" });
+  }
 });
 
-app.get("/api/watchlist/load", requireAuth, (req, res) => {
-  if (!req.sessionToken) return res.status(401).json({ error: "No session token" });
-  const addresses = watchlistStore.get(req.sessionToken) ?? [];
-  res.json({ addresses });
+app.get("/api/watchlist/load", requireAuth, async (req, res) => {
+  try {
+    const addresses = await loadWatchlist(actorTag(req.sessionToken));
+    res.json({ addresses });
+  } catch (err) {
+    console.error("[watchlist/load] db error:", err.message);
+    res.status(500).json({ error: "Failed to load watchlist" });
+  }
 });
 
 // ── /api/model_meta — model provenance object (written by train_xgboost.py) ──

@@ -19,7 +19,13 @@ from sklearn.metrics import roc_auc_score
 
 # ── Import model building functions from ll97_model.py ───────────────────────
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ll97_model import load_data, build_rows, make_labels, FEATURES
+from ll97_model import load_data, build_rows, make_labels, FEATURES, compute_shap_drivers, update_enrichment
+
+try:
+    import shap as _shap_mod
+    HAS_SHAP = True
+except ImportError:
+    HAS_SHAP = False
 
 # ── XGBoost (optional — graceful fallback if import fails) ───────────────────
 try:
@@ -341,6 +347,36 @@ def main():
         with open(meta_path, "w") as f:
             json.dump(meta, f, indent=2)
         print(f"  Written: {meta_path}")
+
+    # ── SHAP ml_drivers + enrichment write ──────────────────────────────────
+    if HAS_XGB and results["xgboost"]["status"] == "completed":
+        if not HAS_SHAP:
+            print("\n  [shap] package not found — skipping ml_drivers write (pip install shap)")
+        else:
+            print("\n  Computing SHAP drivers for all buildings (this uses ALL rows, not just labeled)...")
+            # predict_proba on ALL rows so ml_risk covers unlabeled buildings too
+            X_all = np.array([[r[f] for f in FEATURES] for r in rows])
+            X_all_sc = scaler.transform(X_all)
+            probs_all = gs.best_estimator_.predict_proba(X_all_sc)[:, 1]
+
+            drivers_all = compute_shap_drivers(gs.best_estimator_, scaler, rows, top_n=5)
+
+            enrichment_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "buildingEnrichment.json")
+            with open(enrichment_path) as f:
+                enrichment_data = json.load(f)
+
+            update_enrichment(enrichment_data, rows, probs_all, drivers_all)
+
+            with open(enrichment_path, "w") as f:
+                json.dump(enrichment_data, f, indent=2)
+
+            print(f"  ml_risk + ml_drivers written for {len(rows)} buildings → {enrichment_path}")
+            if rows:
+                sample_addr = rows[0]["address"]
+                sample_d = enrichment_data.get(sample_addr, {}).get("ml_drivers", [])
+                if sample_d:
+                    print(f"  Sample ({sample_addr}): top driver = {sample_d[0]['feature']} (contrib={sample_d[0]['contribution']:+.4f})")
+
     print("=" * 70)
 
     # ── Quick console summary ────────────────────────────────────────────────
