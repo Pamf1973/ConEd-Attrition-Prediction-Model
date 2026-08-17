@@ -14,6 +14,7 @@ import dotenv from "dotenv";
 import { EXPLAIN_PROMPT } from "./prompts/explainPrompt.js";
 import { csvCell, validateSpec, _isRetryable, ALLOWED_SORT_BY, ALLOWED_SORT_DIR, ALLOWED_SIGNALS, ALLOWED_USES, ALLOWED_CLUSTERS } from "./utils.js";
 import { initSchema, appendStatus, getCurrentStatus, getStatusHistory, getBulkCurrentStatus, VALID_STATUSES } from "./db.js";
+import { renderReportPdf } from "./pdf.js";
 
 // Keep track of inherited keys before dotenv overrides them
 const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
@@ -1157,6 +1158,42 @@ const exportLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Export rate limit — try again in a minute" },
+});
+
+// ── M5 /api/report/:bbl.pdf ──────────────────────────────────────────────────
+// Puppeteer renders /report/:bbl (screen DOM, print media) to a PDF Buffer.
+// Graceful degradation per roadmap §M5: if this fails, /report/:bbl alone
+// is the deliverable (browser print-to-PDF). Reuses BBL_RE from §status.
+
+app.get("/api/report/:bbl.pdf", requireAuth, exportLimiter, async (req, res) => {
+  const bbl = req.params.bbl;
+  if (!BBL_RE.test(bbl)) {
+    return res.status(400).json({ error: "Invalid BBL" });
+  }
+  const authHeader = req.headers.authorization ?? "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return res.status(401).json({ error: "Missing token" });
+
+  // Prefer an explicit env var to prevent x-forwarded-host spoofing on deploys
+  // where the reverse proxy does not strip client-supplied headers.
+  const origin =
+    process.env.PUBLIC_ORIGIN ??
+    (process.env.RAILWAY_PUBLIC_DOMAIN
+      ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+      : `${req.get("x-forwarded-proto") || req.protocol || "http"}://${req.get("x-forwarded-host") || req.get("host") || `localhost:${PORT}`}`);
+
+  try {
+    const pdf = await renderReportPdf(bbl, token, { origin });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="report-${bbl}.pdf"`);
+    res.setHeader("Cache-Control", "no-store, private");
+    res.send(pdf);
+  } catch (err) {
+    console.error("[/api/report/:bbl.pdf] render failed:", err.message);
+    res.status(500).json({
+      error: "PDF render failed — use browser print-to-PDF on /report/" + bbl,
+    });
+  }
 });
 
 app.get("/api/export/csv", requireAuth, exportLimiter, (req, res) => {

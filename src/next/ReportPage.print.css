@@ -1,0 +1,48 @@
+/*
+ * M5 print stylesheet. Overrides ReportPage.css when printing (browser
+ * print, or Puppeteer with emulateMediaType('print')).
+ *
+ * R2: page-break-before on the exhibits page.
+ * R3: grayscale-safe — screen already avoids color-only meaning; this
+ * layer strips shadows and background tints.
+ */
+
+@page {
+  size: Letter;
+  margin: 0.5in;
+}
+
+@media print {
+  .rp-scope {
+    background: #fff;
+    padding: 0;
+  }
+
+  .rp-sheet {
+    max-width: none;
+    gap: 0;
+  }
+
+  .rp-page {
+    box-shadow: none;
+    padding: 0;
+    min-height: 0;
+  }
+
+  .rp-page--two {
+    page-break-before: always;
+  }
+
+  /* Watermark stays visible in PDF (printBackground: true captures it). */
+  .rp-watermark {
+    position: fixed;
+    color: rgba(0, 0, 0, 0.08);
+  }
+
+  /* Preserve exhibit cites and driver rows; avoid awkward breaks. */
+  .rp-exhibit,
+  .rp-finding,
+  .rp-signature {
+    break-inside: avoid;
+  }
+}
