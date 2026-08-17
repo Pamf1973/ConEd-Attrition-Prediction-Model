@@ -1,0 +1,247 @@
+/*
+ * M5 report — screen styles. Scoped under .rp-scope so nothing leaks to
+ * other routes. Print overrides live in ReportPage.print.css.
+ *
+ * R3: grayscale-safe. Distinctions rely on weight/position/typography,
+ * never color alone. Divergence is a text tag, not a color swap.
+ */
+
+.rp-scope {
+  --rp-fg: #111;
+  --rp-fg-muted: #555;
+  --rp-fg-faint: #888;
+  --rp-bg: #fff;
+  --rp-rule: #222;
+  --rp-rule-faint: #ccc;
+  --rp-page-w: 7.5in;
+  --rp-page-pad: 0.5in;
+
+  color: var(--rp-fg);
+  background: #eaeaea;
+  font-family: "Times New Roman", Georgia, serif;
+  min-height: 100vh;
+  padding: 24px 0;
+  position: relative;
+}
+
+.rp-sheet {
+  max-width: var(--rp-page-w);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rp-page {
+  background: var(--rp-bg);
+  padding: var(--rp-page-pad);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  min-height: 10in;
+  box-sizing: border-box;
+}
+
+.rp-empty {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--rp-rule-faint);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.rp-empty--error { border-color: #900; }
+
+/* Header --------------------------------------------------------------- */
+.rp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  border-bottom: 1px solid var(--rp-rule);
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+.rp-eyebrow {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rp-fg-muted);
+  margin-bottom: 6px;
+}
+.rp-address {
+  font-size: 22px;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.rp-id-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--rp-fg-muted);
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.rp-run-stamp {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 10px;
+  color: var(--rp-fg-muted);
+  text-align: right;
+}
+
+/* Finding band --------------------------------------------------------- */
+.rp-finding {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rp-rule);
+  margin-bottom: 24px;
+}
+.rp-finding-percentile {
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.rp-finding-tier {
+  font-size: 20px;
+  font-weight: 500;
+}
+.rp-diverged {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-fg-muted);
+  border: 1px solid var(--rp-fg-muted);
+  padding: 1px 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.rp-finding-coverage {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 11px;
+  color: var(--rp-fg-muted);
+}
+
+/* Narrative ------------------------------------------------------------ */
+.rp-narrative {
+  margin-bottom: 24px;
+}
+.rp-narrative-slot {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 10px 0;
+}
+.rp-cite {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 9px;
+  margin-left: 3px;
+  color: var(--rp-fg-muted);
+}
+
+/* Method footer + signature ------------------------------------------- */
+.rp-method-brief {
+  border-top: 1px solid var(--rp-rule-faint);
+  padding-top: 12px;
+  margin-bottom: 24px;
+}
+.rp-method-line,
+.rp-method-link {
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 10px;
+  color: var(--rp-fg-muted);
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+}
+.rp-method-link a {
+  color: inherit;
+}
+
+.rp-signature {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rp-rule);
+}
+.rp-sig-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 11px;
+}
+.rp-sig-label {
+  font-family: ui-monospace, "SF Mono", monospace;
+  color: var(--rp-fg-muted);
+  min-width: 100px;
+}
+.rp-sig-line {
+  font-family: ui-monospace, "SF Mono", monospace;
+  color: var(--rp-fg-faint);
+  letter-spacing: 0.05em;
+}
+
+/* Exhibits page -------------------------------------------------------- */
+.rp-exhibits-heading {
+  font-size: 16px;
+  margin: 0 0 16px 0;
+  border-bottom: 1px solid var(--rp-rule);
+  padding-bottom: 8px;
+}
+.rp-exhibit {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--rp-rule-faint);
+}
+.rp-exhibit:last-child { border-bottom: none; }
+.rp-exhibit h3 {
+  font-size: 12px;
+  margin: 0 0 8px 0;
+  font-family: ui-monospace, "SF Mono", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-fg-muted);
+}
+.rp-exhibit-body {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rp-drivers {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.rp-driver-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--rp-rule-faint);
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", monospace;
+}
+.rp-driver-value,
+.rp-driver-contrib {
+  font-variant-numeric: tabular-nums;
+}
+.rp-empty-inline { color: var(--rp-fg-muted); font-size: 11px; }
+
+/* Watermark ------------------------------------------------------------ */
+.rp-watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-family: ui-monospace, "SF Mono", monospace;
+  font-size: 140px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
