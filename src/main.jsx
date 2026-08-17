@@ -10,6 +10,7 @@ import NotFound from './next/NotFound.jsx'
 import M4Preview from './next/M4Preview.jsx'
 import CaseFileContainer from './next/CaseFileContainer.jsx'
 import ReportPage from './next/ReportPage.jsx'
+import MethodologyPage from './next/MethodologyPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/m4-preview" element={<M4Preview />} />
         <Route path="/case-file/:bbl" element={<CaseFileContainer />} />
         <Route path="/report/:bbl" element={<ReportPage />} />
+        <Route path="/methodology" element={<MethodologyPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
