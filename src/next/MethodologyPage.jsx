@@ -59,6 +59,23 @@ export default function MethodologyPage() {
           in the tool asserts a claim, the definition lives here and the surface links back.
         </p>
 
+        <div className="mp-note">
+          <p>
+            <strong>Two dates on this page are not interchangeable.</strong> The
+            validation run on 2026-07-01 fit the current XGBoost configuration to
+            1,003 labeled buildings and produced the AUC reported in §9. The scoring
+            refresh on 2026-07-15 reran the tiering pipeline against that same model
+            configuration on the current enrichment, producing the ml_risk values
+            shown in the rankings and case files. Same model, later scores. Label
+            counts, positive counts, and AUC in this document trace to the 07-01
+            validation run; population totals and per-building tiers trace to the
+            07-15 scoring refresh. When the model configuration itself changes — a
+            rerun of <code>train_xgboost.py</code> that yields a new{" "}
+            <code>params_hash</code> — both clocks advance together and this note
+            is retired.
+          </p>
+        </div>
+
         <Section
           n="1"
           title="What the tool claims, and what it doesn't"
@@ -69,17 +86,19 @@ export default function MethodologyPage() {
             This tool ranks buildings by steam-attrition risk and surfaces the reasons
             behind each ranking so an analyst can decide whether to engage. It does not
             forecast disconnect dates, allocate territory, or generate customer outreach
-            on its own. Every ranking carries a provenance chip and a validation status.
+            on its own. Every ranking carries a provenance chip and a validation status;
+            today that chip reads <code>UNVAL</code> because the classifier has not yet
+            been back-tested against ConEd disconnect records (§7).
+          </p>
+          <p>
+            The intended reader is a Steam Ops analyst preparing weekly triage. The
+            intended cadence is a weekly review of the queue plus event-driven
+            follow-ups when the delta feed names a change worth attention.
           </p>
           <p>
             The tool is a workbench, not an autopilot. The strongest defensibility
             feature is a human signature: reports and digests are drafted by the system
             and owned by the analyst who sends them (§8 rule 6).
-          </p>
-          <p className="mp-todo">
-            TODO(edwin): revise for voice; consider adding one sentence on the intended
-            reader (Steam Ops analyst preparing weekly triage) and the intended cadence
-            (weekly review of the queue plus event-driven follow-ups).
           </p>
         </Section>
 
@@ -90,11 +109,13 @@ export default function MethodologyPage() {
           stamp={modelStamp}
         >
           <p>
-            The XGBoost model consumes 12 features derived from public data (LL84
-            energy disclosures, LL97 penalty arithmetic, DOB permits, NYCHA regressions
-            where they exist, NOAA weather normals). Feature importances are read from{" "}
-            <code>model_meta.feature_importances</code> so this section stays honest
-            across model revisions.
+            The XGBoost model consumes 12 features derived from public data: LL84
+            energy disclosures, LL97 penalty arithmetic, DOB permit counts, NYCHA
+            per-development weather regressions where they exist, NOAA Central Park
+            weather normals. The full feature list and each feature's derivation live
+            in <code>docs/model-technical-spec.md</code> §4. Feature importances render
+            from <code>model_meta.feature_importances</code> so this section stays
+            honest across model revisions.
           </p>
           <FeatureImportances importances={modelMeta?.feature_importances} />
           <p>
@@ -105,9 +126,10 @@ export default function MethodologyPage() {
             This is why LL97 over-cap is excluded from the Critical modifier leg (§5).
           </p>
           <p className="mp-todo">
-            TODO(edwin): once <code>model_meta.feature_importances</code> lands
-            (tracked as Q1, owner Ismael, folded into the M2 AUC rerun and SHAP top-N
-            work), review the top-3 for one-sentence plain-language glosses.
+            TODO(edwin): the pending item is <code>model_meta.feature_importances</code>
+            {" "}(computed at <code>train_xgboost.py:194</code>, not yet written to the
+            meta output at line 340). Once the write lands, add one-sentence
+            plain-language glosses for the top three features.
           </p>
         </Section>
 
@@ -148,8 +170,7 @@ export default function MethodologyPage() {
             those from base Low. The system is model-seeded and modifier-driven.
           </p>
           <p>
-            The ledger column label is <strong>"Tier · ML base + trend/statute modifiers"</strong>{" "}
-            (full form "model base" acceptable in pitch contexts only).
+            The ledger column label is <strong>"Tier · ML base + trend/statute modifiers."</strong>
           </p>
         </Section>
 
@@ -162,20 +183,21 @@ export default function MethodologyPage() {
           <p>
             Modifier prevalence surfaces as counted filter chips on the queue and table.
             The count on a chip is the count of rows the chip opens; the two can never
-            disagree because they are the same query.
+            disagree because they are the same query. Every count in this section is
+            named against the population it describes — "N of the 1,210 ranked
+            buildings," never a bare number.
           </p>
           <p className="mp-todo">
             TODO(edwin): this section regenerates per pipeline run. Populate the prevalence
             table (Outlier Δ, Accelerating, Decelerating, LL97 over-cap 2024/2030,
-            Modifier-promoted) with counts from the current run, plus the top three
-            co-occurrence pairs. LL97 pressure at portfolio scale renders as
-            penalty-magnitude bands (dollar ranges), never the over-cap boolean count
-            (§8 rule 5).
+            Modifier-promoted) with counts from the 2026-07-15 scoring refresh, each
+            named against the 1,210 ranked buildings, plus the top three co-occurrence
+            pairs. LL97 pressure at portfolio scale renders as penalty-magnitude bands
+            (dollar ranges), never the over-cap boolean count (§8 rule 5).
           </p>
           <p className="mp-todo">
-            TODO(edwin): graceful degradation note in the roadmap acceptance criteria:
-            per-run tables regenerate manually per pipeline run until automation exists.
-            The run-date stamp above makes that honest.
+            TODO(edwin): per-run tables regenerate manually per pipeline run until
+            automation exists. The run-date stamp above makes that honest.
           </p>
         </Section>
 
@@ -195,8 +217,9 @@ export default function MethodologyPage() {
             either period OR accelerating decline).
           </blockquote>
           <p>
-            Population as of pipeline run 2026-07-01: <strong>23 buildings</strong>.
-            Top of queue: 660 Madison Ave, 200 E 42nd St, 58 W 58th St.
+            Current population: <strong>23 buildings</strong> (per the 2026-07-15
+            scoring refresh; see the reconciliation note above). Top of queue: 660
+            Madison Ave, 200 E 42nd St, 58 W 58th St.
           </p>
           <p>
             LL97 over-cap is deliberately excluded from the modifier leg: the boolean
@@ -222,20 +245,26 @@ export default function MethodologyPage() {
             <strong>ml_risk is a ranking, not a probability.</strong> Percentile display,
             no percent sign, no decimals, ties acknowledged. The distribution is strongly
             bimodal: below the ≥0.99 quasi-tie block, percentile gaps reflect very small
-            score differences (§8 rule 1). This is why the case-file scale renders block
-            membership, not rank, for rows inside the quasi-tie (52 rows).
+            score differences (§8 rule 1).
           </p>
           <p>
             <strong>Quasi-tie block.</strong> The top 52 rows share ml_risk ≥ 0.99. Within
-            the block, ordering is noise; the score cell shows the tier chip and provenance,
-            not the ordinal position (§6 law L6, v1.1 refinement).
+            the block, ordering is noise. The score cell in the rankings table still
+            shows the row's percentile because that cell is a table primitive; at
+            case-file scale, however, the rank line renders block membership instead
+            of ordinal position for rows inside the quasi-tie (§6 law L6, v1.1
+            refinement). "Ranked #7 of 1,210" implies a precision the model does not
+            have when six neighbors sit within noise of you.
           </p>
           <p>
             <strong>Freshness states.</strong> Four named states, always naming the vintage
             of the newest normalized delta: fresh (Δ '24, 422 rows), Δ '23 only (321 rows),
-            no adjacent-year Δ (208 rows), Uncertain (254 rows, handled by the tier). Absence
-            of fresh signal is a designed state, never a bare dash. Roughly 5 rows sit in an
-            unnamed edge state pending Ismael (ledger #22).
+            no adjacent-year Δ (208 rows), Uncertain (254 rows, handled by the tier).
+            Freshness is a state, not a decoration, because the ranking of a row against
+            no-signal peers can be defensible while the same ranking against fresh-signal
+            peers is not; the state tells the reader which comparison they are looking at.
+            Absence of fresh signal is a designed state, never a bare dash. Roughly 5 rows
+            sit in an unnamed edge state pending Ismael (ledger #22).
           </p>
         </Section>
 
@@ -245,10 +274,49 @@ export default function MethodologyPage() {
           clock="model"
           stamp={modelStamp}
         >
-          <p className="mp-todo">
-            TODO(edwin): confirm the four limitations from the tech-spec §7 land here
-            verbatim. Draft below reflects what the alignment doc and system-v1.1 make
-            explicit; revise for exact wording and source citation.
+          <p>
+            The four limitations below are the tech-spec §7 register (see{" "}
+            <code>docs/model-technical-spec.md</code>). They describe what this model
+            cannot answer honestly today. Each limitation ships with the model version
+            stamped above; when a limitation is closed, it moves to the supersessions
+            block in §8.
+          </p>
+          <ol className="mp-chain">
+            <li>
+              <strong>Weather normalization gap (§7.1).</strong> ConEd's internal model
+              uses per-building HDD/CDD linear regression with billing-day adjustment.
+              Our labels use a single annual citywide HDD ratio. Some of the 57 positive
+              labels may be partially weather-driven rather than behavioral. Best
+              estimate: affects 5 to 15% of training labels.
+            </li>
+            <li>
+              <strong>Causal validity gap (§7.2, partially addressed).</strong>{" "}
+              <code>steam_ghg_share</code> addresses the "LL97 pressure ≠ steam
+              conversion" gap but does not resolve two adjacent problems.
+              Building-type feasibility: large hospitals and institutional buildings
+              may not be able to convert (process steam for sterilization, scale of
+              distribution systems) and may receive inflated risk scores. Alternative
+              compliance pathways: envelope upgrades, controls, or RECs all satisfy
+              LL97 without steam reduction, and the model cannot distinguish these
+              pathways from actual attrition intent.
+            </li>
+            <li>
+              <strong>No temporal holdout (§7.3).</strong> All labeled data comes from
+              the same LL84 vintage as the features (CY2022/2023). A fully rigorous
+              evaluation would train on pre-2022 behavior and predict 2023
+              disconnections. We cannot do this until we have multiple years of ConEd
+              billing history.
+            </li>
+            <li>
+              <strong>Peer score contemporaneity (§7.4).</strong>{" "}
+              <code>peer_score</code> reflects neighbors' attrition signals from the
+              same reporting period, not a lagged leading indicator. It may capture
+              simultaneous neighborhood-level decisions rather than predictive signal.
+            </li>
+          </ol>
+          <h3 className="mp-h3">Data limitations (secondary)</h3>
+          <p>
+            These are not tech-spec §7 items but are load-bearing enough to name here:
           </p>
           <ol className="mp-chain">
             <li>
@@ -256,25 +324,13 @@ export default function MethodologyPage() {
               54 confirmed steam-demand drops. Cross-validation AUC around 0.68 is a
               self-consistency check on the training universe, not a back-test against
               ConEd disconnect records. The provenance chip reads <code>UNVAL</code>{" "}
-              until back-testing completes (§4.4).
+              until back-testing completes.
             </li>
             <li>
               <strong>Yearly resolution on the demand signal.</strong> LL84 publishes
               annual consumption. Per-building slope estimates on 3 to 4 years of data
-              carry 2 to 3 degrees of freedom. Legitimate but statistically thin; billing-day
-              resolution requires ConEd internal data.
-            </li>
-            <li>
-              <strong>Weather normalization uses citywide HDD.</strong> Central Park HDD
-              is applied uniformly. Per-building weather sensitivity is captured only for
-              the 24 NYCHA developments where the regression is defensible. Portfolio-wide
-              per-building weather normalization is a Round 2 item.
-            </li>
-            <li>
-              <strong>LL97 boolean vs log-penalty encoding.</strong> The over-cap boolean
-              is deliberately not used as a Critical modifier or as a standalone signal
-              at portfolio scale; the log-scaled penalty carries the statute-pressure
-              information already. Presenting both would double-count.
+              carry 2 to 3 degrees of freedom. Legitimate but statistically thin;
+              billing-day resolution requires ConEd internal data.
             </li>
           </ol>
         </Section>
@@ -320,12 +376,22 @@ export default function MethodologyPage() {
           </p>
           <h3 className="mp-h3">Where they meet</h3>
           <p>
-            ConEd's diagnostic approach catches customer-specific usage anomalies before
-            they're externally visible, and customers whose own pattern is breaking down.
-            Our classifier catches external pressure (LL97 fines, DOB permits) before
-            usage drops, and customers in market conditions historically correlated with
-            departure. These are <strong>complementary signals</strong>, not competing
-            models. The ideal early-warning system runs both and triangulates.
+            ConEd's diagnostic approach surfaces customer-specific usage anomalies
+            before they are externally visible, and customers whose own pattern is
+            breaking down. Our classifier surfaces external pressure (LL97 fines, DOB
+            permits) alongside customers in market conditions historically correlated
+            with departure. These are <strong>complementary signals</strong>, not
+            competing models. The ideal early-warning system runs both and
+            triangulates.
+          </p>
+          <p>
+            <strong>The shipped chain is not a pure classifier.</strong> Path C in
+            §4.1 blends the ML base with trend and statute modifiers: the tier that
+            reaches a case file is XGBoost's ranking shifted by IQR outliers,
+            acceleration/deceleration, and LL97 posture. That blend already borrows
+            from the diagnostic tradition on the modifier leg. The "classifier vs
+            diagnostic" framing above describes intellectual lineage; the running
+            system is a hybrid.
           </p>
           <p>
             <strong>Uncertain, aligned.</strong> Our Uncertain tier already converges
@@ -335,19 +401,31 @@ export default function MethodologyPage() {
             gate. Round 2 extends the fit-based gate portfolio-wide when per-building
             regressions land.
           </p>
+          <h3 className="mp-h3">Supersessions</h3>
+          <p>
+            Two prior framings appear in older documents and should be read as
+            retired, not applied to the shipped tool:
+          </p>
+          <ul className="mp-chain">
+            <li>
+              The alignment doc's dual-tier <strong>disagreement badge</strong> is not
+              the shipped <code>DIVERGE</code> class. <code>DIVERGE</code> is
+              intra-hybrid: base vs modifiers within one method. True two-method
+              disagreement (classifier vs diagnostic fit) waits on the Round 2
+              research engine.
+            </li>
+            <li>
+              The <strong>"81% probability" display language</strong> from earlier
+              spec drafts (§3d) is retired. Killed by law L1: ml_risk is a ranking,
+              not a probability, and no surface presents it as one.
+            </li>
+          </ul>
           <p className="mp-todo">
             RESEARCH PENDING: pattern-mining approach for repeatable diagnostic labels.
             Johan's "repeatable pattern-based approach" is the Round 2 research engine
             behind the complementary-signals framing. This section backfills when that
             work runs. Placeholder per M10 acceptance criteria and §5 note on section 8's
             backfill clock.
-          </p>
-          <p className="mp-todo">
-            TODO(edwin): consider adding a short paragraph naming the two supersessions
-            called out in the roadmap: (a) the alignment doc's dual-tier disagreement
-            badge is not the shipped DIVERGE class (DIVERGE is intra-hybrid, base vs
-            modifiers within one method; true two-method disagreement waits on Round 2);
-            (b) the "81% probability" display language from §3d is retired, killed by L1.
           </p>
         </Section>
 
@@ -436,6 +514,12 @@ function ProvenanceBlock({ modelMeta }) {
   const aucLine = modelMeta.cv_auc == null
     ? "Validation rerun in progress."
     : `Ranks a true churner above a non-churner about ${Math.round(modelMeta.cv_auc * 100)}% of the time (${modelMeta.cv_kfold}-fold CV, ${modelMeta.n_positive} positive labels).`;
+  const cvStdLine = modelMeta.cv_std == null
+    ? null
+    : `±${Number(modelMeta.cv_std).toFixed(4)} across the ${modelMeta.cv_kfold} folds.`;
+  const validationLine = modelMeta.validation_status === "unvalidated"
+    ? "unvalidated — cross-validated on the training universe only; no back-test against ConEd disconnect records yet. Provenance chip reads UNVAL until that back-test lands."
+    : modelMeta.validation_status;
 
   return (
     <dl className="mp-dl">
@@ -444,9 +528,15 @@ function ProvenanceBlock({ modelMeta }) {
       <dt>Version</dt>
       <dd><code>{modelMeta.model_version}</code></dd>
       <dt>Validation status</dt>
-      <dd>{modelMeta.validation_status}</dd>
+      <dd>{validationLine}</dd>
       <dt>AUC</dt>
       <dd>{aucLine}</dd>
+      {cvStdLine && (
+        <>
+          <dt>CV spread</dt>
+          <dd>{cvStdLine}</dd>
+        </>
+      )}
       <dt>Label definition</dt>
       <dd>{modelMeta.label_definition}</dd>
       <dt>Training set</dt>
