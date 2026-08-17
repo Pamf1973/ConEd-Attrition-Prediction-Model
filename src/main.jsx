@@ -7,6 +7,7 @@ import LegacyApp from './legacy/App.jsx'
 import M3Preview from './next/M3Preview.jsx'
 import RankingsPage from './next/RankingsPage.jsx'
 import NotFound from './next/NotFound.jsx'
+import M4Preview from './next/M4Preview.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/legacy" element={<LegacyApp />} />
         <Route path="/m3-preview" element={<M3Preview />} />
         <Route path="/rankings" element={<RankingsPage />} />
+        <Route path="/m4-preview" element={<M4Preview />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
