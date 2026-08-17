@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import "./MethodologyPage.css";
 
-// TODO(post-#25): wrap the page in <ErrorBoundary label="MethodologyPage" fallback={...}>
-// once edwin/error-boundary-atoms merges. Same discipline as D15's temp adapter.
+// TODO(post-M10-merge): wrap the page in <ErrorBoundary label="MethodologyPage" fallback={...}>.
+// ErrorBoundary already landed on main via be97bd1; this branch predates that merge, so the
+// wrap ships as a follow-up PR once M10 is in. Same discipline as ScoreCell / CaseFileHeader.
 
 /**
  * MethodologyPage — the M10 register.
@@ -175,9 +176,7 @@ export default function MethodologyPage() {
             </li>
           </ol>
           <p>
-            The system is model-seeded and modifier-driven. Definition lives under the
-            model clock; the current-run distribution facts below live under the run
-            clock because they regenerate on every scoring refresh.
+            The system is model-seeded and modifier-driven.
           </p>
           <RunFacts stamp={runStampShort}>
             <p>
@@ -276,7 +275,7 @@ export default function MethodologyPage() {
             membership instead of ordinal position for rows inside the quasi-tie
             (§6 law L6, v1.1 refinement).
           </p>
-          <RunFacts stamp={runStampShort}>
+          <RunFacts stamp={runStampShort} tag="Quasi-tie">
             <p>
               The quasi-tie block currently holds 52 rows. "Ranked #7 of 1,210"
               implies a precision the model does not have when 51 other rows sit
@@ -295,7 +294,7 @@ export default function MethodologyPage() {
             (publication lag, not a pipeline failure), and the no-adjacent-year rows have
             non-consecutive reporting years so no adjacent-year delta is computable.
           </p>
-          <RunFacts stamp={runStampShort}>
+          <RunFacts stamp={runStampShort} tag="Freshness">
             <p>
               Fresh (Δ '24): 422 rows. Δ '23 only: 321 rows. No adjacent-year Δ: 208
               rows. Uncertain: 254 rows. Roughly 5 rows sit in an unnamed edge state
@@ -439,8 +438,10 @@ export default function MethodologyPage() {
           </p>
           <h3 className="mp-h3">Supersessions</h3>
           <p>
-            Two prior framings appear in older documents and should be read as
-            retired, not applied to the shipped tool:
+            Framings and limitations retired from the shipped tool are recorded here.
+            Two prior framings appear in older documents and should be read as retired,
+            not applied to the shipped tool; limitations closed by future model versions
+            will be added below as they land (per §7's cross-reference).
           </p>
           <ul className="mp-chain">
             <li>
@@ -494,10 +495,13 @@ export default function MethodologyPage() {
   );
 }
 
-function RunFacts({ stamp, children }) {
+function RunFacts({ stamp, tag, children }) {
+  const label = tag
+    ? `${tag} · as of the ${stamp} scoring refresh · run clock`
+    : `as of the ${stamp} scoring refresh · run clock`;
   return (
     <div className="mp-runfacts">
-      <span className="mp-runfacts-label">as of the {stamp} scoring refresh · run clock</span>
+      <span className="mp-runfacts-label">{label}</span>
       {children}
     </div>
   );
