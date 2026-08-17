@@ -193,3 +193,13 @@ Examples:
 - **STILL OPEN**: Ismael runs merge chain (#10 → #11 → #12) post-6 PM ET tonight (in class until then). Ismael's five D8 post-merge follow-ups for PR #10. Edwin R14 external sign-off. Ismael R7 watchlist migration and `plans/ai_model_config.md` — Ed check-in drafts staged, send tonight. Edwin Zoom recording reply committed for this week.
 - PROJECT_STATE.md rewritten to reflect these Slack-source truths (Blocked shortened, Open Commitments pruned, Risks rewritten). Not a /sync — a manual reconciliation, still under 5d76657.
 - Added docs/notes/2026-08-16_handoff.md as living pickup doc bridging what /brief can't see (Slack activity, PR-branch commits). Overwritten per session. Note: HANDOFF.md at repo root is gitignored (line 39) — canonical convention is timestamped notes in docs/notes/.
+
+## 2026-08-17 00:15 post-call reconciliation (Slack-source + git-verified)
+- 7 PM call outcome: **merge chain landed successfully**. PR #10 (f6f11d4), PR #11 (0979412 + merge 0b2ecff), PR #12 (9712ab9 merge). Head of main advanced 96f37ab → 5a6520a. Plus Ismael pushed follow-up fix 5a6520a guarding sanitizeNote against null/non-string input.
+- Conflict resolution per Ismael's Slack: (a) model_meta (PR #11) + status endpoints (PR #10) coexisted in api/server.js — both kept. (b) Auth comparison: kept SHA-256 hash-both-sides from main (equivalent security property to the HMAC approach on pr-9c branch, simpler). (c) package.json/package-lock.json took main's (pg dep already present from PR #10).
+- **Team scope clarification from call**: Pedro scoped to deployment/Railway only. Building work is Edwin + Ismael. M3 remains Edwin solo; Ismael offered design-pass on PRs #15/#16 when Edwin ready.
+- Unblocked: `edwin/M1-fallback-cleanup` PR (pre-staged, ready to fire — `data/model_meta.json` now live on main with real values cv_auc 0.6833, n_positive 54). M4 case-file (/api/model_meta on main). PR #16 base auto-flips to main when PR #15 merges.
+- Advances: R2, R3 (M1 shipped), R7 backbone (M6 half shipped), M2 AUC delivery. Retires Risks #1 (merge queue) and #4 (Ismael-quiet false alarm — was PR-branch-invisibility).
+- Still open on Edwin: Sunday touchpoint time (Ismael asked again in same message), M3 design-pass invite to Ismael, Zoom recording reply, two Ismael check-in drafts still worth sending (R7 watchlist, plans/ai_model_config.md).
+- PROJECT_STATE.md not yet updated for this reconciliation — deferred to next /brief-triggered state-sync (which will now walk 5d76657..5a6520a and rewrite from post-merge git truth).
+- Handoff doc (docs/notes/2026-08-16_handoff.md) updated with post-call section at top; pre-call section preserved below the fold.
