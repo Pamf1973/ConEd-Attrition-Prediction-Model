@@ -138,10 +138,10 @@ def main():
 
     # ── Load data ────────────────────────────────────────────────────────────
     print("\n[1/5] Loading data...")
-    buildings, enrichment, peer, signals, floor_area = load_data()
+    buildings, enrichment, peer, signals, floor_area, yoy = load_data()
 
     print("\n[2/5] Building feature matrix...")
-    rows = build_rows(buildings, enrichment, peer, signals, floor_area)
+    rows = build_rows(buildings, enrichment, peer, signals, floor_area, yoy)
 
     print("\n[3/5] Making labels (big_drop=1, no_signal=0, exclude mod_drop)...")
     labeled = make_labels(rows)
@@ -367,8 +367,15 @@ def main():
 
             update_enrichment(enrichment_data, rows, probs_all, drivers_all)
 
-            with open(enrichment_path, "w") as f:
-                json.dump(enrichment_data, f, indent=2)
+            tmp_path = enrichment_path + ".tmp"
+            try:
+                with open(tmp_path, "w") as f:
+                    json.dump(enrichment_data, f, indent=2)
+                os.replace(tmp_path, enrichment_path)
+            except Exception:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+                raise
 
             print(f"  ml_risk + ml_drivers written for {len(rows)} buildings → {enrichment_path}")
             if rows:
