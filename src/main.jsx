@@ -7,6 +7,7 @@ import LegacyApp from './legacy/App.jsx'
 import M3Preview from './next/M3Preview.jsx'
 import RankingsPage from './next/RankingsPage.jsx'
 import M4Preview from './next/M4Preview.jsx'
+import CaseFileContainer from './next/CaseFileContainer.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/m3-preview" element={<M3Preview />} />
         <Route path="/rankings" element={<RankingsPage />} />
         <Route path="/m4-preview" element={<M4Preview />} />
+        <Route path="/case-file/:bbl" element={<CaseFileContainer />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
