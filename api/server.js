@@ -1267,7 +1267,7 @@ app.get("/api/predict/xgboost", requireAuth, (req, res) => {
   const e = lookupEnrichment(addr);
   if (!e) return res.status(404).json({ error: "Building not found" });
   if (e.xgb_risk == null) return res.status(503).json({ error: "XGBoost scores not available — run save_models.py" });
-  res.json({ address: addr.toUpperCase(), xgb_risk: e.xgb_risk, gbm_risk: e.gbm_risk ?? null, auc: 0.6833 });
+  res.json({ address: addr.toUpperCase(), xgb_risk: e.xgb_risk, gbm_risk: e.gbm_risk ?? null, auc: getModelMeta().cv_auc ?? null });
 });
 
 // Compare GBM vs XGBoost for a building
@@ -1283,8 +1283,8 @@ app.get("/api/predict/compare", requireAuth, (req, res) => {
     xgb_risk:  e.xgb_risk,
     gbm_risk:  e.gbm_risk ?? e.ml_risk,
     delta:     Math.round(delta * 10000) / 10000,
-    xgb_auc:   0.6833,
-    gbm_auc:   0.6639,
+    xgb_auc:   getModelMeta().cv_auc ?? null,
+    gbm_auc:   null,
     features:  PREDICT_FEATURES,
   });
 });
