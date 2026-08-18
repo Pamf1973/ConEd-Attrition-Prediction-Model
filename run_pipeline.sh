@@ -31,4 +31,7 @@ fi
 log "emit — diffing enrichment, writing events.json"
 "$PYTHON" generate_events.py --emit
 
+log "merge — plumbing M6 status events into events.json (workflow layer)"
+node api/mergeStatusEvents.mjs
+
 log "done."
