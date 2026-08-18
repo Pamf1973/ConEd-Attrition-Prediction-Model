@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useBuildings } from "../data/useBuildings.js";
 import RankingsTable from "./RankingsTable.jsx";
+import CriticalQueue from "./CriticalQueue.jsx";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import "./RankingsPage.css";
 
 /**
@@ -61,7 +63,14 @@ export default function RankingsPage() {
       )}
 
       {token && !loading && !error && buildings.length > 0 && (
-        <RankingsTable buildings={buildings} limit={100} />
+        <>
+          <RankingsTable buildings={buildings} limit={100} />
+          <div style={{ marginTop: "48px" }}>
+            <ErrorBoundary label="CriticalQueue" fallback={null}>
+              <CriticalQueue buildings={buildings} hasM6={false} />
+            </ErrorBoundary>
+          </div>
+        </>
       )}
     </div>
   );
