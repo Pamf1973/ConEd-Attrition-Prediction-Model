@@ -122,7 +122,7 @@ export default function CriticalQueue({ buildings, hasM6 = false }) {
                 const bbl  = normalizeBbl(b.bbl);
                 const cell = toScoreCellProps(b, pctByKey);
                 return (
-                  <tr key={b.address} className={isCritical(b) ? "cq-row--critical" : ""}>
+                  <tr key={bbl ?? b.address} className={isCritical(b) ? "cq-row--critical" : ""}>
                     <td className="cq-addr">
                       {bbl
                         ? <a href={`/case-file/${bbl}`} className="cq-addr-link">{b.address}</a>

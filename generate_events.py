@@ -32,6 +32,14 @@ def _load(path):
         return json.load(f)
 
 
+def _safe_float(val, default=0.0):
+    """Return float(val) or default if val is non-numeric."""
+    try:
+        return float(val) if val else default
+    except (ValueError, TypeError):
+        return default
+
+
 def _write_atomic(path, data):
     tmp = path + ".tmp"
     try:
@@ -107,17 +115,31 @@ def emit():
         run_date = _load(MODEL_META).get("run_date")
 
     generated_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    first_run    = not os.path.exists(ENRICHMENT_PREV)
+
+    # prev_run_date: carried from the last written events.json (not MODEL_META)
+    prev_run_date = None
+    if os.path.exists(EVENTS_JSON):
+        try:
+            prev_run_date = _load(EVENTS_JSON).get("run_date")
+        except Exception:
+            pass
+
+    # TOCTOU-safe: determine first_run and load prev atomically via try/except
+    try:
+        prev = _load(ENRICHMENT_PREV)
+        first_run = False
+    except FileNotFoundError:
+        prev = None
+        first_run = True
 
     if first_run:
-        _emit_first_run(curr, yoy, run_date, generated_at)
+        _emit_first_run(curr, yoy, run_date, prev_run_date, generated_at)
         return
 
-    prev = _load(ENRICHMENT_PREV)
-    _emit_diff(curr, prev, yoy, run_date, generated_at)
+    _emit_diff(curr, prev, yoy, run_date, prev_run_date, generated_at)
 
 
-def _emit_first_run(curr, yoy, run_date, generated_at):
+def _emit_first_run(curr, yoy, run_date, prev_run_date, generated_at):
     divergent = [a for a, e in curr.items() if _is_divergent(e)]
     critical  = [a for a, e in curr.items() if _is_critical(e)]
 
@@ -141,10 +163,10 @@ def _emit_first_run(curr, yoy, run_date, generated_at):
             "count":       len(divergent),
         })
 
-    _finalize(events, run_date, prev_run_date=None, generated_at=generated_at, first_run=True)
+    _finalize(events, run_date, prev_run_date=prev_run_date, generated_at=generated_at, first_run=True)
 
 
-def _emit_diff(curr, prev, yoy, run_date, generated_at):
+def _emit_diff(curr, prev, yoy, run_date, prev_run_date, generated_at):
     tier_ups   = []
     tier_downs = []
     permits    = []
@@ -169,8 +191,8 @@ def _emit_diff(curr, prev, yoy, run_date, generated_at):
             data_changed_count += 1
 
         # Permit (dob_jobs increase)
-        prev_jobs = float(p.get("dob_jobs") or 0)
-        curr_jobs = float(c.get("dob_jobs") or 0)
+        prev_jobs = _safe_float(p.get("dob_jobs"))
+        curr_jobs = _safe_float(c.get("dob_jobs"))
         if curr_jobs > prev_jobs:
             permits.append((addr, c, prev_jobs, curr_jobs))
             data_changed_count += 1
@@ -188,7 +210,7 @@ def _emit_diff(curr, prev, yoy, run_date, generated_at):
     # TIER_UP — sorted by ml_risk desc
     tier_ups.sort(key=lambda x: -(x[1].get("ml_risk") or 0))
     for addr, c, p in tier_ups:
-        yoy_e   = yoy.get(addr, {})
+        yoy_e   = yoy.get(addr.upper(), {})
         now_crit = _is_critical(c)
         ev_parts = []
 
@@ -281,7 +303,7 @@ def _emit_diff(curr, prev, yoy, run_date, generated_at):
         "consequence": "Review run" if data_changed_count else None,
     })
 
-    _finalize(events, run_date, prev_run_date=None, generated_at=generated_at, first_run=False)
+    _finalize(events, run_date, prev_run_date=prev_run_date, generated_at=generated_at, first_run=False)
 
 
 def _finalize(events, run_date, prev_run_date, generated_at, first_run):
@@ -295,7 +317,7 @@ def _finalize(events, run_date, prev_run_date, generated_at, first_run):
     _write_atomic(EVENTS_JSON, payload)
     print(f"[events] {len(events)} event{'s' if len(events) != 1 else ''} → {EVENTS_JSON}")
     for e in events:
-        print(f"  [{e['kind']:<10}] {e['subject']} — {e['verb']}")
+        print(f"  [{e.get('kind','?'):<10}] {e.get('subject','?')} — {e.get('verb','?')}")
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

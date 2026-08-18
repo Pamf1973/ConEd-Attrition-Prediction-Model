@@ -81,11 +81,8 @@ export default function ThisWeekPage() {
     () => sessionStorage.getItem("coned_token") || null
   );
 
-  useEffect(() => {
-    const onStorage = () => setToken(sessionStorage.getItem("coned_token"));
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  // sessionStorage is per-tab — storage event only fires for localStorage (cross-tab).
+  // Token is read correctly on mount; re-login navigates to /legacy which sets it there.
 
   const { buildings, loading: bldgLoading, error: bldgError } = useBuildings(token);
   const { events: eventsData, loading: evtLoading }            = useEvents(token);
@@ -150,8 +147,8 @@ export default function ThisWeekPage() {
 
             {!evtLoading && !firstRun && feedEvents.length > 0 && (
               <div className="tw-feed">
-                {feedEvents.map((e, i) => (
-                  <ErrorBoundary key={i} fallback={null}>
+                {feedEvents.map((e) => (
+                  <ErrorBoundary key={`${e.kind}-${e.subject}`} fallback={null}>
                     <EventRow event={e} />
                   </ErrorBoundary>
                 ))}

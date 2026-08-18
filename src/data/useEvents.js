@@ -11,6 +11,8 @@ export function useEvents(token) {
       return;
     }
 
+    setError(null);
+    setLoading(true);
     let cancelled = false;
 
     fetch("/api/events", { headers: { Authorization: `Bearer ${token}` } })

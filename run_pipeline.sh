@@ -22,6 +22,10 @@ log "ll97 model — LL97 penalties + ml_risk + outlier fields"
 if [[ "${1:-}" == "--full" ]]; then
   log "xgboost — hyperparameter search + model_meta.json (slow)"
   "$PYTHON" train_xgboost.py
+elif [[ -n "${1:-}" ]]; then
+  echo "[pipeline] unknown argument: ${1}" >&2
+  echo "Usage: $0 [--full]" >&2
+  exit 1
 fi
 
 log "emit — diffing enrichment, writing events.json"
