@@ -1,19 +1,11 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
+import { useStatusCounts } from "../data/useStatusCounts.js";
+import { isCritical } from "../data/criticalFilter.js";
 import CriticalQueue from "./CriticalQueue.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import "./ThisWeekPage.css";
-
-// ── Critical membership filter (mirrors CriticalQueue) ────────────────────
-
-function isCritical(b) {
-  return (
-    typeof b.ml_risk === "number" && b.ml_risk >= 0.6 &&
-    b.norm_delta_23_24 != null &&
-    (b.outlier_23_24 || b.outlier_22_23 || b.decline_trend_label === "accelerating")
-  );
-}
 
 // ── Portfolio pulse aggregation ───────────────────────────────────────────
 
@@ -86,6 +78,7 @@ export default function ThisWeekPage() {
 
   const { buildings, loading: bldgLoading, error: bldgError } = useBuildings(token);
   const { events: eventsData, loading: evtLoading }            = useEvents(token);
+  const { counts: statusCounts }                               = useStatusCounts(buildings, token);
 
   const pulse = useMemo(() => computePulse(buildings), [buildings]);
 
@@ -173,7 +166,7 @@ export default function ThisWeekPage() {
             )}
             {!bldgLoading && !bldgError && (
               <ErrorBoundary label="CriticalQueue" fallback={<div className="tw-placeholder tw-placeholder--err">Queue failed to render.</div>}>
-                <CriticalQueue buildings={buildings} hasM6={false} />
+                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} />
               </ErrorBoundary>
             )}
           </section>

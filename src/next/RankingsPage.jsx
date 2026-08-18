@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useBuildings } from "../data/useBuildings.js";
+import { useStatusCounts } from "../data/useStatusCounts.js";
 import RankingsTable from "./RankingsTable.jsx";
 import CriticalQueue from "./CriticalQueue.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
@@ -22,7 +23,8 @@ export default function RankingsPage() {
   // sessionStorage is per-tab — storage event only fires for localStorage (cross-tab).
   // Token is read correctly on mount; re-login navigates to /legacy which sets it there.
 
-  const { buildings, loading, error } = useBuildings(token);
+  const { buildings, loading, error }  = useBuildings(token);
+  const { counts: statusCounts }       = useStatusCounts(buildings, token);
 
   return (
     <div className="sc-scope rankings-page">
@@ -64,7 +66,7 @@ export default function RankingsPage() {
           <RankingsTable buildings={buildings} limit={100} />
           <div style={{ marginTop: "48px" }}>
             <ErrorBoundary label="CriticalQueue" fallback={null}>
-              <CriticalQueue buildings={buildings} hasM6={false} />
+              <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} />
             </ErrorBoundary>
           </div>
         </>

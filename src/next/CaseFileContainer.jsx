@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import CaseFileHeader from "./CaseFileHeader.jsx";
+import StatusWriter from "./StatusWriter.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import { buildCaseFileProps, computePercentileMap, normalizeBbl } from "./caseFileAdapter.jsx";
 import "./CaseFileContainer.css";
@@ -25,11 +26,8 @@ export default function CaseFileContainer() {
   const [currentStatus, setCurrentStatus] = useState(null);
   const [statusErr, setStatusErr] = useState(null);
 
-  useEffect(() => {
-    const onStorage = () => setToken(sessionStorage.getItem("coned_token"));
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  // sessionStorage is per-tab — storage event only fires for localStorage (cross-tab).
+  // Token is read correctly on mount; re-login navigates to /legacy which sets it there.
 
   const { buildings, loading, error } = useBuildings(token);
 
@@ -146,6 +144,12 @@ export default function CaseFileContainer() {
           >
             <CaseFileHeader {...props} />
           </ErrorBoundary>
+          <StatusWriter
+            bbl={urlBbl}
+            currentStatus={currentStatus}
+            token={token}
+            onSaved={(newStatus) => setCurrentStatus(newStatus)}
+          />
         </>
       )}
     </div>

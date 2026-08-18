@@ -2,17 +2,8 @@ import { useMemo, useState } from "react";
 import ScoreCell from "./ScoreCell.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import { computePercentileMap, toScoreCellProps, normalizeBbl } from "./caseFileAdapter.jsx";
+import { isCritical } from "../data/criticalFilter.js";
 import "./CriticalQueue.css";
-
-// ── Critical v1.1 filter (Q3 sign-off) ───────────────────────────────────────
-
-function isCritical(b) {
-  return (
-    typeof b.ml_risk === "number" && b.ml_risk >= 0.6 &&
-    b.norm_delta_23_24 != null &&
-    (b.outlier_23_24 || b.outlier_22_23 || b.decline_trend_label === "accelerating")
-  );
-}
 
 function isOutlierDelta(b) {
   return !!(b.outlier_23_24 || b.outlier_22_23);
@@ -51,7 +42,7 @@ function formatMoney(n) {
  * Gracefully omits the M6 subtraction arithmetic when not available —
  * shows membership and chips only, and says so plainly.
  */
-export default function CriticalQueue({ buildings, hasM6 = false }) {
+export default function CriticalQueue({ buildings, hasM6 = false, statusCounts = null }) {
   const [activeChip, setActiveChip] = useState("critical");
 
   const pctByKey = useMemo(() => computePercentileMap(buildings), [buildings]);
@@ -96,7 +87,17 @@ export default function CriticalQueue({ buildings, hasM6 = false }) {
           ))}
         </div>
 
-        {!hasM6 && (
+        {hasM6 && statusCounts ? (
+          <p className="cq-m6-math">
+            <span className="cq-m6-total">{statusCounts.total} Critical</span>
+            {" − "}
+            <span>{statusCounts.contacted} contacted</span>
+            {" − "}
+            <span>{statusCounts.dismissed} dismissed</span>
+            {" = "}
+            <span className="cq-m6-toreview">{statusCounts.toReview} to review</span>
+          </p>
+        ) : !hasM6 && (
           <p className="cq-m6-note">
             Subtraction arithmetic and carry-over ages ship with M6.
           </p>

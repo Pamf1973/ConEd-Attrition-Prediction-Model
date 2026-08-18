@@ -184,3 +184,12 @@
   font-family: var(--sc-mono);
   font-size: 12px;
 }
+
+.cq-m6-math {
+  font-family: var(--sc-mono);
+  font-size: 12px;
+  color: var(--sc-bench-muted);
+  margin: 8px 0 0;
+}
+.cq-m6-total    { color: var(--sc-high, #ef4444); font-weight: 600; }
+.cq-m6-toreview { color: var(--sc-bench-text);    font-weight: 600; }
