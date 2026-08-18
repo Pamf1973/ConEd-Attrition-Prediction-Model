@@ -37,3 +37,8 @@ analysis/
 .claude/
 SESSION_JOURNAL.md
 HANDOFF.md
+
+# Pipeline-generated artifacts (created at runtime by generate_events.py)
+public/events.json
+public/buildingEnrichment_prev.json
+public/*.tmp

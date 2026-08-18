@@ -235,7 +235,7 @@ app.get("/api/auth/check", (req, res) => {
 });
 
 // Preload JSON files at startup — avoids blocking readFileSync on every request
-function loadJsonFile(filename) {
+function loadJsonFile(filename, { optional = false } = {}) {
   const publicPath = resolve(process.cwd(), "public", filename);
   const distPath   = resolve(process.cwd(), "dist", filename);
   try {
@@ -245,6 +245,10 @@ function loadJsonFile(filename) {
     try {
       return readFileSync(distPath, "utf8");
     } catch (fallbackErr) {
+      if (optional) {
+        console.warn(`[startup] ${filename}: not found in public/ or dist/ — serving null (optional file)`);
+        return null;
+      }
       throw new Error(
         `FATAL: cannot load ${filename} — public/ (${primaryErr.code ?? primaryErr.message}), dist/ (${fallbackErr.code ?? fallbackErr.message})`
       );
@@ -256,7 +260,7 @@ const DATA_CACHE = {
   enrichment: loadJsonFile("buildingEnrichment.json"),
   yearly:     loadJsonFile("yearly.json"),
   yoyDeltas:  loadJsonFile("yoy_deltas.json"),
-  events:     loadJsonFile("events.json"),
+  events:     loadJsonFile("events.json", { optional: true }),
 };
 
 // ETag for the enrichment payload — changes each time the server starts (i.e. after redeploy).
