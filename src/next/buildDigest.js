@@ -14,8 +14,11 @@
  *   modelMeta  — from /api/model_meta (model_version, cv_auc, run_date)
  *   events     — optional array from public/events.json (M7). When absent,
  *                the digest degrades to a "quiet week" section per D2.
- *   contacted  — optional Set<bbl> of buildings currently in outreach
- *   dismissed  — optional Set<bbl> of buildings dismissed with reasons
+ *   contactedCount — count of Critical buildings currently in outreach
+ *                    (Contacted / In review / Confirmed at-risk). Sourced
+ *                    from useStatusCounts (M6 /api/buildings/status/bulk).
+ *   dismissedCount — count of Critical buildings dismissed with reasons
+ *                    (Dismissed / False positive). Same source.
  *   sender     — { name, title, email } for the signature and mailto From:
  */
 
@@ -122,14 +125,12 @@ export function buildDigest({
   buildings = [],
   modelMeta = null,
   events = null,
-  contacted = new Set(),
-  dismissed = new Set(),
+  contactedCount = 0,
+  dismissedCount = 0,
   sender = { name: "Ed Perez", title: "ML Research and Domain Lead · Steam Attrition · Pursuit x Con Edison", email: "edwin.perez@pursuit.org" },
 } = {}) {
   const pulse = computePulseFromBuildings(buildings);
   const top = topOfQueue(buildings, 3);
-  const contactedCount = [...contacted].length;
-  const dismissedCount = [...dismissed].length;
   const toReview = Math.max(0, pulse.critical - contactedCount - dismissedCount);
 
   // Count of events tagged NEW-into-Critical this week. Without M7 events, 0.

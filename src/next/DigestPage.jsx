@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
+import { useStatusCounts } from "../data/useStatusCounts.js";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import { buildDigest } from "./buildDigest.js";
 import "./DigestPage.css";
@@ -42,6 +43,7 @@ function DigestPageInner() {
 
   const { buildings, loading, error } = useBuildings(token);
   const { events } = useEvents(token);
+  const { counts: statusCounts } = useStatusCounts(buildings, token);
 
   useEffect(() => {
     if (!token) return;
@@ -55,8 +57,14 @@ function DigestPageInner() {
 
   const drafted = useMemo(() => {
     if (!buildings || buildings.length === 0) return null;
-    return buildDigest({ buildings, modelMeta, events });
-  }, [buildings, modelMeta, events]);
+    return buildDigest({
+      buildings,
+      modelMeta,
+      events,
+      contactedCount: statusCounts?.contacted ?? 0,
+      dismissedCount: statusCounts?.dismissed ?? 0,
+    });
+  }, [buildings, modelMeta, events, statusCounts]);
 
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
