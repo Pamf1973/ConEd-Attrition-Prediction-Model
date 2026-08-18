@@ -1,16 +1,10 @@
+import { Navigate } from "react-router-dom";
+
+/**
+ * Root route ("/") is the front door to the new build. Everything the
+ * demo audience needs lives on /this-week — including the login surface
+ * for unauthed visitors (D20). Bare-domain traffic lands there.
+ */
 export default function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 text-neutral-900 p-6">
-      <div className="max-w-md">
-        <h1 className="text-xl font-semibold mb-3">
-          ConEd steam attrition: workflow build in progress
-        </h1>
-        <p className="text-sm leading-relaxed text-neutral-600">
-          The new workflow-focused build is under construction. Milestones M3
-          through M12 land here as they ship. The previous portfolio-view
-          dashboard is preserved at <code className="font-mono text-neutral-800">/legacy</code>.
-        </p>
-      </div>
-    </div>
-  )
+  return <Navigate to="/this-week" replace />;
 }

@@ -1,0 +1,88 @@
+/* LoginForm — workflow-native auth surface.
+   Inherits .sc-scope tokens from ScoreCell.css. */
+
+.lf-wrap {
+  max-width: 460px;
+  margin: 64px auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.lf-lede {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--sc-bench-muted);
+}
+
+.lf-card {
+  background: var(--sc-canvas-raised);
+  border: 1px solid var(--sc-bench-line);
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lf-label {
+  font-family: var(--sc-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sc-bench-muted);
+}
+
+.lf-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--sc-mono);
+  font-size: 14px;
+  color: var(--sc-bench-text);
+  background: var(--sc-canvas);
+  border: 1px solid var(--sc-bench-line);
+  border-radius: 0;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.lf-input:focus {
+  border-color: var(--sc-bench-text);
+}
+
+.lf-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lf-error {
+  font-family: var(--sc-mono);
+  font-size: 12px;
+  color: #a5312a;
+  margin-top: -4px;
+}
+
+.lf-submit {
+  margin-top: 6px;
+  padding: 10px 14px;
+  font-family: var(--sc-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-canvas-raised);
+  background: var(--sc-bench-text);
+  border: 1px solid var(--sc-bench-text);
+  cursor: pointer;
+}
+
+.lf-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lf-helper {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sc-bench-muted);
+}

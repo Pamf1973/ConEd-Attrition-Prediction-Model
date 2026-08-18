@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import { useStatusCounts } from "../data/useStatusCounts.js";
 import RankingsTable from "./RankingsTable.jsx";
@@ -9,22 +10,26 @@ import "./RankingsPage.css";
 /**
  * M3 container harness — /rankings.
  *
- * Reads the session token established by the existing login flow.
- * Auth UI belongs to M9 (This Week landing composition); until then,
- * users log in via /legacy (writes sessionStorage.coned_token), then
- * navigate here. Frozen-legacy rule forbids importing the legacy Login
- * component, so this page renders a pointer instead of a login form.
+ * Reads the session token established by the LoginForm on /this-week.
+ * Unauthed visitors and expired sessions bounce to /this-week where the
+ * workflow-native login surface lives (D20).
  */
 export default function RankingsPage() {
   const [token, setToken] = useState(
     () => sessionStorage.getItem("coned_token") || null
   );
 
-  // sessionStorage is per-tab — storage event only fires for localStorage (cross-tab).
-  // Token is read correctly on mount; re-login navigates to /legacy which sets it there.
-
   const { buildings, loading, error }  = useBuildings(token);
   const { counts: statusCounts }       = useStatusCounts(buildings, token);
+
+  useEffect(() => {
+    if (error === "UNAUTHORIZED") {
+      sessionStorage.removeItem("coned_token");
+      setToken(null);
+    }
+  }, [error]);
+
+  if (!token) return <Navigate to="/this-week" replace />;
 
   return (
     <div className="sc-scope rankings-page">
@@ -42,26 +47,17 @@ export default function RankingsPage() {
         </p>
       </header>
 
-      {!token && (
-        <div className="rankings-empty">
-          Sign in at <a href="/legacy">/legacy</a> first — the M3 route
-          reads that session. Standalone auth arrives with M9.
-        </div>
-      )}
-
-      {token && loading && (
+      {loading && (
         <div className="rankings-empty">Loading buildings…</div>
       )}
 
-      {token && error && (
+      {error && error !== "UNAUTHORIZED" && (
         <div className="rankings-empty rankings-empty--error">
-          {error === "UNAUTHORIZED"
-            ? <>Session expired. <a href="/legacy">Log in again.</a></>
-            : `Failed to load: ${error}`}
+          {`Failed to load: ${error}`}
         </div>
       )}
 
-      {token && !loading && !error && buildings.length > 0 && (
+      {!loading && !error && buildings.length > 0 && (
         <>
           <RankingsTable buildings={buildings} limit={100} />
           <div style={{ marginTop: "48px" }}>

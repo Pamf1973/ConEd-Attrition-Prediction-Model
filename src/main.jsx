@@ -19,13 +19,13 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/legacy" element={<LegacyApp />} />
-        <Route path="/m3-preview" element={<M3Preview />} />
         <Route path="/rankings" element={<RankingsPage />} />
-        <Route path="/m4-preview" element={<M4Preview />} />
         <Route path="/case-file/:bbl" element={<CaseFileContainer />} />
         <Route path="/report/:bbl" element={<ReportPage />} />
         <Route path="/methodology" element={<MethodologyPage />} />
         <Route path="/this-week" element={<ThisWeekPage />} />
+        {import.meta.env.DEV && <Route path="/m3-preview" element={<M3Preview />} />}
+        {import.meta.env.DEV && <Route path="/m4-preview" element={<M4Preview />} />}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

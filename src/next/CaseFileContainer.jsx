@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import CaseFileHeader from "./CaseFileHeader.jsx";
 import StatusWriter from "./StatusWriter.jsx";
@@ -13,8 +13,8 @@ import "./CaseFileContainer.css";
  * Renders CaseFileHeader (from the atom PR) against real building data,
  * live /api/model_meta, and current /api/buildings/:bbl/status.
  *
- * Same session-token pattern as the M3 rankings container. Auth UI lives
- * in /legacy until M9 lands the workflow-native login surface.
+ * Unauthed visitors and expired sessions bounce to /this-week where the
+ * LoginForm lives (D20).
  */
 export default function CaseFileContainer() {
   const { bbl: urlBbl } = useParams();
@@ -26,10 +26,16 @@ export default function CaseFileContainer() {
   const [currentStatus, setCurrentStatus] = useState(null);
   const [statusErr, setStatusErr] = useState(null);
 
-  // sessionStorage is per-tab — storage event only fires for localStorage (cross-tab).
-  // Token is read correctly on mount; re-login navigates to /legacy which sets it there.
-
   const { buildings, loading, error } = useBuildings(token);
+
+  useEffect(() => {
+    if (error === "UNAUTHORIZED") {
+      sessionStorage.removeItem("coned_token");
+      setToken(null);
+    }
+  }, [error]);
+
+  if (!token) return <Navigate to="/this-week" replace />;
 
   // Fetch /api/model_meta once per token
   useEffect(() => {
@@ -91,24 +97,15 @@ export default function CaseFileContainer() {
         </p>
       </header>
 
-      {!token && (
-        <div className="cfc-empty">
-          Sign in at <a href="/legacy">/legacy</a> first — this route
-          reads that session. Standalone auth arrives with M9.
-        </div>
-      )}
+      {loading && <div className="cfc-empty">Loading buildings…</div>}
 
-      {token && loading && <div className="cfc-empty">Loading buildings…</div>}
-
-      {token && error && (
+      {error && error !== "UNAUTHORIZED" && (
         <div className="cfc-empty cfc-empty--error">
-          {error === "UNAUTHORIZED"
-            ? <>Session expired. <a href="/legacy">Log in again.</a></>
-            : `Failed to load: ${error}`}
+          {`Failed to load: ${error}`}
         </div>
       )}
 
-      {token && !loading && !error && !building && (
+      {!loading && !error && !building && (
         <div className="cfc-empty">
           No building found for BBL <code>{urlBbl}</code>. Try one of these:
           {buildings.slice(0, 5).map((b) => {
@@ -122,7 +119,7 @@ export default function CaseFileContainer() {
         </div>
       )}
 
-      {token && props && (
+      {props && (
         <>
           {modelMetaErr && (
             <div className="cfc-warn">
@@ -150,6 +147,9 @@ export default function CaseFileContainer() {
             token={token}
             onSaved={(newStatus) => setCurrentStatus(newStatus)}
           />
+          <div className="cfc-report-link">
+            <a href={`/report/${urlBbl}`}>See the reasoning →</a>
+          </div>
         </>
       )}
     </div>

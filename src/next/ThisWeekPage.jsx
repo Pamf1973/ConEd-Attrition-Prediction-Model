@@ -1,11 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
 import { useStatusCounts } from "../data/useStatusCounts.js";
 import { isCritical } from "../data/criticalFilter.js";
 import CriticalQueue from "./CriticalQueue.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
+import LoginForm from "./LoginForm.jsx";
 import "./ThisWeekPage.css";
+
+const SURFACE_LEDE =
+  "This Week is the weekly triage surface for the ConEd steam attrition workflow. Sign in to see since-last-run events, your Critical queue, and portfolio pulse.";
 
 // ── Portfolio pulse aggregation ───────────────────────────────────────────
 
@@ -80,6 +84,14 @@ export default function ThisWeekPage() {
   const { events: eventsData, loading: evtLoading }            = useEvents(token);
   const { counts: statusCounts }                               = useStatusCounts(buildings, token);
 
+  // Expired session → clear token, re-render into LoginForm in place.
+  useEffect(() => {
+    if (bldgError === "UNAUTHORIZED") {
+      sessionStorage.removeItem("coned_token");
+      setToken(null);
+    }
+  }, [bldgError]);
+
   const pulse = useMemo(() => computePulse(buildings), [buildings]);
 
   const runDate     = eventsData?.run_date     ?? null;
@@ -112,9 +124,7 @@ export default function ThisWeekPage() {
       </header>
 
       {!token && (
-        <div className="tw-gate">
-          Sign in at <a href="/legacy">/legacy</a> first.
-        </div>
+        <LoginForm onLogin={setToken} surfaceLede={SURFACE_LEDE} />
       )}
 
       {token && (
@@ -157,11 +167,9 @@ export default function ThisWeekPage() {
             </div>
 
             {bldgLoading && <div className="tw-placeholder">Loading buildings…</div>}
-            {bldgError && (
+            {bldgError && bldgError !== "UNAUTHORIZED" && (
               <div className="tw-placeholder tw-placeholder--err">
-                {bldgError === "UNAUTHORIZED"
-                  ? <><a href="/legacy">Log in again</a> — session expired.</>
-                  : `Failed to load buildings: ${bldgError}`}
+                {`Failed to load buildings: ${bldgError}`}
               </div>
             )}
             {!bldgLoading && !bldgError && (
