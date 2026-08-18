@@ -193,3 +193,122 @@
 }
 .cq-m6-total    { color: var(--sc-high, #ef4444); font-weight: 600; }
 .cq-m6-toreview { color: var(--sc-bench-text);    font-weight: 600; }
+
+/* ── M11: view toggle ───────────────────────────────────────────────────── */
+
+.cq-view-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 4px;
+  border: 1px solid var(--sc-bench-line);
+  border-radius: 2px;
+  padding: 2px;
+}
+
+.cq-view-btn {
+  font-family: var(--sc-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--sc-bench-muted);
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.cq-view-btn--active {
+  background: var(--sc-canvas-raised);
+  color: var(--sc-bench-text);
+}
+
+/* ── M11: aggregate stamp + view ────────────────────────────────────────── */
+
+.cq-agg-stamp {
+  font-family: var(--sc-mono);
+  font-size: 11px;
+  color: var(--sc-bench-muted);
+  margin: 12px 0 0;
+}
+
+.cq-agg-expr {
+  color: var(--sc-bench-text);
+}
+
+.cq-agg {
+  background: var(--sc-canvas-raised);
+  padding: 24px 28px 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+@media (min-width: 720px) {
+  .cq-agg { grid-template-columns: 1fr 1fr; }
+  .cq-agg-section:first-child { grid-column: 1 / -1; }
+}
+
+.cq-agg-h {
+  font-family: var(--sc-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sc-bench-muted);
+  margin: 0 0 12px;
+}
+
+.cq-agg-tiles {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cq-agg-tile {
+  min-width: 140px;
+  padding: 14px 16px;
+  border: 1px solid var(--sc-bench-line);
+  border-radius: 2px;
+  background: var(--sc-canvas);
+}
+
+.cq-agg-tile-n {
+  font-family: var(--sc-mono);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--sc-bench-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.cq-agg-tile-label {
+  font-size: 12px;
+  color: var(--sc-bench-muted);
+  margin-top: 4px;
+}
+
+.cq-agg-pairs, .cq-agg-bands {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cq-agg-pair, .cq-agg-band {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sc-bench-line);
+  font-size: 13px;
+  color: var(--sc-bench-text);
+}
+
+.cq-agg-pair-label, .cq-agg-band-label {
+  color: var(--sc-bench-muted);
+}
+
+.cq-agg-pair-n, .cq-agg-band-n {
+  font-family: var(--sc-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}

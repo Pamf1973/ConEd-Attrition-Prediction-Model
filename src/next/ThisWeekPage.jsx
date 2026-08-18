@@ -166,7 +166,7 @@ export default function ThisWeekPage() {
             )}
             {!bldgLoading && !bldgError && (
               <ErrorBoundary label="CriticalQueue" fallback={<div className="tw-placeholder tw-placeholder--err">Queue failed to render.</div>}>
-                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} />
+                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} runDate={runDate} />
               </ErrorBoundary>
             )}
           </section>
