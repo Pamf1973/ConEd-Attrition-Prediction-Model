@@ -12,6 +12,7 @@ import CaseFileContainer from './next/CaseFileContainer.jsx'
 import ReportPage from './next/ReportPage.jsx'
 import MethodologyPage from './next/MethodologyPage.jsx'
 import ThisWeekPage from './next/ThisWeekPage.jsx'
+import DigestPage from './next/DigestPage.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -26,6 +27,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/report/:bbl" element={<ReportPage />} />
         <Route path="/methodology" element={<MethodologyPage />} />
         <Route path="/this-week" element={<ThisWeekPage />} />
+        <Route path="/digest" element={<DigestPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
