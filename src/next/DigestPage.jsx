@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useBuildings } from "../data/useBuildings.js";
+import { useEvents } from "../data/useEvents.js";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import { buildDigest } from "./buildDigest.js";
 import "./DigestPage.css";
@@ -13,9 +14,9 @@ import "./DigestPage.css";
  * v1; locked-token editor is a later increment. Send (C3) opens mailto with
  * the text twin or copies HTML/text to clipboard. No SMTP.
  *
- * events.json (M7) is fetched when available and folded into "What changed";
- * absent, the section states "Nothing crossed a threshold since your last
- * review" per D2.
+ * events.json (M7, useEvents hook) folds into "What changed"; when zero
+ * events, the section states "Nothing crossed a threshold since your last
+ * review" per D2 — a quiet week is a real result.
  */
 export default function DigestPage() {
   return (
@@ -31,7 +32,6 @@ export default function DigestPage() {
 function DigestPageInner() {
   const [token, setToken] = useState(() => sessionStorage.getItem("coned_token") || null);
   const [modelMeta, setModelMeta] = useState(null);
-  const [events, setEvents] = useState(null);
   const [copyState, setCopyState] = useState("");
 
   useEffect(() => {
@@ -41,6 +41,7 @@ function DigestPageInner() {
   }, []);
 
   const { buildings, loading, error } = useBuildings(token);
+  const { events } = useEvents(token);
 
   useEffect(() => {
     if (!token) return;
@@ -49,11 +50,6 @@ function DigestPageInner() {
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((m) => { if (!cancelled) setModelMeta(m); })
       .catch(() => { /* fall back to defaults inside buildDigest */ });
-    // events.json is served through /api/data/* once M7 lands; try both routes.
-    fetch("/api/data/events", { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((e) => { if (!cancelled && Array.isArray(e)) setEvents(e); })
-      .catch(() => { /* stay null → quiet-week copy */ });
     return () => { cancelled = true; };
   }, [token]);
 
@@ -179,8 +175,8 @@ function DigestPageInner() {
               To review: <b>{drafted.toReview}</b> ·
               Critical: <b>{drafted.pulse.critical}</b> ·
               Portfolio: <b>{drafted.pulse.total}</b>
-              {events == null && (
-                <> · Events feed: <b>pending M7</b> (quiet-week copy in "What changed")</>
+              {Array.isArray(events) && (
+                <> · Events: <b>{events.length}</b></>
               )}
             </div>
           </footer>

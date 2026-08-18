@@ -19,20 +19,11 @@
  *   sender     — { name, title, email } for the signature and mailto From:
  */
 
-/**
- * Canonical Critical filter (Ismael-owned, source of truth for M8 CriticalQueue):
- *   ml_risk >= 0.6 AND norm_delta_23_24 not null AND (outlier OR accelerating trend)
- * When M8 lands, replace this with an import from Ismael's module rather than
- * carrying a second definition.
- */
-export function isCritical(b) {
-  if (!b) return false;
-  if ((b.ml_risk ?? 0) < 0.6) return false;
-  if (b.norm_delta_23_24 == null) return false;
-  const outlier = b.outlier_23_24 === true || b.outlier_22_23 === true;
-  const accelerating = b.decline_trend_label === "accelerating";
-  return outlier || accelerating;
-}
+import { isCritical } from "../data/criticalFilter.js";
+
+// Re-export so existing callers that import isCritical from buildDigest.js
+// keep working, but the definition lives in the shared filter module.
+export { isCritical };
 
 export function computePulseFromBuildings(buildings) {
   const out = { total: buildings.length, high: 0, medium: 0, low: 0, uncertain: 0, critical: 0 };
@@ -150,7 +141,7 @@ export function buildDigest({
 
   const quietWeek = !Array.isArray(events) || events.length === 0;
   const changedItems = quietWeek
-    ? [{ line: "Nothing crossed a threshold since your last review. Named events resume once the M7 events pipeline is diffed run-over-run." }]
+    ? [{ line: "Nothing crossed a threshold since your last review. A quiet week is a real result." }]
     : events.slice(0, 6).map((e) => ({ line: e.summary || `[${e.kind}] ${e.address || e.bbl || ""}` }));
 
   const method = `Screening analysis for outreach prioritization, not a determination of customer intent. ${aucSentence(modelMeta)} Tier from a transparent weather-normalized rule. Public data only: LL84, steam demand, DOB, PLUTO. Full methodology at /methodology.`;

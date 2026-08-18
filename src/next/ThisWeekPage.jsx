@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
 import { useStatusCounts } from "../data/useStatusCounts.js";
@@ -107,6 +108,7 @@ export default function ThisWeekPage() {
               <span className="tw-anchor-label">Pipeline run</span>
               <span className="tw-anchor-val">{fmtRunDate(runDate)}</span>
             </div>
+            <Link to="/digest" className="tw-compose">Compose weekly digest</Link>
           </div>
         </div>
       </header>
