@@ -15,6 +15,11 @@
   --sc-crit-text: #E8574A;
   --sc-uncertain: #7A828D;
   --sc-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Motion tokens — one easing, two durations, everywhere. */
+  --sc-motion-fast: 120ms;
+  --sc-motion-med:  180ms;
+  --sc-motion-easing: cubic-bezier(0.2, 0, 0, 1);
 }
 
 .sc-cell {
