@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import {
   toReportProps,
@@ -71,28 +71,22 @@ export default function ReportPage() {
     );
   }
 
-  if (!token) {
-    return (
-      <div className="rp-scope">
-        <div className="rp-empty">
-          Sign in at <a href="/legacy">/legacy</a> first. Standalone auth
-          arrives with M9.
-        </div>
-      </div>
-    );
-  }
+  if (!token) return <Navigate to="/this-week" replace />;
 
   if (loading) {
     return <div className="rp-scope"><div className="rp-empty">Loading…</div></div>;
+  }
+
+  if (error === "UNAUTHORIZED") {
+    sessionStorage.removeItem("coned_token");
+    return <Navigate to="/this-week" replace />;
   }
 
   if (error) {
     return (
       <div className="rp-scope">
         <div className="rp-empty rp-empty--error">
-          {error === "UNAUTHORIZED"
-            ? <>Session expired. <a href="/legacy">Log in again.</a></>
-            : `Failed to load: ${error}`}
+          {`Failed to load: ${error}`}
         </div>
       </div>
     );

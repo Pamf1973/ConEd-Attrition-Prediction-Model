@@ -96,3 +96,20 @@
   font-size: 11.5px;
   margin-bottom: 16px;
 }
+
+.cfc-report-link {
+  margin-top: 24px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--cfc-line, #E5E1D8);
+  font-family: var(--cfc-mono);
+  font-size: 13px;
+}
+.cfc-report-link a {
+  color: var(--cfc-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--cfc-ink);
+  padding-bottom: 2px;
+}
+.cfc-report-link a:hover {
+  opacity: 0.7;
+}

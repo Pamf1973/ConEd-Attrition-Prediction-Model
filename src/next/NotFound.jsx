@@ -16,9 +16,9 @@ export default function NotFound() {
           <code>{pathname}</code> isn&rsquo;t a route in this build.
         </p>
         <ul className="nf-links">
-          <li><Link to="/">Home</Link></li>
+          <li><Link to="/this-week">This Week</Link></li>
           <li><Link to="/rankings">Rankings</Link></li>
-          <li><Link to="/legacy">Legacy dashboard</Link></li>
+          <li><Link to="/methodology">Methodology</Link></li>
         </ul>
       </div>
     </div>

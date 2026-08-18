@@ -1,19 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
+import { useStatusCounts } from "../data/useStatusCounts.js";
+import { isCritical } from "../data/criticalFilter.js";
 import CriticalQueue from "./CriticalQueue.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
+import LoginForm from "./LoginForm.jsx";
 import "./ThisWeekPage.css";
 
-// ── Critical membership filter (mirrors CriticalQueue) ────────────────────
-
-function isCritical(b) {
-  return (
-    typeof b.ml_risk === "number" && b.ml_risk >= 0.6 &&
-    b.norm_delta_23_24 != null &&
-    (b.outlier_23_24 || b.outlier_22_23 || b.decline_trend_label === "accelerating")
-  );
-}
+const SURFACE_LEDE =
+  "This Week is the weekly triage surface for the ConEd steam attrition workflow. Sign in to see since-last-run events, your Critical queue, and portfolio pulse.";
 
 // ── Portfolio pulse aggregation ───────────────────────────────────────────
 
@@ -86,6 +83,15 @@ export default function ThisWeekPage() {
 
   const { buildings, loading: bldgLoading, error: bldgError } = useBuildings(token);
   const { events: eventsData, loading: evtLoading }            = useEvents(token);
+  const { counts: statusCounts }                               = useStatusCounts(buildings, token);
+
+  // Expired session → clear token, re-render into LoginForm in place.
+  useEffect(() => {
+    if (bldgError === "UNAUTHORIZED") {
+      sessionStorage.removeItem("coned_token");
+      setToken(null);
+    }
+  }, [bldgError]);
 
   const pulse = useMemo(() => computePulse(buildings), [buildings]);
 
@@ -103,7 +109,22 @@ export default function ThisWeekPage() {
   return (
     <div className="sc-scope tw-page">
       {/* ── Topbar ─────────────────────────────────────────────────── */}
+      {token && (
       <header className="tw-topbar">
+        {/* Harmonic divider — quiet echo of the login cover. */}
+        <svg
+          className="tw-topbar-wave"
+          viewBox="0 0 1200 6"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M 0 3 Q 60 1, 120 3 T 240 3 T 360 3 T 480 3 T 600 3 T 720 3 T 840 3 T 960 3 T 1080 3 T 1200 3"
+            fill="none"
+            stroke="var(--sc-bench-line)"
+            strokeWidth="1"
+          />
+        </svg>
         <div className="tw-topbar-inner">
           <div className="tw-topbar-left">
             <span className="tw-eyebrow">ConEd Steam Attrition · M9</span>
@@ -114,14 +135,21 @@ export default function ThisWeekPage() {
               <span className="tw-anchor-label">Pipeline run</span>
               <span className="tw-anchor-val">{fmtRunDate(runDate)}</span>
             </div>
+            {token && (
+              <>
+                <kbd className="tw-cmdk-hint" title="Command palette">⌘K</kbd>
+                <Link to="/digest" className="tw-compose-btn">
+                  Compose weekly digest
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
+      )}
 
       {!token && (
-        <div className="tw-gate">
-          Sign in at <a href="/legacy">/legacy</a> first.
-        </div>
+        <LoginForm onLogin={setToken} surfaceLede={SURFACE_LEDE} />
       )}
 
       {token && (
@@ -164,16 +192,14 @@ export default function ThisWeekPage() {
             </div>
 
             {bldgLoading && <div className="tw-placeholder">Loading buildings…</div>}
-            {bldgError && (
+            {bldgError && bldgError !== "UNAUTHORIZED" && (
               <div className="tw-placeholder tw-placeholder--err">
-                {bldgError === "UNAUTHORIZED"
-                  ? <><a href="/legacy">Log in again</a> — session expired.</>
-                  : `Failed to load buildings: ${bldgError}`}
+                {`Failed to load buildings: ${bldgError}`}
               </div>
             )}
             {!bldgLoading && !bldgError && (
               <ErrorBoundary label="CriticalQueue" fallback={<div className="tw-placeholder tw-placeholder--err">Queue failed to render.</div>}>
-                <CriticalQueue buildings={buildings} hasM6={false} />
+                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} runDate={runDate} />
               </ErrorBoundary>
             )}
           </section>
