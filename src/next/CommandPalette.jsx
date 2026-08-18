@@ -121,7 +121,7 @@ export default function CommandPalette({ open, onClose }) {
         if (matches.length > 0) {
           const m = matches[cursor];
           if (m) { m.run(); onClose(); }
-        } else if (ai?.status === "action" && commandById[ai.data.commandId]) {
+        } else if (ai?.status === "action" && Object.hasOwn(commandById, ai.data.commandId) && commandById[ai.data.commandId]) {
           commandById[ai.data.commandId].run();
           onClose();
         }
@@ -168,7 +168,7 @@ export default function CommandPalette({ open, onClose }) {
             {ai.status === "loading" && <div className="cp-ai-line cp-ai-line--muted">Asking Claude…</div>}
             {ai.status === "error"   && <div className="cp-ai-line cp-ai-line--err">{ai.msg}</div>}
             {ai.status === "off"     && <div className="cp-ai-line cp-ai-line--muted">{ai.msg}</div>}
-            {ai.status === "action"  && commandById[ai.data.commandId] && (
+            {ai.status === "action"  && Object.hasOwn(commandById, ai.data.commandId) && commandById[ai.data.commandId] && (
               <button
                 className="cp-ai-action"
                 onClick={() => { commandById[ai.data.commandId].run(); onClose(); }}
@@ -184,7 +184,7 @@ export default function CommandPalette({ open, onClose }) {
                 </div>
                 {ai.data.suggest?.length > 0 && (
                   <div className="cp-ai-suggests">
-                    {ai.data.suggest.map((id) => commandById[id] && (
+                    {ai.data.suggest.map((id) => Object.hasOwn(commandById, id) && commandById[id] && (
                       <button
                         key={id}
                         className="cp-ai-suggest"

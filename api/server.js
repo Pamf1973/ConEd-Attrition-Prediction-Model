@@ -1026,10 +1026,17 @@ app.post("/api/palette", requireAuth, aiLimiter, async (req, res) => {
     return res.status(503).json({ error: "No LLM API key configured" });
   }
 
+  // Strip CR/LF from id and label before they land in the prompt template —
+  // otherwise a crafted command can inject newlines and manipulate the LLM's
+  // instruction context. Cap length after stripping so the slice still applies.
+  const stripNewlines = (s) => s.replace(/[\r\n]/g, " ");
   const safeCommands = commands
     .filter((c) => c && typeof c.id === "string" && typeof c.label === "string")
     .slice(0, 40)
-    .map((c) => ({ id: c.id.slice(0, 64), label: c.label.slice(0, 120) }));
+    .map((c) => ({
+      id:    stripNewlines(c.id).slice(0, 64),
+      label: stripNewlines(c.label).slice(0, 120),
+    }));
   const validIds = new Set(safeCommands.map((c) => c.id));
 
   const user = `Available commands:\n${safeCommands.map((c) => `- ${c.id}: ${c.label}`).join("\n")}\n\nUser query: ${sanitizeQuestion(query)}`;

@@ -62,9 +62,10 @@ export default function LoginForm({ onLogin, surfaceLede }) {
       onLogin(data.token);
     } catch (err) {
       setError(err.message || "Authentication failed.");
-      setLoading(false);
       inputRef.current?.focus();
       inputRef.current?.select();
+    } finally {
+      setLoading(false);
     }
   }
 
