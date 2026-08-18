@@ -96,9 +96,9 @@ export async function initSchema() {
 export async function saveWatchlist(actor, addresses) {
   await pool.query(
     `INSERT INTO watchlists (actor, addresses, updated_at)
-     VALUES ($1, $2, NOW())
-     ON CONFLICT (actor) DO UPDATE SET addresses = $2, updated_at = NOW()`,
-    [actor, addresses]
+     VALUES ($1, $2::jsonb, NOW())
+     ON CONFLICT (actor) DO UPDATE SET addresses = $2::jsonb, updated_at = NOW()`,
+    [actor, JSON.stringify(addresses)]
   );
 }
 

@@ -235,7 +235,7 @@ app.get("/api/auth/check", (req, res) => {
 });
 
 // Preload JSON files at startup — avoids blocking readFileSync on every request
-function loadJsonFile(filename) {
+function loadJsonFile(filename, { optional = false } = {}) {
   const publicPath = resolve(process.cwd(), "public", filename);
   const distPath   = resolve(process.cwd(), "dist", filename);
   try {
@@ -245,6 +245,10 @@ function loadJsonFile(filename) {
     try {
       return readFileSync(distPath, "utf8");
     } catch (fallbackErr) {
+      if (optional) {
+        console.warn(`[startup] ${filename}: not found in public/ or dist/ — serving null (optional file)`);
+        return null;
+      }
       throw new Error(
         `FATAL: cannot load ${filename} — public/ (${primaryErr.code ?? primaryErr.message}), dist/ (${fallbackErr.code ?? fallbackErr.message})`
       );
@@ -256,6 +260,7 @@ const DATA_CACHE = {
   enrichment: loadJsonFile("buildingEnrichment.json"),
   yearly:     loadJsonFile("yearly.json"),
   yoyDeltas:  loadJsonFile("yoy_deltas.json"),
+  events:     loadJsonFile("events.json", { optional: true }),
 };
 
 // ETag for the enrichment payload — changes each time the server starts (i.e. after redeploy).
@@ -287,6 +292,7 @@ app.get("/api/data/enrichment",  requireAuth, (req, res) => {
 });
 app.get("/api/data/yearly",      requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yearly));
 app.get("/api/data/yoy-deltas",  requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.yoyDeltas));
+app.get("/api/events",           requireAuth, (_req, res) => res.type("json").send(DATA_CACHE.events));
 
 // GET /api/buildings — server-side filtered + paginated building query
 app.get("/api/buildings", requireAuth, (req, res) => {

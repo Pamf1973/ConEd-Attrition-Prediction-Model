@@ -83,6 +83,28 @@ export function computePercentileMap(buildings) {
   return { pctByAddr, total: n };
 }
 
+// ── ScoreCell adapter ────────────────────────────────────────────────────────
+// Maps a building + pctMap → props ready to spread onto <ScoreCell />.
+export function toScoreCellProps(building, pctMap) {
+  const entry = pctMap.pctByAddr?.get(building.address);
+  const percentile = entry ? ordinal(entry.pct) : "est.";
+
+  const finalTier = building.diagnostic_risk ?? "Uncertain";
+  const ml = building.ml_risk;
+  const base = Number.isFinite(ml)
+    ? ml < BASE_LOW_MAX ? "Low" : ml >= BASE_HIGH_MIN ? "High" : "Medium"
+    : null;
+  const diverged = base === "Low" && finalTier === "High";
+
+  return {
+    percentile,
+    tier: finalTier,
+    provenance: { label: "XGB v1 · UNVAL", verified: false },
+    freshness: null,
+    diverged,
+  };
+}
+
 // ── ledger columns ───────────────────────────────────────────────────────────
 function buildQueueColumn(building, pctMap, modelMeta) {
   const entry = pctMap.pctByAddr.get(building.address);

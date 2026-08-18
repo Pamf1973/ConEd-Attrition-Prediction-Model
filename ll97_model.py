@@ -27,6 +27,7 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BUILDINGS_JSON     = "public/buildings.json"
 ENRICHMENT_JSON    = "public/buildingEnrichment.json"
+YOY_DELTAS_JSON    = "public/yoy_deltas.json"
 STEAM_CSV          = "../coned-3d-map/data/steam-buildings.csv"
 TREND_SIGNALS_JSON = "../coned-3d-map/data/ml_features/steam_trend_signals.json"
 PEER_SCORES_JSON   = "../coned-3d-map/data/ml_features/peer_scores.json"
@@ -119,7 +120,10 @@ def load_data():
             except (ValueError, AttributeError):
                 pass
 
-    return buildings, enrichment, peer, signals, floor_area
+    with open(YOY_DELTAS_JSON) as f:
+        yoy = {k.upper(): v for k, v in json.load(f).items()}
+
+    return buildings, enrichment, peer, signals, floor_area, yoy
 
 
 # ── LL97 penalty computation ──────────────────────────────────────────────────
@@ -142,8 +146,10 @@ def compute_ll97(ghg, floor_sqft, use_type):
 
 # ── Feature matrix ────────────────────────────────────────────────────────────
 
-def build_rows(buildings, enrichment, peer, signals, floor_area):
+def build_rows(buildings, enrichment, peer, signals, floor_area, yoy=None):
     rows, skipped = [], 0
+    if yoy is None:
+        yoy = {}
     global_median_estar = 50.0
 
     # Compute group medians for energy star imputation
@@ -172,6 +178,7 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
             continue
 
         e         = enrichment.get(addr, {})
+        yoy_e     = yoy.get(addr, {})
         dob       = float(e.get("dob_jobs") or 0)
         peer_s    = float(peer.get(addr, 0) or 0)
         cluster   = int(e.get("cluster_id", -1))
@@ -211,6 +218,10 @@ def build_rows(buildings, enrichment, peer, signals, floor_area):
             "ll97_cap_2024":        ll97["ll97_cap_2024"],
             "ll97_cap_2030":        ll97["ll97_cap_2030"],
             "floor_sqft":           fa,
+            # yoy delta fields — used for M8 Critical membership filter
+            "norm_delta_23_24":     yoy_e.get("norm_delta_23_24"),
+            "outlier_23_24":        yoy_e.get("outlier_23_24"),
+            "outlier_22_23":        yoy_e.get("outlier_22_23"),
         })
 
     print(f"Feature matrix: {len(rows)} buildings ({skipped} skipped)")
@@ -377,13 +388,18 @@ def update_enrichment(enrichment, rows, probs, drivers):
         enrichment[addr]["steam_ghg_share"]   = round(row["steam_ghg_share"], 3)
         enrichment[addr]["ml_risk"]            = round(float(prob), 4)
         enrichment[addr]["ml_drivers"]         = top5
+        # yoy delta fields for M8 Critical membership (null-safe: absent if yoy not loaded)
+        if row.get("norm_delta_23_24") is not None:
+            enrichment[addr]["norm_delta_23_24"] = round(float(row["norm_delta_23_24"]), 4)
+            enrichment[addr]["outlier_23_24"]    = bool(row["outlier_23_24"])
+            enrichment[addr]["outlier_22_23"]    = bool(row["outlier_22_23"])
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    buildings, enrichment, peer, signals, floor_area = load_data()
-    rows = build_rows(buildings, enrichment, peer, signals, floor_area)
+    buildings, enrichment, peer, signals, floor_area, yoy = load_data()
+    rows = build_rows(buildings, enrichment, peer, signals, floor_area, yoy)
 
     labeled = make_labels(rows)
     if len(labeled) < 50:
