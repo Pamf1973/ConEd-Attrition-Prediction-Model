@@ -11,9 +11,20 @@
 /* ── Topbar ─────────────────────────────────────────────────────────────── */
 
 .tw-topbar {
-  border-bottom: 1px solid var(--sc-bench-line);
+  position: relative;
   background: var(--sc-canvas-raised);
   padding: 0 32px;
+}
+
+.tw-topbar-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 6px;
+  display: block;
+  pointer-events: none;
 }
 
 .tw-topbar-inner {
@@ -262,7 +273,7 @@
   text-decoration: none;
   border-radius: 6px;
   border: 1px solid transparent;
-  transition: background 0.12s ease;
+  transition: background var(--sc-motion-fast) var(--sc-motion-easing);
 }
 .tw-compose-btn:hover  { background: color-mix(in srgb, var(--sc-accent, #ea580c) 88%, #000); }
 .tw-compose-btn:focus  { outline: 2px solid var(--sc-accent, #ea580c); outline-offset: 2px; }

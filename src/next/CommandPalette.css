@@ -7,6 +7,7 @@
   align-items: flex-start;
   justify-content: center;
   padding-top: 12vh;
+  animation: cp-backdrop-in var(--sc-motion-med) var(--sc-motion-easing) both;
 }
 
 .cp-panel {
@@ -19,6 +20,20 @@
   overflow: hidden;
   color: var(--sc-bench-text);
   font-family: 'Inter', system-ui, sans-serif;
+  animation: cp-panel-in var(--sc-motion-med) var(--sc-motion-easing) both;
+}
+
+@keyframes cp-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes cp-panel-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-backdrop, .cp-panel { animation: none; }
 }
 
 .cp-input {

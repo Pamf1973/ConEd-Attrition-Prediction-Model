@@ -109,7 +109,22 @@ export default function ThisWeekPage() {
   return (
     <div className="sc-scope tw-page">
       {/* ── Topbar ─────────────────────────────────────────────────── */}
+      {token && (
       <header className="tw-topbar">
+        {/* Harmonic divider — quiet echo of the login cover. */}
+        <svg
+          className="tw-topbar-wave"
+          viewBox="0 0 1200 6"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M 0 3 Q 60 1, 120 3 T 240 3 T 360 3 T 480 3 T 600 3 T 720 3 T 840 3 T 960 3 T 1080 3 T 1200 3"
+            fill="none"
+            stroke="var(--sc-bench-line)"
+            strokeWidth="1"
+          />
+        </svg>
         <div className="tw-topbar-inner">
           <div className="tw-topbar-left">
             <span className="tw-eyebrow">ConEd Steam Attrition · M9</span>
@@ -131,6 +146,7 @@ export default function ThisWeekPage() {
           </div>
         </div>
       </header>
+      )}
 
       {!token && (
         <LoginForm onLogin={setToken} surfaceLede={SURFACE_LEDE} />

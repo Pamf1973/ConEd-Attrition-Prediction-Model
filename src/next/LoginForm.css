@@ -1,88 +1,185 @@
-/* LoginForm — workflow-native auth surface.
-   Inherits .sc-scope tokens from ScoreCell.css. */
+/* LoginForm — harmonic cover + simplified auth form.
+   Inherits .sc-scope tokens (colors + motion). */
+
+.lf-shell {
+  position: relative;
+  min-height: calc(100dvh - 120px); /* fill the viewport below the topbar */
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Harmonic cover ────────────────────────────────────────────────────── */
+
+.lf-cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lf-cover-svg {
+  width: min(1600px, 98vw);
+  height: 60vh;
+  max-height: 520px;
+  min-height: 260px;
+}
+
+.lf-cover-line {
+  fill: none;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  animation-name: lf-cover-draw;
+  animation-timing-function: var(--sc-motion-easing);
+  animation-fill-mode: forwards;
+  will-change: stroke-dashoffset, opacity;
+}
+
+/* Pulse cycle: shoots across (fast draw), holds briefly at full opacity,
+   then fades out in place. No drift, no blur. */
+@keyframes lf-cover-draw {
+  0%   { stroke-dashoffset: 1; opacity: 0; }
+  8%   { opacity: 1; }
+  35%  { stroke-dashoffset: 0; opacity: 1; }
+  60%  { opacity: 0.85; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+/* Collapse flourish — on auth success, all noise collapses toward the
+   horizontal center as the workbench materializes underneath. */
+.lf-shell--parting .lf-cover {
+  opacity: 0;
+  transform: scaleY(0.04);
+  transform-origin: center center;
+  transition:
+    opacity 400ms var(--sc-motion-easing),
+    transform 400ms var(--sc-motion-easing);
+}
+
+/* ── Form ──────────────────────────────────────────────────────────────── */
 
 .lf-wrap {
-  max-width: 460px;
-  margin: 64px auto;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
   padding: 0 24px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 22px;
+  transition: opacity 380ms var(--sc-motion-easing),
+              transform 380ms var(--sc-motion-easing);
+}
+
+.lf-shell--parting .lf-wrap {
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
 
 .lf-lede {
-  font-size: 13px;
-  line-height: 1.55;
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
   color: var(--sc-bench-muted);
+  text-align: center;
 }
 
-.lf-card {
-  background: var(--sc-canvas-raised);
-  border: 1px solid var(--sc-bench-line);
-  padding: 28px 28px 24px;
+.lf-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
+  padding: 22px 24px;
+  background: color-mix(in srgb, var(--sc-canvas) 78%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--sc-bench-line);
 }
 
 .lf-label {
   font-family: var(--sc-mono);
   font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sc-bench-muted);
+}
+
+.lf-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.lf-field {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 2px;
+  font-family: var(--sc-mono);
+  font-size: 15px;
+  color: var(--sc-bench-text);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sc-bench-line);
+  border-radius: 0;
+  outline: none;
+  transition: border-color var(--sc-motion-fast) var(--sc-motion-easing);
+}
+.lf-field:focus  { border-bottom-color: var(--sc-bench-text); }
+.lf-field:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.lf-go {
+  padding: 8px 2px;
+  font-family: var(--sc-mono);
+  font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sc-bench-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    color var(--sc-motion-fast) var(--sc-motion-easing),
+    border-color var(--sc-motion-fast) var(--sc-motion-easing);
+  white-space: nowrap;
 }
-
-.lf-input {
-  width: 100%;
-  padding: 10px 12px;
-  font-family: var(--sc-mono);
-  font-size: 14px;
+.lf-go:not(:disabled):hover {
   color: var(--sc-bench-text);
-  background: var(--sc-canvas);
-  border: 1px solid var(--sc-bench-line);
-  border-radius: 0;
-  outline: none;
-  box-sizing: border-box;
+  border-bottom-color: var(--sc-bench-text);
 }
-
-.lf-input:focus {
-  border-color: var(--sc-bench-text);
-}
-
-.lf-input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.lf-go:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .lf-error {
   font-family: var(--sc-mono);
-  font-size: 12px;
-  color: #a5312a;
-  margin-top: -4px;
-}
-
-.lf-submit {
-  margin-top: 6px;
-  padding: 10px 14px;
-  font-family: var(--sc-mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--sc-canvas-raised);
-  background: var(--sc-bench-text);
-  border: 1px solid var(--sc-bench-text);
-  cursor: pointer;
-}
-
-.lf-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  font-size: 11.5px;
+  color: #b23b32;
+  margin: 0;
 }
 
 .lf-helper {
-  margin: 8px 0 0;
-  font-size: 12px;
-  line-height: 1.5;
+  margin: 0;
+  font-family: var(--sc-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
   color: var(--sc-bench-muted);
+  text-align: center;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .lf-cover-line { animation: none; stroke-dashoffset: 0; opacity: 0.3; }
+  .lf-wrap, .lf-shell--parting .lf-wrap {
+    transition: none;
+    transform: none;
+  }
 }
