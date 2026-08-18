@@ -21,11 +21,11 @@ function computePulse(buildings) {
   let critical = 0, high = 0, medium = 0, low = 0, uncertain = 0;
   for (const b of buildings) {
     const dr = b.diagnostic_risk;
-    if (isCritical(b))       critical++;
-    else if (dr === "High")   high++;
-    else if (dr === "Medium") medium++;
-    else if (dr === "Low")    low++;
-    else                      uncertain++;
+    if (isCritical(b))            critical++;
+    else if (dr === "High")        high++;
+    else if (dr === "Medium")      medium++;
+    else if (dr === "Low")         low++;
+    else if (dr === "Uncertain" || dr == null) uncertain++;
   }
   return { critical, high, medium, low, uncertain, total: buildings.length };
 }
