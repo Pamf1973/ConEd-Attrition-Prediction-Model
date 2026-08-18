@@ -9,6 +9,7 @@ import { isCritical } from "./criticalFilter.js";
 export function useStatusCounts(buildings, token) {
   const [counts, setCounts]   = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState(null);
 
   useEffect(() => {
     if (!token || !buildings.length) return;
@@ -26,8 +27,15 @@ export function useStatusCounts(buildings, token) {
       return;
     }
 
+    // Server rejects arrays > 500 BBLs — cap before POSTing
+    const bounded = criticalBbls.slice(0, 500);
+    if (criticalBbls.length > 500) {
+      console.warn(`[useStatusCounts] Critical BBL count ${criticalBbls.length} exceeds 500 — truncated`);
+    }
+
     let cancelled = false;
     setLoading(true);
+    setError(null);
 
     fetch("/api/buildings/status/bulk", {
       method: "POST",
@@ -35,7 +43,7 @@ export function useStatusCounts(buildings, token) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ bbls: criticalBbls }),
+      body: JSON.stringify({ bbls: bounded }),
     })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -52,8 +60,8 @@ export function useStatusCounts(buildings, token) {
         const toReview = Math.max(0, total - contacted - dismissed);
         setCounts({ contacted, dismissed, toReview, total });
       })
-      .catch(() => {
-        if (!cancelled) setCounts(null);
+      .catch((err) => {
+        if (!cancelled) setError(err.message ?? "Failed to load status counts");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -62,5 +70,5 @@ export function useStatusCounts(buildings, token) {
     return () => { cancelled = true; };
   }, [buildings, token]);
 
-  return { counts, loading };
+  return { counts, loading, error };
 }

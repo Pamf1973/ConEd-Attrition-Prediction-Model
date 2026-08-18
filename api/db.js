@@ -12,9 +12,12 @@ const _poolMax = Number.isFinite(_rawPoolMax) && _rawPoolMax > 0 ? _rawPoolMax :
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL ?? "postgresql://localhost:5432/coned_dashboard",
-  // TODO: supply DATABASE_CA_CERT env var with Railway's CA bundle to enable cert verification.
-  // rejectUnauthorized: false is a known limitation until the CA cert is wired up — tracked issue.
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  // Set DATABASE_CA_CERT env var (base64-encoded Railway CA bundle) to enable full TLS verification.
+  ssl: process.env.DATABASE_URL
+    ? process.env.DATABASE_CA_CERT
+      ? { rejectUnauthorized: true, ca: Buffer.from(process.env.DATABASE_CA_CERT, "base64").toString() }
+      : { rejectUnauthorized: false }
+    : false,
   // Tune via DB_POOL_MAX env var; default 5 works for single-dyno Railway deployments
   max: _poolMax,
   idleTimeoutMillis: 30_000,

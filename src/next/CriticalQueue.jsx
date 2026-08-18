@@ -3,6 +3,7 @@ import ScoreCell from "./ScoreCell.jsx";
 import ErrorBoundary from "./ErrorBoundary.jsx";
 import { computePercentileMap, toScoreCellProps, normalizeBbl } from "./caseFileAdapter.jsx";
 import { isCritical } from "../data/criticalFilter.js";
+import { LL97_BANDS, bandOf } from "../data/ll97Bands.js";
 import "./CriticalQueue.css";
 
 function isOutlierDelta(b) {
@@ -19,10 +20,17 @@ function isModifierPromoted(b) {
 }
 
 const CHIPS = [
-  { key: "critical",          label: "Critical",          filter: isCritical },
-  { key: "outlier",           label: "Outlier Δ",         filter: isOutlierDelta },
-  { key: "accelerating",      label: "Accelerating",      filter: isAccelerating },
-  { key: "modifier-promoted", label: "Modifier-promoted", filter: isModifierPromoted },
+  { key: "critical",          label: "Critical",          filter: isCritical,         expr: "ml_risk ≥ 0.6 · Δ23–24 present · (outlier OR accelerating)" },
+  { key: "outlier",           label: "Outlier Δ",         filter: isOutlierDelta,     expr: "outlier_23_24 OR outlier_22_23" },
+  { key: "accelerating",      label: "Accelerating",      filter: isAccelerating,     expr: "decline_trend_label = accelerating" },
+  { key: "modifier-promoted", label: "Modifier-promoted", filter: isModifierPromoted, expr: "diagnostic_risk = High AND ml_risk < 0.6" },
+];
+
+// Modifiers used for aggregate co-occurrence (Critical is the frame, not a modifier axis)
+const MODIFIERS = [
+  { key: "outlier",           label: "Outlier Δ",         test: isOutlierDelta },
+  { key: "accelerating",      label: "Accelerating",      test: isAccelerating },
+  { key: "modifier-promoted", label: "Modifier-promoted", test: isModifierPromoted },
 ];
 
 function formatMkBtu(steam) {
@@ -35,50 +43,68 @@ function formatMoney(n) {
   return `$${Math.round(n).toLocaleString()}`;
 }
 
+function formatRunStamp(iso) {
+  if (!iso) return "run —";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "run —";
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  return `run ${yyyy}-${mm}-${dd}`;
+}
+
+function computeBandCounts(rows) {
+  const counts = Object.fromEntries(LL97_BANDS.map((b) => [b.key, 0]));
+  for (const b of rows) counts[bandOf(b.ll97_penalty_2030).key] += 1;
+  return counts;
+}
+
+function computeCoOccurrence(rows) {
+  const pairs = [];
+  for (let i = 0; i < MODIFIERS.length; i++) {
+    for (let j = i + 1; j < MODIFIERS.length; j++) {
+      const a = MODIFIERS[i];
+      const z = MODIFIERS[j];
+      const n = rows.filter((b) => a.test(b) && z.test(b)).length;
+      pairs.push({ key: `${a.key}+${z.key}`, label: `${a.label} + ${z.label}`, n });
+    }
+  }
+  return pairs;
+}
+
 /**
  * M8: Queue + modifier filter chips + Critical membership.
- *
- * Receives the full merged buildings array from useBuildings.
- * Gracefully omits the M6 subtraction arithmetic when not available —
- * shows membership and chips only, and says so plainly.
+ * M11: List | Aggregate toggle. Aggregate renders count tiles, modifier co-occurrence pairs,
+ * and LL97 2030 penalty-magnitude bands — all derived from the currently filtered rowset.
+ * Header states filter expression + row count + run stamp (W3 amended).
  */
-export default function CriticalQueue({ buildings, hasM6 = false, statusCounts = null, events = null }) {
+export default function CriticalQueue({ buildings, hasM6 = false, statusCounts = null, runDate = null }) {
   const [activeChip, setActiveChip] = useState("critical");
+  const [view, setView] = useState("list");
 
   const pctByKey = useMemo(() => computePercentileMap(buildings), [buildings]);
-
-  // W5: carry-over. Single-run events.json can only distinguish "New this week"
-  // (subject appears as a TIER_UP event) from "Carried" (already Critical before
-  // this diff). Multi-week ages ("Carried · wk N") wait on event history.
-  const newThisWeek = useMemo(() => {
-    if (!events || events.first_run || !Array.isArray(events.events)) return null;
-    const s = new Set();
-    for (const e of events.events) {
-      if (e.kind === "TIER_UP" && typeof e.subject === "string") {
-        s.add(e.subject.trim().toUpperCase());
-      }
-    }
-    return s;
-  }, [events]);
-  const showStatusCol = newThisWeek !== null;
 
   const counts = useMemo(() =>
     Object.fromEntries(CHIPS.map((c) => [c.key, buildings.filter(c.filter).length])),
     [buildings]
   );
 
+  const activeChipObj = CHIPS.find((c) => c.key === activeChip);
+
   const rows = useMemo(() => {
-    const chip = CHIPS.find((c) => c.key === activeChip);
-    const filtered = chip ? buildings.filter(chip.filter) : buildings;
+    const filtered = activeChipObj ? buildings.filter(activeChipObj.filter) : buildings;
     return filtered
       .slice()
       .sort((a, z) => (z.ml_risk ?? -1) - (a.ml_risk ?? -1));
-  }, [buildings, activeChip]);
+  }, [buildings, activeChip, activeChipObj]);
+
+  const bandCounts    = useMemo(() => computeBandCounts(rows),    [rows]);
+  const coOccurrence  = useMemo(() => computeCoOccurrence(rows),  [rows]);
 
   const criticalCount = counts["critical"];
   const queueLabel = activeChip === "critical"
     ? `${criticalCount} Critical`
-    : `${rows.length} ${CHIPS.find((c) => c.key === activeChip)?.label ?? ""}`;
+    : `${rows.length} ${activeChipObj?.label ?? ""}`;
 
   return (
     <div className="cq-scope cq-root">
@@ -86,6 +112,22 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
         <div className="cq-title-row">
           <h2 className="cq-title">Queue</h2>
           <span className="cq-count">{queueLabel}</span>
+          <div className="cq-view-toggle" role="group" aria-label="Queue view">
+            <button
+              className={`cq-view-btn${view === "list" ? " cq-view-btn--active" : ""}`}
+              onClick={() => setView("list")}
+              aria-pressed={view === "list"}
+            >
+              List
+            </button>
+            <button
+              className={`cq-view-btn${view === "aggregate" ? " cq-view-btn--active" : ""}`}
+              onClick={() => setView("aggregate")}
+              aria-pressed={view === "aggregate"}
+            >
+              Aggregate
+            </button>
+          </div>
         </div>
 
         <div className="cq-chips" role="group" aria-label="Filter queue">
@@ -117,9 +159,62 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
             Subtraction arithmetic and carry-over ages ship with M6.
           </p>
         )}
+
+        {view === "aggregate" && (
+          <p className="cq-agg-stamp">
+            Filter: <span className="cq-agg-expr">{activeChipObj?.expr}</span>
+            {" · "}n = {rows.length}
+            {" · "}{formatRunStamp(runDate)}
+          </p>
+        )}
       </div>
 
-      {rows.length === 0 ? (
+      {view === "aggregate" ? (
+        rows.length === 0 ? (
+          <div className="cq-empty">No buildings match this filter.</div>
+        ) : (
+          <div className="cq-agg" aria-label="Aggregate view">
+            <section className="cq-agg-section">
+              <h3 className="cq-agg-h">Modifier tiles</h3>
+              <div className="cq-agg-tiles">
+                {MODIFIERS.map((m) => {
+                  const n = rows.filter(m.test).length;
+                  return (
+                    <div key={m.key} className="cq-agg-tile">
+                      <div className="cq-agg-tile-n">{n}</div>
+                      <div className="cq-agg-tile-label">{m.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="cq-agg-section">
+              <h3 className="cq-agg-h">Co-occurrence</h3>
+              <ul className="cq-agg-pairs">
+                {coOccurrence.map((p) => (
+                  <li key={p.key} className="cq-agg-pair">
+                    <span className="cq-agg-pair-label">{p.label}</span>
+                    <span className="cq-agg-pair-n">{p.n}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="cq-agg-section">
+              <h3 className="cq-agg-h">LL97 2030 penalty bands</h3>
+              <ul className="cq-agg-bands">
+                {LL97_BANDS.map((b) => (
+                  <li key={b.key} className="cq-agg-band">
+                    <span className="cq-agg-band-label">{b.label}</span>
+                    <span className="cq-agg-band-n">{bandCounts[b.key]}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        )
+      ) : rows.length === 0 ? (
         <div className="cq-empty">No buildings match this filter.</div>
       ) : (
         <div className="cq-bench">
@@ -129,17 +224,16 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
                 <th>Address</th>
                 <th>Score</th>
                 <th>Trend</th>
-                {showStatusCol && <th>Status</th>}
                 <th className="num">Steam (M kBtu)</th>
                 <th className="num">LL97 '24</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((b, i) => {
+              {rows.map((b) => {
                 const bbl  = normalizeBbl(b.bbl);
                 const cell = toScoreCellProps(b, pctByKey);
                 return (
-                  <tr key={`${bbl ?? b.address ?? "row"}-${i}`} className={isCritical(b) ? "cq-row--critical" : ""}>
+                  <tr key={bbl ?? b.address} className={isCritical(b) ? "cq-row--critical" : ""}>
                     <td className="cq-addr">
                       {bbl
                         ? <a href={`/case-file/${bbl}`} className="cq-addr-link">{b.address}</a>
@@ -153,13 +247,6 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
                     <td className="cq-trend" data-trend={b.decline_trend_label ?? ""}>
                       {b.decline_trend_label ?? "—"}
                     </td>
-                    {showStatusCol && (
-                      <td className="cq-carry">
-                        {newThisWeek.has((b.address ?? "").trim().toUpperCase())
-                          ? <span className="cq-carry--new">New this week</span>
-                          : <span className="cq-carry--carried">Carried</span>}
-                      </td>
-                    )}
                     <td className="num">{formatMkBtu(b.steam)}</td>
                     <td className="num">{formatMoney(b.ll97_penalty_2024)}</td>
                   </tr>

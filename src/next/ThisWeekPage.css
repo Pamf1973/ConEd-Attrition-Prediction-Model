@@ -87,6 +87,22 @@
   color: var(--sc-bench-text);
 }
 
+.tw-compose {
+  align-self: center;
+  font-family: var(--sc-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  padding: 8px 14px;
+  border: 1px solid var(--sc-bench-text);
+  background: var(--sc-bench-text);
+  color: var(--sc-canvas-raised);
+  text-decoration: none;
+}
+.tw-compose:hover {
+  background: transparent;
+  color: var(--sc-bench-text);
+}
+
 /* ── Auth gate ───────────────────────────────────────────────────────────── */
 
 .tw-gate {

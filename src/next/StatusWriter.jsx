@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./StatusWriter.css";
 
 const STATUSES = [
@@ -15,6 +15,8 @@ const STATUSES = [
  * Reads currentStatus from parent, POSTs to /api/buildings/:bbl/status on save.
  * Calls onSaved(newStatus) so the parent can update its local state.
  */
+const BBL_RE = /^[1-5]\d{9}$/;
+
 export default function StatusWriter({ bbl, currentStatus, token, onSaved }) {
   const initial = currentStatus ?? "Unreviewed";
   const [selected, setSelected] = useState(initial);
@@ -22,10 +24,22 @@ export default function StatusWriter({ bbl, currentStatus, token, onSaved }) {
   const [saving,   setSaving]   = useState(false);
   const [flash,    setFlash]    = useState(null); // "saved" | "error"
 
-  const dirty = selected !== initial;
+  // Sync selected when parent updates currentStatus after a re-fetch,
+  // but don't overwrite an in-progress edit.
+  useEffect(() => {
+    if (!saving && selected === initial) {
+      setSelected(currentStatus ?? "Unreviewed");
+    }
+  }, [currentStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const dirty = selected !== (currentStatus ?? "Unreviewed");
 
   function handleSave() {
     if (!dirty || saving) return;
+    if (!BBL_RE.test(bbl)) {
+      setFlash("error");
+      return;
+    }
     setSaving(true);
     setFlash(null);
 
