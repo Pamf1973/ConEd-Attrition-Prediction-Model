@@ -259,3 +259,12 @@
   font-size: 14px;
   font-style: italic;
 }
+
+.mp-error {
+  padding: 40px 32px;
+  color: var(--mp-muted, #94a3b8);
+  font-size: 14px;
+  border: 1px dashed var(--mp-rule, #334155);
+  max-width: 640px;
+  margin: 40px auto;
+}

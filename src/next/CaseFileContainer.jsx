@@ -140,7 +140,7 @@ export default function CaseFileContainer() {
             label={`CaseFileHeader:${urlBbl}`}
             fallback={
               <div className="cfc-warn">
-                Case file failed to render for BBL {bbl} — record is malformed. Check console for details.
+                Case file failed to render for BBL {urlBbl} — record is malformed. Check console for details.
               </div>
             }
           >

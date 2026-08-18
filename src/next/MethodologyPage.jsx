@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 import "./MethodologyPage.css";
 
 /**
@@ -37,7 +38,10 @@ export default function MethodologyPage() {
     : "pending";
 
   return (
-    <>
+    <ErrorBoundary
+      label="MethodologyPage"
+      fallback={<div className="mp-error">Methodology page failed to load. Check the browser console for details.</div>}
+    >
       <div className="mp-scope">
         <header className="mp-topbar">
           <span className="mp-eyebrow">CONED STEAM ATTRITION · M10</span>
@@ -479,7 +483,7 @@ export default function MethodologyPage() {
           </p>
         </footer>
       </div>
-    </>
+    </ErrorBoundary>
   );
 }
 
