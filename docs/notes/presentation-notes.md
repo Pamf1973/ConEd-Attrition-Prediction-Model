@@ -115,3 +115,52 @@ If asked "will this improve the model?" (Ildi's ask, positioning it as roadmap):
 - [ ] Verify on Railway once `DATABASE_URL` is set that the script actually queries and merges. Right now it's tested pure-function; end-to-end runs need the DB to be reachable.
 - [ ] Once demo data has a few real status events, screenshot the feed for the deck — this is the visual proof of the reframe.
 - [ ] Ildi ask: draft one slide positioning the AM-feedback loop as "next unlock." Not code — deck content.
+
+---
+
+## 2026-08-18 — Presentation constraints (David's brief, 2026-08-12 email)
+
+**Wednesday slot:** 15-20 minutes **including Q&A**. David's specced sections:
+1. Introduction to the problem statement and why you built the solution.
+2. Introduction to who you are and what you are building.
+3. Discuss the problem statement in the lens of a specific business persona's problem.
+4. Walk through a demo from the business users perspective.
+5. 2-3 minute overview of the tech stack and how you built what you built.
+
+**Realistic time budget:**
+- Problem statement + why: ~2 min
+- Who you are + what you're building: ~1-2 min
+- Persona lens: ~2-3 min
+- Demo walkthrough: ~4-6 min (product visible time)
+- Tech stack: 2-3 min (David's explicit spec — one dense slide)
+- Q&A: ~3-5 min
+
+**Wednesday is the qualifier for September.** The September session is with ConEd's technical specialists in this role. This round was noted as requiring stronger technical understanding and demonstration of it. Leadership is on Wednesday and may be less technically proficient — but **normalization and cleaning of the data is elementary to any ML story.** Anyone, technical or not, knows to ask "did you wash the fruit." So the data-prep story has to be tight regardless of audience.
+
+**Framing rule for Wednesday and September both:** own limitations on no ConEd internal data honestly, but be **sharp on preparation** — what data we pulled, how we cleaned/normalized it, the choices we made and why, the choices we deferred and why. Don't be defensive. Clear-eyed.
+
+**Methodology gap and this framing (see 2026-07-16 alignment doc):**
+- What we do today: citywide HDD multiplier + per-building HDD/CDD regression for the 24 NYCHA buildings + IQR outlier flags + accelerating/decelerating trend labels.
+- What Johan's methodology calls for that we don't have: per-building HDD/CDD regression at billing-day resolution across the full portfolio, plus 5 of 6 diagnostic metrics.
+- Why we don't have it: LL84 is annual aggregates, no billing-day resolution possible on public data.
+- How to say it: "We did per-customer weather normalization where the data supported it — 24 NYCHA buildings with monthly regression. For the other 1,186 we applied citywide HDD normalization at yearly resolution because LL84 doesn't publish monthly. With monthly billing data from ConEd, we'd extend the per-customer regression to the full portfolio at yearly-then-billing-day resolution — that's the natural unlock the data-sharing agreement would open." Section 4 of the alignment doc: detective vs classifier — complementary signals, not competing.
+
+**Build-vs-position on the methodology gap for Wednesday:**
+- Not building the diagnostic framework before Wednesday. Not enough time; not in the presentation outline. Section 4 framing carries it in Q&A.
+- For September (technical audience) we may want to build a subset — e.g., yearly per-building regression across the full portfolio with honest thin-data labeling. Alignment doc sizes at ~5-6 focused days. Decision defer to post-Wednesday, once we've heard what technical questions actually come up.
+
+**Q&A prep — questions to have crisp answers for:**
+- "Did you apply per-customer weather normalization?" (data-prep rigor)
+- "How often does the model retrain?" (model stability — see reconciliation-loop note above)
+- "How do you handle uncertainty when a building doesn't have enough data?" (Uncertain tier, gates in `compute_diagnostic_risk`)
+- "Where does your training label come from and why?" (weather-normalized decline in CY22 or CY23, 54 positives out of 1003 labeled)
+- "What's your validation status?" (unvalidated; cv_auc 0.683; model_meta labels this honestly)
+- "Why XGBoost specifically?" (hyperparameter search vs GBM; docs/ref/2026-07-13_ismael-q1-q10-response.md Q4)
+- "What data do you not use that we'd expect you to?" (billing-day resolution, meter-level data, customer account history — all ConEd-internal)
+- "What's your next step if we shared X?" (Ildi's AM-feedback loop; full diagnostic framework at monthly resolution)
+
+**Actions:**
+- [ ] Draft tech stack slide content — one dense slide, 2-3 min spoken.
+- [ ] Draft persona-thread demo script — Monday-morning AM working the queue.
+- [ ] Draft Q&A prep bank — 8-10 anticipated questions with speakable answers.
+- [ ] Decide post-Wednesday whether to invest in the diagnostic framework build for September.
