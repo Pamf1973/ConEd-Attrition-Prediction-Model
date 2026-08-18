@@ -1,0 +1,286 @@
+/* ThisWeekPage — M9 landing shell. Paper canvas outside, dark bench
+   inside for the specimen. Only .tw-* classes; not global. */
+
+.tw-page {
+  --tw-paper: #F8F8F6;
+  --tw-ink: #17181A;
+  --tw-ink-muted: #6C6F75;
+  --tw-hairline: #DDDDD8;
+  --tw-warn-bg: #FFF4E5;
+  --tw-warn-ink: #7A4A00;
+
+  --tw-canvas: #0C0F13;
+  --tw-canvas-raised: #12161C;
+  --tw-bench-text: #E6E8EB;
+  --tw-bench-muted: #8A919C;
+  --tw-bench-line: #232A33;
+
+  --tw-high: #E05545;
+  --tw-med: #D19A3D;
+  --tw-low: #4C8A68;
+  --tw-uncertain: #7A828D;
+  --tw-action: #E87722;
+
+  --tw-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --tw-body: 'Inter', system-ui, sans-serif;
+  --tw-display: 'Space Grotesk', sans-serif;
+
+  background: var(--tw-paper);
+  color: var(--tw-ink);
+  font-family: var(--tw-body);
+  min-height: 100vh;
+  padding: 56px 32px 96px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.tw-header {
+  border-bottom: 1px solid var(--tw-ink);
+  padding-bottom: 28px;
+  margin-bottom: 40px;
+}
+.tw-meta {
+  font-family: var(--tw-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tw-ink-muted);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.tw-header h1 {
+  font-family: var(--tw-display);
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.tw-lede {
+  margin-top: 16px;
+  max-width: 68ch;
+  color: var(--tw-ink-muted);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+.tw-lede code, .tw-empty-e2 code {
+  font-family: var(--tw-mono);
+  font-size: 13px;
+  color: var(--tw-ink);
+  background: rgba(23, 24, 26, 0.06);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.tw-empty {
+  padding: 40px 24px;
+  border: 1px dashed var(--tw-hairline);
+  border-radius: 3px;
+  color: var(--tw-ink-muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.tw-empty--error {
+  border-color: #C22B1F;
+  color: #C22B1F;
+}
+
+.tw-error {
+  padding: 24px;
+  background: #FDECEA;
+  color: #7A1F14;
+  border: 1px solid #E5B6AE;
+  border-radius: 3px;
+  font-family: var(--tw-mono);
+  font-size: 13px;
+  margin: 40px auto;
+  max-width: 1120px;
+}
+
+.tw-warn {
+  background: var(--tw-warn-bg);
+  color: var(--tw-warn-ink);
+  border: 1px solid #E8B87A;
+  border-radius: 3px;
+  padding: 10px 14px;
+  font-family: var(--tw-mono);
+  font-size: 11.5px;
+  margin-top: 16px;
+}
+
+/* Dark bench */
+.tw-bench {
+  background: var(--tw-canvas);
+  border-radius: 4px;
+  padding: 28px;
+  color: var(--tw-bench-text);
+  overflow-x: auto;
+}
+.tw-landing { min-width: 720px; }
+
+/* Topbar */
+.tw-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--tw-bench-line);
+  flex-wrap: wrap;
+}
+.tw-topbar-left h3 {
+  font-family: var(--tw-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--tw-bench-text);
+  margin: 0;
+}
+.tw-anchor {
+  font-family: var(--tw-mono);
+  font-size: 10px;
+  color: var(--tw-bench-muted);
+  margin-top: 3px;
+  letter-spacing: 0.03em;
+}
+.tw-anchor b { color: var(--tw-bench-text); font-weight: 500; }
+
+.tw-topbar-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tw-cmd {
+  font-family: var(--tw-mono);
+  font-size: 11px;
+  color: var(--tw-bench-muted);
+  border: 1px solid var(--tw-bench-line);
+  border-radius: 3px;
+  padding: 7px 12px;
+  min-width: 200px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.tw-cmd kbd {
+  font-family: var(--tw-mono);
+  font-size: 9px;
+  border: 1px solid var(--tw-bench-line);
+  border-radius: 2px;
+  padding: 1px 5px;
+  color: var(--tw-bench-muted);
+}
+.tw-btn {
+  font-family: var(--tw-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 8px 14px;
+  border-radius: 3px;
+  border: 1px solid var(--tw-bench-line);
+  color: var(--tw-bench-text);
+  background: transparent;
+  white-space: nowrap;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.tw-btn--primary {
+  background: var(--tw-action);
+  border-color: var(--tw-action);
+  color: #14100B;
+  font-weight: 600;
+}
+
+/* Band labels */
+.tw-band-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--tw-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tw-bench-muted);
+  margin: 22px 0 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tw-count { text-transform: none; letter-spacing: 0.03em; }
+.tw-count b { color: var(--tw-bench-text); font-weight: 500; }
+
+/* Empty band placeholders */
+.tw-empty-band {
+  border: 1px dashed var(--tw-bench-line);
+  border-radius: 3px;
+  padding: 22px;
+  color: var(--tw-bench-muted);
+}
+.tw-empty-e1 {
+  font-size: 13.5px;
+  color: var(--tw-bench-text);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.tw-empty-e2 {
+  font-family: var(--tw-mono);
+  font-size: 10.5px;
+  line-height: 1.7;
+  color: var(--tw-bench-muted);
+}
+.tw-empty-e2 code {
+  color: var(--tw-bench-text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Pulse */
+.tw-pulse {
+  padding: 14px 16px;
+  border: 1px solid var(--tw-bench-line);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.tw-pulse-bar {
+  flex: 1 1 260px;
+  height: 8px;
+  display: flex;
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 220px;
+  background: var(--tw-canvas-raised);
+}
+.tw-seg { height: 100%; }
+.tw-seg--high  { background: var(--tw-high); }
+.tw-seg--med   { background: var(--tw-med); }
+.tw-seg--low   { background: var(--tw-low); }
+.tw-seg--unc   { background: var(--tw-uncertain); }
+.tw-seg--empty { background: var(--tw-bench-line); }
+
+.tw-pulse-stats {
+  font-family: var(--tw-mono);
+  font-size: 10px;
+  color: var(--tw-bench-muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.9;
+}
+.tw-pulse-stats b { color: var(--tw-bench-text); font-weight: 500; }
+.tw-pulse-vint {
+  font-family: var(--tw-mono);
+  font-size: 9px;
+  color: #5E6672;
+  margin-left: auto;
+  text-align: right;
+  line-height: 1.8;
+}
+
+.tw-note {
+  margin-top: 18px;
+  font-family: var(--tw-mono);
+  font-size: 10.5px;
+  color: var(--tw-bench-muted);
+  line-height: 1.7;
+  max-width: 62ch;
+}
