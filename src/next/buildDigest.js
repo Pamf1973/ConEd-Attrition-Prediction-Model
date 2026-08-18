@@ -19,6 +19,21 @@
  *   sender     — { name, title, email } for the signature and mailto From:
  */
 
+/**
+ * Canonical Critical filter (Ismael-owned, source of truth for M8 CriticalQueue):
+ *   ml_risk >= 0.6 AND norm_delta_23_24 not null AND (outlier OR accelerating trend)
+ * When M8 lands, replace this with an import from Ismael's module rather than
+ * carrying a second definition.
+ */
+export function isCritical(b) {
+  if (!b) return false;
+  if ((b.ml_risk ?? 0) < 0.6) return false;
+  if (b.norm_delta_23_24 == null) return false;
+  const outlier = b.outlier_23_24 === true || b.outlier_22_23 === true;
+  const accelerating = b.decline_trend_label === "accelerating";
+  return outlier || accelerating;
+}
+
 export function computePulseFromBuildings(buildings) {
   const out = { total: buildings.length, high: 0, medium: 0, low: 0, uncertain: 0, critical: 0 };
   for (const b of buildings) {
@@ -27,21 +42,34 @@ export function computePulseFromBuildings(buildings) {
     else if (t === "Medium") out.medium++;
     else if (t === "Low") out.low++;
     else out.uncertain++;
-    if ((b.ml_risk ?? 0) >= 0.9 && t === "High") out.critical++;
+    if (isCritical(b)) out.critical++;
   }
   return out;
 }
 
 export function topOfQueue(buildings, limit = 3) {
   return buildings
-    .filter((b) => b.diagnostic_risk === "High" && (b.ml_risk ?? 0) >= 0.9)
+    .filter(isCritical)
     .sort((a, b) => (b.ml_risk ?? 0) - (a.ml_risk ?? 0))
     .slice(0, limit);
 }
 
-function pctile(ml) {
-  if (ml == null) return null;
-  return Math.round(ml * 100);
+/**
+ * Rank-based percentile: what fraction of the portfolio the building
+ * outranks by ml_risk. Matches the "99th pctile" copy in the Fable spec.
+ */
+function rankPercentile(building, buildings) {
+  const ml = building.ml_risk;
+  if (ml == null || !Array.isArray(buildings) || buildings.length === 0) return null;
+  let below = 0;
+  let counted = 0;
+  for (const b of buildings) {
+    if (b.ml_risk == null) continue;
+    counted++;
+    if (b.ml_risk < ml) below++;
+  }
+  if (counted === 0) return null;
+  return Math.round((100 * below) / counted);
 }
 
 function formatWeekOf(iso) {
@@ -78,11 +106,13 @@ function driverLine(b) {
   if (Number.isFinite(pen) && pen > 0) {
     bits.push(`LL97 2024 penalty $${Math.round(pen).toLocaleString()}/yr`);
   }
-  const dec = Number(b.decline_2024_pct ?? b.yoy_2024_pct);
+  const dec = Number(b.norm_delta_23_24);
   if (Number.isFinite(dec) && dec !== 0) {
     const sign = dec < 0 ? "−" : "+";
-    bits.push(`normalized demand ${sign}${Math.abs(dec).toFixed(0)}% YoY`);
+    bits.push(`weather-normalized demand ${sign}${Math.abs(dec).toFixed(1)}% '23→'24`);
   }
+  if (b.outlier_23_24 === true) bits.push("flagged outlier");
+  else if (b.decline_trend_label === "accelerating") bits.push("accelerating decline");
   if (bits.length === 0) return "See case file for driver detail.";
   return `Driver: ${bits.join("; ")}.`;
 }
@@ -125,8 +155,9 @@ export function buildDigest({
 
   const method = `Screening analysis for outreach prioritization, not a determination of customer intent. ${aucSentence(modelMeta)} Tier from a transparent weather-normalized rule. Public data only: LL84, steam demand, DOB, PLUTO. Full methodology at /methodology.`;
 
-  const html = renderHtml({ subject, runAnchor, finding, top, changedItems, pulse, method, sender });
-  const text = renderText({ subject, runAnchor, finding, top, changedItems, pulse, method, sender });
+  const topWithRank = top.map((b) => ({ ...b, _pctile: rankPercentile(b, buildings) }));
+  const html = renderHtml({ subject, runAnchor, finding, top: topWithRank, changedItems, pulse, method, sender });
+  const text = renderText({ subject, runAnchor, finding, top: topWithRank, changedItems, pulse, method, sender });
 
   return { subject, html, text, pulse, toReview, criticalNewEvents };
 }
@@ -135,8 +166,8 @@ function renderHtml({ subject, runAnchor, finding, top, changedItems, pulse, met
   const kicker = `Steam Attrition Weekly · data through run ${runAnchor}`;
   const items = top.map((b) => {
     const tag = "CRITICAL";
-    const p = pctile(b.ml_risk);
-    const line1 = `<b>${escape(b.address || b.bbl || "unknown")}</b> &nbsp;<span style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#B3261E;font-weight:700;">${tag}</span>${p != null ? ` &nbsp;${p}th pctile, rule tier High` : ""}`;
+    const p = b._pctile;
+    const line1 = `<b>${escape(b.address || b.bbl || "unknown")}</b> &nbsp;<span style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#B3261E;font-weight:700;">${tag}</span>${p != null ? ` &nbsp;${p}th pctile, rule tier ${escape(b.diagnostic_risk || "—")}` : ""}`;
     const line2 = escape(driverLine(b));
     return `<div style="padding:8px 0;border-bottom:1px solid #F0F0EB;"><div style="font-size:13px;">${line1}</div><div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#55585E;margin-top:2px;">${line2}</div></div>`;
   }).join("");
@@ -174,8 +205,8 @@ function renderText({ subject, runAnchor, finding, top, changedItems, pulse, met
     lines.push("  (No buildings meet the Critical definition this week.)");
   } else {
     for (const b of top) {
-      const p = pctile(b.ml_risk);
-      lines.push(`  * ${b.address || b.bbl || "unknown"} [CRITICAL]${p != null ? `  ${p}th pctile, rule tier High` : ""}`);
+      const p = b._pctile;
+      lines.push(`  * ${b.address || b.bbl || "unknown"} [CRITICAL]${p != null ? `  ${p}th pctile, rule tier ${b.diagnostic_risk || "—"}` : ""}`);
       lines.push(`      ${driverLine(b)}`);
     }
   }

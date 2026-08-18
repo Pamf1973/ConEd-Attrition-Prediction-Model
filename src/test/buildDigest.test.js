@@ -7,7 +7,9 @@ const b = (over = {}) => ({
   ml_risk: 0.95,
   diagnostic_risk: "High",
   ll97_penalty_2024: 1190650,
-  decline_2024_pct: -66,
+  norm_delta_23_24: -66,
+  outlier_23_24: true,
+  decline_trend_label: "accelerating",
   ...over,
 });
 
@@ -24,23 +26,35 @@ describe("buildDigest", () => {
     expect(s).toBe("Steam attrition · Week of Jul 6 · 3 new Critical · 15 to review");
   });
 
-  it("top of queue picks High + ml_risk >= 0.9, ranked desc", () => {
-    const buildings = [
-      b({ address: "A", ml_risk: 0.91 }),
-      b({ address: "B", ml_risk: 0.99 }),
-      b({ address: "C", ml_risk: 0.85 }),
-      b({ address: "D", ml_risk: 0.95, diagnostic_risk: "Medium" }),
-    ];
-    const top = topOfQueue(buildings, 3);
-    expect(top.map((x) => x.address)).toEqual(["B", "A"]);
+  it("Critical filter matches Ismael's canonical definition", () => {
+    // baseline b() passes: ml_risk 0.95, delta present, outlier true
+    expect(topOfQueue([b()]).length).toBe(1);
+    // ml_risk below 0.6 → not Critical
+    expect(topOfQueue([b({ ml_risk: 0.5 })]).length).toBe(0);
+    // norm_delta_23_24 null → not Critical
+    expect(topOfQueue([b({ norm_delta_23_24: null })]).length).toBe(0);
+    // outlier false + non-accelerating trend → not Critical
+    expect(topOfQueue([b({ outlier_23_24: false, decline_trend_label: "stable" })]).length).toBe(0);
+    // outlier false but accelerating trend → Critical
+    expect(topOfQueue([b({ outlier_23_24: false, decline_trend_label: "accelerating" })]).length).toBe(1);
   });
 
-  it("pulse counts by tier and derives critical from High + ml_risk >= 0.9", () => {
+  it("topOfQueue ranks by ml_risk desc", () => {
+    const buildings = [
+      b({ address: "A", ml_risk: 0.65 }),
+      b({ address: "B", ml_risk: 0.99 }),
+      b({ address: "C", ml_risk: 0.75 }),
+    ];
+    const top = topOfQueue(buildings, 3);
+    expect(top.map((x) => x.address)).toEqual(["B", "C", "A"]);
+  });
+
+  it("pulse counts by tier and derives critical from Ismael's filter", () => {
     const p = computePulseFromBuildings([
-      b({ ml_risk: 0.95 }),
-      b({ diagnostic_risk: "Medium", ml_risk: 0.4 }),
-      b({ diagnostic_risk: "Low", ml_risk: 0.1 }),
-      b({ diagnostic_risk: null, ml_risk: null }),
+      b(),
+      b({ diagnostic_risk: "Medium", ml_risk: 0.4, outlier_23_24: false }),
+      b({ diagnostic_risk: "Low", ml_risk: 0.1, outlier_23_24: false }),
+      b({ diagnostic_risk: null, ml_risk: null, outlier_23_24: false, norm_delta_23_24: null }),
     ]);
     expect(p).toEqual({ total: 4, high: 1, medium: 1, low: 1, uncertain: 1, critical: 1 });
   });
@@ -61,7 +75,7 @@ describe("buildDigest", () => {
 
   it("HTML and text carry the same critical count", () => {
     const { html, text, pulse } = buildDigest({
-      buildings: [b(), b({ address: "X", ml_risk: 0.92 })],
+      buildings: [b(), b({ address: "X", ml_risk: 0.72 })],
       modelMeta,
     });
     expect(pulse.critical).toBe(2);
