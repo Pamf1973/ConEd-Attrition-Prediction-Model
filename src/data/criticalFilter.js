@@ -9,7 +9,7 @@ export function isCritical(b) {
   return (
     typeof b.ml_risk === "number" && b.ml_risk >= 0.6 &&
     b.norm_delta_23_24 != null &&
-    (b.outlier_23_24 === true || b.outlier_22_23 === true ||
+    (!!b.outlier_23_24 || !!b.outlier_22_23 ||
      b.decline_trend_label === "accelerating")
   );
 }
