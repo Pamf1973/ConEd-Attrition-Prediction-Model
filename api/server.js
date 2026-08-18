@@ -995,6 +995,66 @@ app.post("/api/query", requireAuth, aiLimiter, async (req, res) => {
   }
 });
 
+// ── /api/palette ──────────────────────────────────────────────────────────────
+// Command palette LLM leg. Receives the user's freeform query plus the
+// available static command registry; returns either a chosen command id
+// (LLM interpreted intent as an existing action) or a short answer with
+// suggested next commands. Output is JSON — validated before returning.
+const PALETTE_SYSTEM = `You are a command palette router for a NYC steam attrition analyst dashboard.
+Given the user's freeform query and a list of available commands, decide:
+- If the query maps to a specific command, return {"kind":"action","commandId":"<id>"}.
+- If the query is a question or ambiguous ask, return {"kind":"answer","answer":"<one to two sentences, plain, no markdown>","suggest":["<commandId>",...]}.
+Rules:
+- Reply with a single JSON object, no prose, no code fences.
+- commandId MUST be from the provided list. suggest array MUST contain only ids from the list.
+- Do not invent buildings, numbers, or actions. If the ask needs data you weren't given, say so plainly in the answer.
+- Keep answer under 220 characters.`;
+
+app.post("/api/palette", requireAuth, aiLimiter, async (req, res) => {
+  const { query, commands } = req.body ?? {};
+
+  if (typeof query !== "string" || !query.trim()) {
+    return res.status(400).json({ error: "query is required" });
+  }
+  if (query.length > 300) {
+    return res.status(400).json({ error: "query too long (max 300 chars)" });
+  }
+  if (!Array.isArray(commands) || commands.length === 0 || commands.length > 40) {
+    return res.status(400).json({ error: "commands array required (1..40)" });
+  }
+  if (!ANTHROPIC_KEY && !GROQ_KEY && !OPENROUTER_KEY) {
+    return res.status(503).json({ error: "No LLM API key configured" });
+  }
+
+  const safeCommands = commands
+    .filter((c) => c && typeof c.id === "string" && typeof c.label === "string")
+    .slice(0, 40)
+    .map((c) => ({ id: c.id.slice(0, 64), label: c.label.slice(0, 120) }));
+  const validIds = new Set(safeCommands.map((c) => c.id));
+
+  const user = `Available commands:\n${safeCommands.map((c) => `- ${c.id}: ${c.label}`).join("\n")}\n\nUser query: ${sanitizeQuestion(query)}`;
+
+  try {
+    const raw     = await callLLM(user, PALETTE_SYSTEM, 8000, 320);
+    const cleaned = raw.replace(/```(?:json)?\n?/g, "").replace(/```/g, "").trim();
+    const parsed  = JSON.parse(cleaned);
+
+    if (parsed.kind === "action" && validIds.has(parsed.commandId)) {
+      return res.json({ kind: "action", commandId: parsed.commandId });
+    }
+    if (parsed.kind === "answer" && typeof parsed.answer === "string") {
+      const suggest = Array.isArray(parsed.suggest)
+        ? parsed.suggest.filter((s) => validIds.has(s)).slice(0, 4)
+        : [];
+      return res.json({ kind: "answer", answer: parsed.answer.slice(0, 400), suggest });
+    }
+    return res.status(502).json({ error: "LLM returned unexpected shape" });
+  } catch (err) {
+    console.error("[/api/palette]", err.message);
+    res.status(502).json({ error: "LLM query failed — try again" });
+  }
+});
+
 // ── /api/summarize ────────────────────────────────────────────────────────────
 app.post("/api/summarize", requireAuth, aiLimiter, async (req, res) => {
   const { question, count, sample } = req.body ?? {};

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useBuildings } from "../data/useBuildings.js";
 import { useEvents } from "../data/useEvents.js";
 import { useStatusCounts } from "../data/useStatusCounts.js";
@@ -119,6 +120,14 @@ export default function ThisWeekPage() {
               <span className="tw-anchor-label">Pipeline run</span>
               <span className="tw-anchor-val">{fmtRunDate(runDate)}</span>
             </div>
+            {token && (
+              <>
+                <kbd className="tw-cmdk-hint" title="Command palette">⌘K</kbd>
+                <Link to="/digest" className="tw-compose-btn">
+                  Compose weekly digest
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -174,7 +183,7 @@ export default function ThisWeekPage() {
             )}
             {!bldgLoading && !bldgError && (
               <ErrorBoundary label="CriticalQueue" fallback={<div className="tw-placeholder tw-placeholder--err">Queue failed to render.</div>}>
-                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} />
+                <CriticalQueue buildings={buildings} hasM6={true} statusCounts={statusCounts} events={eventsData} />
               </ErrorBoundary>
             )}
           </section>

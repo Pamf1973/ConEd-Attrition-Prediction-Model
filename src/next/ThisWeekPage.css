@@ -246,3 +246,34 @@
   text-transform: uppercase;
   color: var(--sc-bench-muted);
 }
+
+/* ── Compose digest button (W6) ─────────────────────────────────────────── */
+
+.tw-compose-btn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  background: var(--sc-accent, #ea580c);
+  color: #fff;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background 0.12s ease;
+}
+.tw-compose-btn:hover  { background: color-mix(in srgb, var(--sc-accent, #ea580c) 88%, #000); }
+.tw-compose-btn:focus  { outline: 2px solid var(--sc-accent, #ea580c); outline-offset: 2px; }
+
+.tw-cmdk-hint {
+  align-self: center;
+  font-family: var(--sc-mono);
+  font-size: 11px;
+  color: var(--sc-bench-muted);
+  border: 1px solid var(--sc-bench-line);
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--sc-canvas);
+}

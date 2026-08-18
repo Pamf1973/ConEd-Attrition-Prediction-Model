@@ -193,3 +193,11 @@
 }
 .cq-m6-total    { color: var(--sc-high, #ef4444); font-weight: 600; }
 .cq-m6-toreview { color: var(--sc-bench-text);    font-weight: 600; }
+
+.cq-carry {
+  font-family: var(--sc-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.cq-carry--new     { color: var(--sc-high, #ef4444); font-weight: 600; }
+.cq-carry--carried { color: var(--sc-bench-muted); }

@@ -42,10 +42,25 @@ function formatMoney(n) {
  * Gracefully omits the M6 subtraction arithmetic when not available —
  * shows membership and chips only, and says so plainly.
  */
-export default function CriticalQueue({ buildings, hasM6 = false, statusCounts = null }) {
+export default function CriticalQueue({ buildings, hasM6 = false, statusCounts = null, events = null }) {
   const [activeChip, setActiveChip] = useState("critical");
 
   const pctByKey = useMemo(() => computePercentileMap(buildings), [buildings]);
+
+  // W5: carry-over. Single-run events.json can only distinguish "New this week"
+  // (subject appears as a TIER_UP event) from "Carried" (already Critical before
+  // this diff). Multi-week ages ("Carried · wk N") wait on event history.
+  const newThisWeek = useMemo(() => {
+    if (!events || events.first_run || !Array.isArray(events.events)) return null;
+    const s = new Set();
+    for (const e of events.events) {
+      if (e.kind === "TIER_UP" && typeof e.subject === "string") {
+        s.add(e.subject.trim().toUpperCase());
+      }
+    }
+    return s;
+  }, [events]);
+  const showStatusCol = newThisWeek !== null;
 
   const counts = useMemo(() =>
     Object.fromEntries(CHIPS.map((c) => [c.key, buildings.filter(c.filter).length])),
@@ -114,16 +129,17 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
                 <th>Address</th>
                 <th>Score</th>
                 <th>Trend</th>
+                {showStatusCol && <th>Status</th>}
                 <th className="num">Steam (M kBtu)</th>
                 <th className="num">LL97 '24</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((b) => {
+              {rows.map((b, i) => {
                 const bbl  = normalizeBbl(b.bbl);
                 const cell = toScoreCellProps(b, pctByKey);
                 return (
-                  <tr key={bbl ?? b.address} className={isCritical(b) ? "cq-row--critical" : ""}>
+                  <tr key={`${bbl ?? b.address ?? "row"}-${i}`} className={isCritical(b) ? "cq-row--critical" : ""}>
                     <td className="cq-addr">
                       {bbl
                         ? <a href={`/case-file/${bbl}`} className="cq-addr-link">{b.address}</a>
@@ -137,6 +153,13 @@ export default function CriticalQueue({ buildings, hasM6 = false, statusCounts =
                     <td className="cq-trend" data-trend={b.decline_trend_label ?? ""}>
                       {b.decline_trend_label ?? "—"}
                     </td>
+                    {showStatusCol && (
+                      <td className="cq-carry">
+                        {newThisWeek.has((b.address ?? "").trim().toUpperCase())
+                          ? <span className="cq-carry--new">New this week</span>
+                          : <span className="cq-carry--carried">Carried</span>}
+                      </td>
+                    )}
                     <td className="num">{formatMkBtu(b.steam)}</td>
                     <td className="num">{formatMoney(b.ll97_penalty_2024)}</td>
                   </tr>
