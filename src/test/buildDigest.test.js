@@ -49,14 +49,17 @@ describe("buildDigest", () => {
     expect(top.map((x) => x.address)).toEqual(["B", "C", "A"]);
   });
 
-  it("pulse counts by tier and derives critical from Ismael's filter", () => {
+  it("pulse buckets are mutually exclusive — Critical not double-counted in its tier", () => {
+    // baseline b() is diagnostic_risk="High" AND Critical — must land in critical only
     const p = computePulseFromBuildings([
       b(),
-      b({ diagnostic_risk: "Medium", ml_risk: 0.4, outlier_23_24: false }),
-      b({ diagnostic_risk: "Low", ml_risk: 0.1, outlier_23_24: false }),
-      b({ diagnostic_risk: null, ml_risk: null, outlier_23_24: false, norm_delta_23_24: null }),
+      b({ diagnostic_risk: "Medium", ml_risk: 0.4, outlier_23_24: false, decline_trend_label: "stable" }),
+      b({ diagnostic_risk: "Low",    ml_risk: 0.1, outlier_23_24: false, decline_trend_label: "stable" }),
+      b({ diagnostic_risk: null,     ml_risk: null, outlier_23_24: false, norm_delta_23_24: null, decline_trend_label: null }),
     ]);
-    expect(p).toEqual({ total: 4, high: 1, medium: 1, low: 1, uncertain: 1, critical: 1 });
+    expect(p).toEqual({ total: 4, high: 0, medium: 1, low: 1, uncertain: 1, critical: 1 });
+    // Invariant: bucket sum equals total (matches ThisWeekPage.computePulse)
+    expect(p.critical + p.high + p.medium + p.low + p.uncertain).toBe(p.total);
   });
 
   it("HTML has no external images (D3)", () => {
@@ -105,6 +108,15 @@ describe("buildDigest", () => {
     expect(withAuc.text).toMatch(/AUC 0\.683/);
     const noAuc = buildDigest({ buildings: [b()], modelMeta: { ...modelMeta, cv_auc: null } });
     expect(noAuc.text).toMatch(/AUC pending/);
+  });
+
+  it("finding paragraph restates the canonical Critical filter, not diagnostic_risk", () => {
+    const { text } = buildDigest({ buildings: [b()], modelMeta });
+    expect(text).toMatch(/ml_risk ≥ 0\.6/);
+    expect(text).toMatch(/outlier or accelerating/);
+    // Must NOT claim Critical requires the diagnostic_risk="High" tier
+    expect(text).not.toMatch(/rule tier High/);
+    expect(text).not.toMatch(/top-decile/);
   });
 
   it("escapes address to prevent HTML injection", () => {

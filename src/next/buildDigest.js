@@ -25,17 +25,23 @@ import { isCritical } from "../data/criticalFilter.js";
 // keep working, but the definition lives in the shared filter module.
 export { isCritical };
 
+/**
+ * Mutually exclusive buckets — matches ThisWeekPage.computePulse so the two
+ * surfaces show the same portfolio math. Critical is checked first; a Critical
+ * building is NOT also counted in its diagnostic_risk tier bucket. Invariant:
+ * critical + high + medium + low + uncertain === total.
+ */
 export function computePulseFromBuildings(buildings) {
-  const out = { total: buildings.length, high: 0, medium: 0, low: 0, uncertain: 0, critical: 0 };
+  let critical = 0, high = 0, medium = 0, low = 0, uncertain = 0;
   for (const b of buildings) {
-    const t = b.diagnostic_risk;
-    if (t === "High") out.high++;
-    else if (t === "Medium") out.medium++;
-    else if (t === "Low") out.low++;
-    else out.uncertain++;
-    if (isCritical(b)) out.critical++;
+    const dr = b.diagnostic_risk;
+    if (isCritical(b))                         critical++;
+    else if (dr === "High")                    high++;
+    else if (dr === "Medium")                  medium++;
+    else if (dr === "Low")                     low++;
+    else if (dr === "Uncertain" || dr == null) uncertain++;
   }
-  return out;
+  return { total: buildings.length, high, medium, low, uncertain, critical };
 }
 
 export function topOfQueue(buildings, limit = 3) {
@@ -135,9 +141,10 @@ export function buildDigest({
   const runAnchor = formatRunAnchor(modelMeta?.run_date);
   const subject = buildSubject({ weekOf, criticalNew: criticalNewEvents, toReview });
 
+  const criticalRestatement = "ml_risk ≥ 0.6, weather-normalized '23→'24 delta present, and either flagged outlier or accelerating trend";
   const finding = criticalNewEvents > 0
-    ? `${toReview} buildings need review this week. ${pulse.critical} meet the Critical definition (rule tier High, top-decile rank, both holding); ${contactedCount} are in active outreach and ${dismissedCount} were dismissed with documented reasons. ${criticalNewEvents} of the ${pulse.critical} are new since last Monday.`
-    : `${toReview} buildings need review this week. ${pulse.critical} meet the Critical definition (rule tier High, top-decile rank, both holding); ${contactedCount} are in active outreach and ${dismissedCount} were dismissed with documented reasons.`;
+    ? `${toReview} buildings need review this week. ${pulse.critical} meet the Critical definition (${criticalRestatement}); ${contactedCount} are in active outreach and ${dismissedCount} were dismissed with documented reasons. ${criticalNewEvents} of the ${pulse.critical} are new since last Monday.`
+    : `${toReview} buildings need review this week. ${pulse.critical} meet the Critical definition (${criticalRestatement}); ${contactedCount} are in active outreach and ${dismissedCount} were dismissed with documented reasons.`;
 
   const quietWeek = !Array.isArray(events) || events.length === 0;
   const changedItems = quietWeek
@@ -158,7 +165,7 @@ function renderHtml({ subject, runAnchor, finding, top, changedItems, pulse, met
   const items = top.map((b) => {
     const tag = "CRITICAL";
     const p = b._pctile;
-    const line1 = `<b>${escape(b.address || b.bbl || "unknown")}</b> &nbsp;<span style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#B3261E;font-weight:700;">${tag}</span>${p != null ? ` &nbsp;${p}th pctile, rule tier ${escape(b.diagnostic_risk || "—")}` : ""}`;
+    const line1 = `<b>${escape(b.address || b.bbl || "unknown")}</b> &nbsp;<span style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#B3261E;font-weight:700;">${tag}</span>${p != null ? ` &nbsp;${p}th pctile ml_risk` : ""}`;
     const line2 = escape(driverLine(b));
     return `<div style="padding:8px 0;border-bottom:1px solid #F0F0EB;"><div style="font-size:13px;">${line1}</div><div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#55585E;margin-top:2px;">${line2}</div></div>`;
   }).join("");
@@ -197,7 +204,7 @@ function renderText({ subject, runAnchor, finding, top, changedItems, pulse, met
   } else {
     for (const b of top) {
       const p = b._pctile;
-      lines.push(`  * ${b.address || b.bbl || "unknown"} [CRITICAL]${p != null ? `  ${p}th pctile, rule tier ${b.diagnostic_risk || "—"}` : ""}`);
+      lines.push(`  * ${b.address || b.bbl || "unknown"} [CRITICAL]${p != null ? `  ${p}th pctile ml_risk` : ""}`);
       lines.push(`      ${driverLine(b)}`);
     }
   }
